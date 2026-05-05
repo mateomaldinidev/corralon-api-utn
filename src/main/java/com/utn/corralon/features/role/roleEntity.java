@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -17,6 +18,9 @@ public class roleEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "externalId", nullable = false, unique = true, updatable = false)
+    private UUID externalId = UUID.randomUUID();
 
     @Column(name = "name", nullable = false)
     private String name;
