@@ -1,6 +1,6 @@
 package com.utn.corralon.features.suppliers;
 
-import com.utn.corralon.features.product.productEntity;
+import com.utn.corralon.features.products.productEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

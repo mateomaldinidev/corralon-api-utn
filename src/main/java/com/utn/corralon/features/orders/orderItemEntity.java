@@ -1,6 +1,6 @@
 package com.utn.corralon.features.orders;
 
-import com.utn.corralon.features.productVariant.productVariantEntity;
+import com.utn.corralon.features.products.productVariantEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -34,9 +34,9 @@ public class orderItemEntity {
     @Column(name="quantity",nullable = false)
     private Integer quantity;
 
-    @Column(name="unit_price",nullable = false)
+    @Column(name="unit_price",nullable = false,precision = 19, scale = 2)
     private BigDecimal unit_price;
 
-    @Column(name="subtotal",nullable = false)
+    @Column(name="subtotal",nullable = false,precision = 19, scale = 2)
     private BigDecimal subtotal; // SE LO SUMAMOS AUNQUE NO ESTE EN EL DER PORQUE ES IMPORTANTE YA QUE HAY QUE TENER UN HISTORIAL DE PRECIOS
 }

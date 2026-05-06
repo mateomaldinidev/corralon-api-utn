@@ -1,4 +1,4 @@
-package com.utn.corralon.features.user;
+package com.utn.corralon.features.users;
 
 import com.utn.corralon.features.addresses.addressEntity;
 import com.utn.corralon.features.role.roleEntity;
@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
 
-import java.security.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,13 +39,12 @@ public class userEntity {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", nullable = false)
-    @Column(name = "role", nullable = false)
     private roleEntity role;
 
     @Column(name = "createdAt", nullable = false)
-    private Timestamp createdAt;
+    private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "user")
     private List<addressEntity> addresses;

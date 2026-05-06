@@ -1,10 +1,11 @@
 package com.utn.corralon.features.orders;
 
 import com.utn.corralon.features.addresses.addressEntity;
-import com.utn.corralon.features.user.userEntity;
+import com.utn.corralon.features.users.userEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -34,7 +35,7 @@ public class orderEntity {
     private addressEntity address;
 
     @Column(name="total",nullable = false, precision = 19, scale = 2)
-    private Double total;
+    private BigDecimal total;
 
     @Column(name="created_at",nullable = false)
     private LocalDateTime created_at;
