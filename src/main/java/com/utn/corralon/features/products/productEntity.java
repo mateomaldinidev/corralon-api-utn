@@ -1,5 +1,6 @@
 package com.utn.corralon.features.products;
 
+import com.utn.corralon.features.productVariant.productVariantEntity;
 import com.utn.corralon.features.suppliers.supplierEntity;
 import com.utn.corralon.features.categories.categorieEntity;
 import com.utn.corralon.features.brands.brandEntity;
