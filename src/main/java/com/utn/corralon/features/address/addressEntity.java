@@ -1,6 +1,6 @@
 package com.utn.corralon.features.address;
 
-import com.utn.corralon.features.user.userEntity;
+import com.utn.corralon.features.users.userEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

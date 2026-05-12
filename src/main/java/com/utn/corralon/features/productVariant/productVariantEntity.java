@@ -23,8 +23,8 @@ public class productVariantEntity {
     @Column(name = "externalId", nullable = false, unique = true, updatable = false)
     private UUID externalId = UUID.randomUUID();
 
-    @Column(name = "attribute", nullable = false)
-    private String attribute;
+    @Column(name = "atrivute", nullable = false)
+    private String atrivute;
 
     @Column(name = "price", nullable = false)
     private BigDecimal price;

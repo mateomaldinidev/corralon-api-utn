@@ -1,7 +1,7 @@
 package com.utn.corralon.features.brands;
 
 import jakarta.persistence.*;
-import com.utn.corralon.features.product.productEntity;
+import com.utn.corralon.features.products.productEntity;
 import lombok.*;
 
 import java.util.List;

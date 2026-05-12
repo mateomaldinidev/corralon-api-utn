@@ -1,7 +1,6 @@
 package com.utn.corralon.features.productVariant.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok. *;
 import java.math.BigDecimal;
 
 @Getter

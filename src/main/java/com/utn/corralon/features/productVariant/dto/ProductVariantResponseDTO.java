@@ -11,5 +11,4 @@ public record ProductVariantResponseDTO(
     Boolean active,
     BigDecimal wholesalePrice,
     BigDecimal wholeMinStock
-
 ) { }
