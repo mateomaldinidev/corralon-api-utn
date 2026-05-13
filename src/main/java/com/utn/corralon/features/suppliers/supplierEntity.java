@@ -1,6 +1,6 @@
 package com.utn.corralon.features.suppliers;
 
-import com.utn.corralon.features.products.productEntity;
+import com.utn.corralon.features.product.ProductEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,5 +33,5 @@ public class supplierEntity {
     private boolean active;
 
     @OneToMany(mappedBy = "supplier")
-    private List<productEntity> products;
+    private List<ProductEntity> products;
 }

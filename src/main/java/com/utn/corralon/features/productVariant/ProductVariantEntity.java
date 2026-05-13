@@ -1,6 +1,6 @@
 package com.utn.corralon.features.productVariant;
 
-import com.utn.corralon.features.products.productEntity;
+import com.utn.corralon.features.product.ProductEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,9 +24,9 @@ public class productVariantEntity {
     private UUID externalId = UUID.randomUUID();
 
     @Column(name = "attribute", nullable = false)
-    private String atrivute;
+    private String attribute;
 
-    @Column(name = "price", nullable = false,precision = 19, scale = 2)
+    @Column(name = "price", nullable = false)
     private BigDecimal price;
 
     @Column(name = "stock", nullable = false)
@@ -35,14 +35,14 @@ public class productVariantEntity {
     @Column(name = "active", nullable = false)
     private Boolean active;
 
-    @Column(name = "whole_sale_price", nullable = false,precision = 19, scale = 2)
+    @Column(name = "whole_sale_price", nullable = false)
     private BigDecimal wholesalePrice;
 
-    @Column(name = "whole_min_stock", nullable = false,precision = 19, scale = 2)
+    @Column(name = "whole_min_stock", nullable = false)
     private BigDecimal wholeMinStock;
 
     @ManyToOne()
     @JoinColumn(name = "product_id", nullable = false)
-    private productEntity product;
+    private ProductEntity product;
 
 }

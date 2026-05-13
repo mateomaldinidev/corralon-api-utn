@@ -1,6 +1,6 @@
 package com.utn.corralon.features.products;
 
-import com.utn.corralon.features.productVariant.productVariantEntity;
+import com.utn.corralon.features.productVariant.ProductVariantEntity;
 import com.utn.corralon.features.suppliers.supplierEntity;
 import com.utn.corralon.features.categories.categorieEntity;
 import com.utn.corralon.features.brands.brandEntity;
@@ -17,7 +17,7 @@ import java.util.UUID;
 @Builder
 @Entity
 @Table(name = "products")
-public class productEntity {
+public class ProductEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
