@@ -1,6 +1,6 @@
 package com.utn.corralon.features.productVariant;
 
-import com.utn.corralon.features.product.productEntity;
+import com.utn.corralon.features.product.ProductEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -43,6 +43,6 @@ public class productVariantEntity {
 
     @ManyToOne()
     @JoinColumn(name = "product_id", nullable = false)
-    private productEntity product;
+    private ProductEntity product;
 
 }
