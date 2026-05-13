@@ -1,6 +1,6 @@
 package com.utn.corralon.features.offers;
 
-import com.utn.corralon.features.productVariant.productVariantEntity;
+import com.utn.corralon.features.productVariant.ProductVariantEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,7 +24,7 @@ public class offerProductEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_variant_id", nullable = false)
-    private productVariantEntity productVariant;
+    private ProductVariantEntity productVariant;
 
     @Column(name = "discounted_price",nullable = false, precision = 19, scale = 2)
     private BigDecimal discountedPrice;//agregamos esto porque el precio original esta en productVatiant y el precio con descuento es distinto por oferta

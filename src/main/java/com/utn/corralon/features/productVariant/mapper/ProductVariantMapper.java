@@ -1,14 +1,13 @@
 package com.utn.corralon.features.productVariant.mapper;
 
-import com.utn.corralon.features.product.ProductEntity;
+import com.utn.corralon.features.product.productEntity;
 import com.utn.corralon.features.productVariant.dto.ProductVariantRequestDTO;
 import com.utn.corralon.features.productVariant.dto.ProductVariantResponseDTO;
-import com.utn.corralon.features.productVariant.productVariantEntity;
-import jakarta.validation.constraints.NotNull;
+import com.utn.corralon.features.productVariant.ProductVariantEntity;
 
 public class ProductVariantMapper {
 
-    public ProductVariantResponseDTO toProductVariantResponse(productVariantEntity variant) {
+    public ProductVariantResponseDTO toProductVariantResponse(ProductVariantEntity variant) {
 
         return ProductVariantResponseDTO.builder()
                 .externalId(variant.getExternalId())
@@ -25,12 +24,12 @@ public class ProductVariantMapper {
                 .build();
     }
 
-    public productVariantEntity toEntity(
+    public ProductVariantEntity toEntity(
             ProductVariantRequestDTO dto,
-            ProductEntity product
+            productEntity product
     ) {
 
-        return productVariantEntity.builder()
+        return ProductVariantEntity.builder()
                 .attribute(dto.getAttribute())
                 .price(dto.getPrice())
                 .stock(dto.getStock())
@@ -42,7 +41,7 @@ public class ProductVariantMapper {
     }
 
     public void updateEntity(
-            productVariantEntity variant,
+            ProductVariantEntity variant,
             ProductVariantRequestDTO dto,
             ProductEntity product
     ) {

@@ -33,7 +33,7 @@ public class ProductEntity {
     private boolean active;
 
     @OneToMany(mappedBy = "product")
-    private List<productVariantEntity> productVariants;
+    private List<ProductVariantEntity> productVariants;
 
     @ManyToOne()
     @JoinColumn(name = "supplier_id", nullable = false)
