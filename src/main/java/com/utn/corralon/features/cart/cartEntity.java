@@ -1,7 +1,8 @@
 package com.utn.corralon.features.cart;
 
 
-import com.utn.corralon.features.users.userEntity;
+import com.utn.corralon.features.cart_item.cartItemEntity;
+import com.utn.corralon.features.user.userEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

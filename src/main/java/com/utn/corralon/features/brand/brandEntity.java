@@ -1,7 +1,7 @@
-package com.utn.corralon.features.role;
+package com.utn.corralon.features.brand;
 
-import com.utn.corralon.features.user.userEntity;
 import jakarta.persistence.*;
+import com.utn.corralon.features.product.productEntity;
 import lombok.*;
 
 import java.util.List;
@@ -13,8 +13,9 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "roles")
-public class roleEntity {
+@Table(name = "brands")
+public class brandEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,7 +26,9 @@ public class roleEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "role")
-    private List<userEntity> users;
+    @Column(name = "active", nullable = false)
+    private Boolean active;
 
+    @OneToMany(mappedBy = "brand")
+    private List<productEntity> products;
 }

@@ -1,6 +1,6 @@
 package com.utn.corralon.features.notifications;
 
-import com.utn.corralon.features.users.userEntity;
+import com.utn.corralon.features.user.userEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
