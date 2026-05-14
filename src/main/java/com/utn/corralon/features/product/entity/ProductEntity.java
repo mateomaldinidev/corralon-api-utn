@@ -1,9 +1,9 @@
-package com.utn.corralon.features.product;
+package com.utn.corralon.features.product.entity;
 
 import com.utn.corralon.features.productVariant.productVariantEntity;
-import com.utn.corralon.features.supplier.supplierEntity;
-import com.utn.corralon.features.categories.categoriesEntity;
-import com.utn.corralon.features.brand.brandEntity;
+import com.utn.corralon.features.supplier.SupplierEntity;
+import com.utn.corralon.features.categoriy.CategoryEntity;
+import com.utn.corralon.features.brand.BrandEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,7 +17,7 @@ import java.util.UUID;
 @Builder
 @Entity
 @Table(name = "products")
-public class productEntity {
+public class ProductEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,15 +37,15 @@ public class productEntity {
 
     @ManyToOne()
     @JoinColumn(name = "supplier_id", nullable = false)
-    private supplierEntity supplier;
+    private SupplierEntity supplier;
 
     @ManyToOne()
-    @JoinColumn(name = "categorie_id", nullable = false)
-    private categoriesEntity categorie;
+    @JoinColumn(name = "category_id", nullable = false)
+    private CategoryEntity category;
 
     @ManyToOne()
     @JoinColumn(name = "brand_id", nullable = false)
-    private brandEntity brand;
+    private BrandEntity brand;
 
     public boolean getActive() {
         return active;

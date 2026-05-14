@@ -1,4 +1,4 @@
-package com.utn.corralon.features.categories.dto;
+package com.utn.corralon.features.categoriy.dto;
 import jakarta.validation.constraints.NotBlank;
 import lombok. *;
 
@@ -7,7 +7,7 @@ import lombok. *;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class categoriesRequestDTO {
+public class CategoryRequestDTO {
     @NotBlank
     private String name;
 

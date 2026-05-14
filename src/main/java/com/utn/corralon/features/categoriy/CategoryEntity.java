@@ -1,7 +1,7 @@
-package com.utn.corralon.features.brand;
+package com.utn.corralon.features.categoriy;
 
+import com.utn.corralon.features.product.entity.ProductEntity;
 import jakarta.persistence.*;
-import com.utn.corralon.features.product.ProductEntity;
 import lombok.*;
 
 import java.util.List;
@@ -13,8 +13,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "brands")
-public class brandEntity {
+@Table(name = "categories")
+public class CategoryEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,10 +29,10 @@ public class brandEntity {
     @Column(name = "active", nullable = false)
     private Boolean active;
 
-    @OneToMany(mappedBy = "brand")
+    @OneToMany(mappedBy = "category")
     private List<ProductEntity> products;
 
-    public boolean isActive(){
+    public Boolean isActive() {
         return true;
     }
 }

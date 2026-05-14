@@ -1,8 +1,8 @@
-package com.utn.corralon.features.categories.dto;
+package com.utn.corralon.features.categoriy.dto;
 
 import java.util.UUID;
 
-public record categoriesResponseDTO(
+public record CategoryResponseDTO(
         UUID externalId,
         String name,
         boolean active
