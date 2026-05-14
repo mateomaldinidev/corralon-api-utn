@@ -1,4 +1,4 @@
-package com.utn.corralon.features.products;
+package com.utn.corralon.features.product;
 
 import com.utn.corralon.features.productVariant.ProductVariantEntity;
 import com.utn.corralon.features.suppliers.supplierEntity;
