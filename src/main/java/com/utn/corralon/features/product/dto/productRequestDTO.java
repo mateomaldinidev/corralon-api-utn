@@ -1,30 +1,21 @@
 package com.utn.corralon.features.product.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.util.UUID;
-
-@Setter
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-
 public class productRequestDTO {
     @NotBlank
     private String description;
 
-    @NotNull
-    private Boolean active;
+    @NotBlank
+    private boolean active;
 
-    @NotNull
-    private UUID supplierExternalId;
+    public boolean getActive() {
+        return true;    }//VER ES PARA SACAR EL ERROR
 
-    @NotNull
-    private UUID categorieExternalId;
-
-    @NotNull
-    private UUID brandExternalId;
 }

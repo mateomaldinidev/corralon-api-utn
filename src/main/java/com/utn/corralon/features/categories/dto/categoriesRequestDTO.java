@@ -12,5 +12,5 @@ public class categoriesRequestDTO {
     private String name;
 
     @NotBlank
-    private Boolean active;
+    private boolean active;
 }
