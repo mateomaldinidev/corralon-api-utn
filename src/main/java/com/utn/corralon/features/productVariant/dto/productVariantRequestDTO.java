@@ -1,32 +1,43 @@
 package com.utn.corralon.features.productVariant.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+
 public class productVariantRequestDTO {
+
     @NotBlank
     private String attribute;
 
-    @NotBlank
+    @NotNull
+    @PositiveOrZero
     private BigDecimal price;
 
-    @NotBlank
+    @NotNull
+    @PositiveOrZero
     private Integer stock;
 
-    @NotBlank
+    @NotNull
     private Boolean active;
 
-    @NotBlank
+    @NotNull
+    @PositiveOrZero
     private BigDecimal wholesalePrice;
 
-    @NotBlank
+    @NotNull
+    @PositiveOrZero
     private BigDecimal wholeMinStock;
 
+    @NotNull
+    private UUID productExternalId;
 }

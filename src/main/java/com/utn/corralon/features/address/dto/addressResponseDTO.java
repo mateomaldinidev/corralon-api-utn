@@ -1,6 +1,5 @@
 package com.utn.corralon.features.address.dto;
 
-
 import java.util.UUID;
 
 public record addressResponseDTO(
@@ -12,5 +11,8 @@ public record addressResponseDTO(
         String city,
         String zipCode,
         Long userId
-) {}
+) {
+
+}
+
 

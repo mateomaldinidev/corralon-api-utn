@@ -1,17 +1,30 @@
 package com.utn.corralon.features.product.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-@Getter
+import java.util.UUID;
+
 @Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+
 public class productRequestDTO {
     @NotBlank
     private String description;
 
-    @NotBlank
-    private boolean active;
+    @NotNull
+    private Boolean active;
+
+    @NotNull
+    private UUID supplierExternalId;
+
+    @NotNull
+    private UUID categorieExternalId;
+
+    @NotNull
+    private UUID brandExternalId;
 }

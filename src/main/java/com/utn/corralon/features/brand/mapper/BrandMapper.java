@@ -1,16 +1,24 @@
 package com.utn.corralon.features.brand.mapper;
 
 import com.utn.corralon.features.brand.brandEntity;
-import com.utn.corralon.features.brand.dto.BrandResponseDTO;
-import jakarta.validation.constraints.NotNull;
+import com.utn.corralon.features.brand.dto.brandRequestDTO;
+import com.utn.corralon.features.brand.dto.brandResponseDTO;
 
-public class BrandMapper {
+public class brandMapper {
 
-    public static BrandResponseDTO toDTO(@NotNull brandEntity brand) {
-        return new BrandResponseDTO(
-                brand.getExternalId(),
-                brand.getName(),
-                brand.getActive()
-        );
+    public static brandResponseDTO toBrandResponse(brandEntity brand) {
+        return brandResponseDTO.builder()
+                .externalId(brand.getExternalId())
+                .name(brand.getName())
+                .active(brand.isActive())
+                .build();
+
+    }
+
+    public static brandEntity toEntity(brandRequestDTO brandRequest){
+        return  brandEntity.builder()
+                .name(brandRequest.getName())
+                .active(brandRequest.getActive())
+                .build();
     }
 }
