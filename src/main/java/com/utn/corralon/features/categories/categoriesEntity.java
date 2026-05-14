@@ -1,6 +1,6 @@
 package com.utn.corralon.features.categories;
 
-import com.utn.corralon.features.product.ProductEntity;
+import com.utn.corralon.features.product.productEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,7 +30,7 @@ public class categoriesEntity {
     private Boolean active;
 
     @OneToMany(mappedBy = "categorie")
-    private List<ProductEntity> products;
+    private List<productEntity> products;
 
     public Boolean isActive() {
         return true;

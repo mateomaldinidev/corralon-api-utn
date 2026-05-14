@@ -9,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 
-public class BrandRequestDTO {
+public class brandRequestDTO {
     @NotBlank
     private String name;
 

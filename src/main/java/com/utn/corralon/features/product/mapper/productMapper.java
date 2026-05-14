@@ -1,40 +1,35 @@
 package com.utn.corralon.features.product.mapper;
 
-import com.utn.corralon.features.brands.brandEntity;
-import com.utn.corralon.features.categories.categorieEntity;
-import com.utn.corralon.features.product.ProductEntity;
-import com.utn.corralon.features.product.dto.ProductRequestDTO;
-import com.utn.corralon.features.product.dto.ProductResponseDTO;
-import com.utn.corralon.features.suppliers.supplierEntity;
+import com.utn.corralon.features.brand.brandEntity;
+import com.utn.corralon.features.categories.categoriesEntity;
+import com.utn.corralon.features.categories.categoriesEntity;
+import com.utn.corralon.features.product.productEntity;
+import com.utn.corralon.features.product.dto.productRequestDTO;
+import com.utn.corralon.features.product.dto.productResponseDTO;
+import com.utn.corralon.features.supplier.supplierEntity;
 
-public class ProductMapper {
-    public ProductResponseDTO toResponse(ProductEntity product) {
-
-        return ProductResponseDTO.builder()
-                .externalId(product.getExternalId())
-                .description(product.getDescription())
-                .active(product.isActive())
-
-                .supplierExternalId(product.getSupplier().getExternalId())
-                .supplierName(product.getSupplier().getName())
-
-                .categorieExternalId(product.getCategorie().getExternalId())
-                .categorieName(product.getCategorie().getName())
-
-                .brandExternalId(product.getBrand().getExternalId())
-                .brandName(product.getBrand().getName())
-
-                .build();
+public class productMapper {
+    public productResponseDTO toResponse(productEntity product) {
+        return new productResponseDTO(
+                product.getExternalId(),
+                product.getDescription(),
+                product.getActive(),
+                product.getSupplier().getExternalId(),
+                product.getSupplier().getName(),
+                product.getCategorie().getExternalId(),
+                product.getCategorie().getName(),
+                product.getBrand().getExternalId(),
+                product.getBrand().getName()
+        );
     }
 
-    public ProductEntity toEntity(
-            ProductRequestDTO dto,
+    public productEntity toEntity(
+            productRequestDTO dto,
             supplierEntity supplier,
-            categorieEntity categorie,
+            categoriesEntity categorie,
             brandEntity brand
     ) {
-
-        return ProductEntity.builder()
+        return productEntity.builder()
                 .description(dto.getDescription())
                 .active(dto.getActive())
                 .supplier(supplier)
@@ -44,13 +39,12 @@ public class ProductMapper {
     }
 
     public void updateEntity(
-            ProductEntity product,
-            ProductRequestDTO dto,
+            productEntity product,
+            productRequestDTO dto,
             supplierEntity supplier,
-            categorieEntity categorie,
+            categoriesEntity categorie,
             brandEntity brand
     ) {
-
         product.setDescription(dto.getDescription());
         product.setActive(dto.getActive());
         product.setSupplier(supplier);
@@ -58,4 +52,3 @@ public class ProductMapper {
         product.setBrand(brand);
     }
 }
-

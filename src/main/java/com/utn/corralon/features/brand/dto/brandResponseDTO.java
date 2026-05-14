@@ -11,7 +11,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 
-public class BrandResponseDTO{
+public class brandResponseDTO {
     @NotNull
     private UUID externalId;
 
