@@ -1,6 +1,6 @@
 package com.utn.corralon.features.users;
 
-import com.utn.corralon.features.address.addressEntity;
+import com.utn.corralon.features.addresses.addressEntity;
 import com.utn.corralon.features.role.roleEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;

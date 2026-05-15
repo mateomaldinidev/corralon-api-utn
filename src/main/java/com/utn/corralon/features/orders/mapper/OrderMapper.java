@@ -1,7 +1,7 @@
 package com.utn.corralon.features.orders.mapper;
 
 
-import com.utn.corralon.features.address.addressEntity;
+import com.utn.corralon.features.addresses.addressEntity;
 import com.utn.corralon.features.orders.dto.OrderRequestDTO;
 import com.utn.corralon.features.orders.dto.OrderResponseDTO;
 import com.utn.corralon.features.orders.orderEntity;

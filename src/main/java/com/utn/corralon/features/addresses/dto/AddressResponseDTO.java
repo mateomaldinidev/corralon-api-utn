@@ -1,15 +1,20 @@
-package com.utn.corralon.features.address.dto;
+package com.utn.corralon.features.addresses.dto;
 
+import lombok. *;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
 
+import java.util.UUID;
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public class AddressRequestDTO {
+
+public class AddressResponseDTO {
+    @NotNull
+    UUID externalId;
+
     @NotBlank
     private String street;
 

@@ -1,4 +1,4 @@
-package com.utn.corralon.features.address;
+package com.utn.corralon.features.addresses;
 
 import com.utn.corralon.features.users.userEntity;
 import jakarta.persistence.*;
