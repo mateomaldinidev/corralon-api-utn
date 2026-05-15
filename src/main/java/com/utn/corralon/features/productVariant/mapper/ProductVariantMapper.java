@@ -1,17 +1,17 @@
 package com.utn.corralon.features.productVariant.mapper;
 
 import com.utn.corralon.features.product.entity.ProductEntity;
+import com.utn.corralon.features.productVariant.dto.ProductVariantRequestDTO;
 import com.utn.corralon.features.productVariant.dto.ProductVariantResponseDTO;
 import com.utn.corralon.features.productVariant.entity.ProductVariantEntity;
-import jakarta.validation.constraints.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 @Component
-public class productVariantMapper {
+public class ProductVariantMapper {
     private final ModelMapper modelMapper;
 
-    public productVariantMapper(ModelMapper modelMapper) {
+    public ProductVariantMapper(ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
     }
 
@@ -25,7 +25,7 @@ public class productVariantMapper {
         return dto;
     }
 
-    public ProductVariantEntity toEntity(ProductVariantResponseDTO dto,
+    public ProductVariantEntity toEntity(ProductVariantRequestDTO dto,
                                          ProductEntity product) {
         ProductVariantEntity variant =
                 modelMapper.map(
@@ -37,7 +37,7 @@ public class productVariantMapper {
     }
 
     public void updateEntity(ProductVariantEntity variant,
-                        ProductVariantResponseDTO dto,
+                        ProductVariantRequestDTO dto,
                         ProductEntity product) {
         modelMapper.map(dto, variant);
         variant.setProduct(product);
