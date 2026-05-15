@@ -40,7 +40,7 @@ public class NotificationEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
-    private RotificationType type;
+    private NotificationType type;
 
 
 

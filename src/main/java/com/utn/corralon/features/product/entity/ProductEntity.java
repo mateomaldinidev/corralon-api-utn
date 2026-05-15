@@ -2,7 +2,7 @@ package com.utn.corralon.features.product.entity;
 
 import com.utn.corralon.features.productVariant.entity.ProductVariantEntity;
 import com.utn.corralon.features.supplier.entity.SupplierEntity;
-import com.utn.corralon.features.categoriy.entity.CategoryEntity;
+import com.utn.corralon.features.category.entity.CategoryEntity;
 import com.utn.corralon.features.brand.entity.BrandEntity;
 import jakarta.persistence.*;
 import lombok.*;

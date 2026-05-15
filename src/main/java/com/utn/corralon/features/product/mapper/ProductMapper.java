@@ -1,7 +1,7 @@
 package com.utn.corralon.features.product.mapper;
 
 import com.utn.corralon.features.brand.entity.BrandEntity;
-import com.utn.corralon.features.categoriy.entity.CategoryEntity;
+import com.utn.corralon.features.category.entity.CategoryEntity;
 import com.utn.corralon.features.product.dto.ProductRequestDTO;
 import com.utn.corralon.features.product.dto.ProductResponseDTO;
 import com.utn.corralon.features.product.entity.ProductEntity;

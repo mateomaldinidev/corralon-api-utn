@@ -1,7 +1,7 @@
 package com.utn.corralon.features.cart.entity;
 
 
-import com.utn.corralon.features.cart_item.cartItemEntity;
+import com.utn.corralon.features.cart_item.entity.CartItemEntity;
 import com.utn.corralon.features.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -35,7 +35,7 @@ public class CartEntity {
     private LocalDateTime lastUpdated;
 
     @OneToMany(mappedBy = "cart",cascade = CascadeType.ALL,orphanRemoval = true)
-    private List<cartItemEntity> cartItems;
+    private List<CartItemEntity> cartItems;
 
 
 }
