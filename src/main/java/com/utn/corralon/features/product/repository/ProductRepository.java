@@ -1,4 +1,10 @@
 package com.utn.corralon.features.product.repository;
 
-public class ProductRepository {
+import com.utn.corralon.features.product.entity.ProductEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+
+@Repository
+public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
 }

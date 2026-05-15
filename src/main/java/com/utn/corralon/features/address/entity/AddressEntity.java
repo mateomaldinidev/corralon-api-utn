@@ -1,6 +1,6 @@
-package com.utn.corralon.features.address;
+package com.utn.corralon.features.address.entity;
 
-import com.utn.corralon.features.user.userEntity;
+import com.utn.corralon.features.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,7 +13,7 @@ import java.util.UUID;
 @Builder
 @Entity
 @Table(name = "addresses")
-public class addressEntity {
+public class AddressEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -37,5 +37,5 @@ public class addressEntity {
 
     @ManyToOne()
     @JoinColumn(name = "user_id", nullable = false)
-    private userEntity user;
+    private UserEntity user;
 }

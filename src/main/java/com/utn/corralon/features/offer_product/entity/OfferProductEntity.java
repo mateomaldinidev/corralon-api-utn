@@ -1,6 +1,6 @@
-package com.utn.corralon.features.offer_product;
+package com.utn.corralon.features.offer_product.entity;
 
-import com.utn.corralon.features.offer.offerEntity;
+import com.utn.corralon.features.offer.entity.OfferEntity;
 import com.utn.corralon.features.productVariant.entity.ProductVariantEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,14 +14,14 @@ import java.math.BigDecimal;
 @Builder
 @Entity
 @Table(name = "offer_products")
-public class offerProductEntity {
+public class OfferProductEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "offer_id", nullable = false)
-    private offerEntity offer;
+    private OfferEntity offer;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_variant_id", nullable = false)

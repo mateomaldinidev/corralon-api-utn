@@ -1,6 +1,6 @@
-package com.utn.corralon.features.offer;
+package com.utn.corralon.features.offer.entity;
 
-import com.utn.corralon.features.offer_product.offerProductEntity;
+import com.utn.corralon.features.offer_product.entity.OfferProductEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,7 +16,7 @@ import java.util.UUID;
 @Builder
 @Entity
 @Table(name="offers")
-public class offerEntity {
+public class OfferEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -42,7 +42,7 @@ public class offerEntity {
     private Boolean active;
 
     @OneToMany(mappedBy = "offer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<offerProductEntity> offerProducts;
+    private List<OfferProductEntity> offerProducts;
 
 
 }

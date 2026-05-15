@@ -1,8 +1,8 @@
-package com.utn.corralon.features.cart;
+package com.utn.corralon.features.cart.entity;
 
 
 import com.utn.corralon.features.cart_item.cartItemEntity;
-import com.utn.corralon.features.user.userEntity;
+import com.utn.corralon.features.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,7 +19,7 @@ import java.util.UUID;
 @Setter
 @Entity
 @Table(name="carts")
-public class cartEntity {
+public class CartEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,7 +29,7 @@ public class cartEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id",nullable = false)
-    private userEntity user;
+    private UserEntity user;
 
     @Column(name="last_updated",nullable = false)
     private LocalDateTime lastUpdated;

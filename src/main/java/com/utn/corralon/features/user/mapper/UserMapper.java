@@ -1,10 +1,10 @@
 package com.utn.corralon.features.user.mapper;
 
 import com.utn.corralon.features.user.dto.userResponseDTO;
-import com.utn.corralon.features.user.userEntity;
+import com.utn.corralon.features.user.entity.UserEntity;
 
-public class userMapper {
-    public static userResponseDTO toDTO(userEntity user){
+public class UserMapper {
+    public static userResponseDTO toDTO(UserEntity user){
         return new userResponseDTO(
                 user.getExternalId(),
                 user.getEmail(),

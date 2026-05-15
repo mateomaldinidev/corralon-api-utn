@@ -1,5 +1,6 @@
-package com.utn.corralon.features.order;
+package com.utn.corralon.features.orderItem.entity;
 
+import com.utn.corralon.features.order.entity.OrderEntity;
 import com.utn.corralon.features.productVariant.entity.ProductVariantEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -14,7 +15,7 @@ import java.util.UUID;
 @Builder
 @Entity
 @Table(name="oder_items")
-public class orderItemEntity {
+public class OrderItemEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +26,7 @@ public class orderItemEntity {
 
     @ManyToOne(fetch= FetchType.LAZY)
     @JoinColumn(name="order_id",nullable = false)
-    private orderEntity order;
+    private OrderEntity order;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="product_variant_id",nullable = false)

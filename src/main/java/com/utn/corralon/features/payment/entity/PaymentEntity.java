@@ -1,7 +1,7 @@
-package com.utn.corralon.features.payment;
+package com.utn.corralon.features.payment.entity;
 
 
-import com.utn.corralon.features.order.orderEntity;
+import com.utn.corralon.features.order.entity.OrderEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,7 +16,7 @@ import java.util.UUID;
 @Builder
 @Entity
 @Table(name = "payments")
-public class paymentEntity {
+public class PaymentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,18 +26,18 @@ public class paymentEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
-    private orderEntity order;
+    private OrderEntity order;
 
     @Column(name = "payment_method", nullable = false)
     @Enumerated(EnumType.STRING)
-    private paymentMethod paymentMethod;
+    private PaymentMethod paymentMethod;
 
     @Column(name="amount",nullable = false,precision = 19, scale = 2)
     private BigDecimal amount;
 
     @Column(name="status",nullable = false)
     @Enumerated(EnumType.STRING)
-    private paymentStatus paymentStatus;
+    private PaymentStatus paymentStatus;
 
     @Column(name="created_at", nullable = false)
     private LocalDateTime createdAt;

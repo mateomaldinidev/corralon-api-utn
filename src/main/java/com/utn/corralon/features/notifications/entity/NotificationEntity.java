@@ -1,6 +1,6 @@
-package com.utn.corralon.features.notifications;
+package com.utn.corralon.features.notifications.entity;
 
-import com.utn.corralon.features.user.userEntity;
+import com.utn.corralon.features.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,7 +16,7 @@ import java.util.UUID;
 @Builder
 @Entity
 @Table(name = "notifications")
-public class notificationEntity {
+public class NotificationEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +27,7 @@ public class notificationEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    private userEntity user;
+    private UserEntity user;
 
     @Column(name = "message", nullable = false)
     private String message;
@@ -40,7 +40,7 @@ public class notificationEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
-    private notificationType type;
+    private RotificationType type;
 
 
 

@@ -1,7 +1,7 @@
-package com.utn.corralon.features.user;
+package com.utn.corralon.features.user.entity;
 
-import com.utn.corralon.features.address.addressEntity;
-import com.utn.corralon.features.role.roleEntity;
+import com.utn.corralon.features.address.entity.AddressEntity;
+import com.utn.corralon.features.role.entity.RoleEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
@@ -17,7 +17,7 @@ import java.util.UUID;
 @Builder
 @Entity
 @Table(name = "users")
-public class userEntity {
+public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,11 +41,11 @@ public class userEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", nullable = false)
-    private roleEntity role;
+    private RoleEntity role;
 
     @Column(name = "createdAt", nullable = false)
     private LocalDateTime createdAt;
 
     @OneToMany(mappedBy = "user")
-    private List<addressEntity> addresses;
+    private List<AddressEntity> addresses;
 }

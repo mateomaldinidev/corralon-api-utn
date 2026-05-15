@@ -1,6 +1,6 @@
 package com.utn.corralon.features.cart_item;
 
-import com.utn.corralon.features.cart.cartEntity;
+import com.utn.corralon.features.cart.entity.CartEntity;
 import com.utn.corralon.features.productVariant.entity.ProductVariantEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -26,7 +26,7 @@ public class cartItemEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="cart_id",nullable = false)
-    private cartEntity cart;
+    private CartEntity cart;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="product_variant_id",nullable = false)

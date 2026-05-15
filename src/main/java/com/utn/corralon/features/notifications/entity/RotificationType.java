@@ -1,6 +1,6 @@
-package com.utn.corralon.features.notifications;
+package com.utn.corralon.features.notifications.entity;
 
-public enum notificationType {
+public enum RotificationType {
     ORDER_CONFIRMED,
     ORDER_SHIPPED,
     ORDER_DELIVERED,
