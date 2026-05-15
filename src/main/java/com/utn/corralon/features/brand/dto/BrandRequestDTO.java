@@ -1,15 +1,16 @@
-package com.utn.corralon.features.categoriy.dto;
+package com.utn.corralon.features.brand.dto;
+
 import jakarta.validation.constraints.NotBlank;
-import lombok. *;
+import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class CategoryRequestDTO {
+public class BrandRequestDTO {
     @NotBlank
     private String name;
     @NotBlank
-    private boolean active;
+    private Boolean active;
 }

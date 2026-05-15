@@ -1,9 +1,9 @@
 package com.utn.corralon.features.product.entity;
 
-import com.utn.corralon.features.productVariant.productVariantEntity;
-import com.utn.corralon.features.supplier.SupplierEntity;
-import com.utn.corralon.features.categoriy.CategoryEntity;
-import com.utn.corralon.features.brand.BrandEntity;
+import com.utn.corralon.features.productVariant.entity.ProductVariantEntity;
+import com.utn.corralon.features.supplier.entity.SupplierEntity;
+import com.utn.corralon.features.categoriy.entity.CategoryEntity;
+import com.utn.corralon.features.brand.entity.BrandEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,7 +33,7 @@ public class ProductEntity {
     private boolean active;
 
     @OneToMany(mappedBy = "product")
-    private List<productVariantEntity> productVariants;
+    private List<ProductVariantEntity> productVariants;
 
     @ManyToOne()
     @JoinColumn(name = "supplier_id", nullable = false)
@@ -46,8 +46,4 @@ public class ProductEntity {
     @ManyToOne()
     @JoinColumn(name = "brand_id", nullable = false)
     private BrandEntity brand;
-
-    public boolean getActive() {
-        return active;
-    }
 }

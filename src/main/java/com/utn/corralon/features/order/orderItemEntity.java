@@ -1,6 +1,6 @@
 package com.utn.corralon.features.order;
 
-import com.utn.corralon.features.productVariant.productVariantEntity;
+import com.utn.corralon.features.productVariant.entity.ProductVariantEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -29,7 +29,7 @@ public class orderItemEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="product_variant_id",nullable = false)
-    private productVariantEntity productVariant;
+    private ProductVariantEntity productVariant;
 
     @Column(name="quantity",nullable = false)
     private Integer quantity;

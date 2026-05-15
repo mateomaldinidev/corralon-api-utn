@@ -1,4 +1,4 @@
-package com.utn.corralon.features.categoriy;
+package com.utn.corralon.features.supplier.entity;
 
 import com.utn.corralon.features.product.entity.ProductEntity;
 import jakarta.persistence.*;
@@ -13,8 +13,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "categories")
-public class CategoryEntity {
+@Table(name = "suppliers")
+public class SupplierEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,13 +26,12 @@ public class CategoryEntity {
     @Column(name = "name", nullable = false)
     private String name;
 
+    @Column(name = "contact")
+    private String contact;
+
     @Column(name = "active", nullable = false)
-    private Boolean active;
+    private boolean active;
 
-    @OneToMany(mappedBy = "category")
+    @OneToMany(mappedBy = "supplier")
     private List<ProductEntity> products;
-
-    public Boolean isActive() {
-        return true;
-    }
 }

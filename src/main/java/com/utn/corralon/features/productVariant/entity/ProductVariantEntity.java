@@ -1,4 +1,4 @@
-package com.utn.corralon.features.productVariant;
+package com.utn.corralon.features.productVariant.entity;
 
 import com.utn.corralon.features.product.entity.ProductEntity;
 import jakarta.persistence.*;
@@ -14,7 +14,7 @@ import java.util.UUID;
 @Builder
 @Entity
 @Table(name = "product_variants")
-public class productVariantEntity {
+public class ProductVariantEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

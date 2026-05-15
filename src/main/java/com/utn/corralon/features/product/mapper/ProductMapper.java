@@ -1,11 +1,11 @@
 package com.utn.corralon.features.product.mapper;
 
-import com.utn.corralon.features.brand.BrandEntity;
-import com.utn.corralon.features.categoriy.CategoryEntity;
+import com.utn.corralon.features.brand.entity.BrandEntity;
+import com.utn.corralon.features.categoriy.entity.CategoryEntity;
 import com.utn.corralon.features.product.dto.ProductRequestDTO;
 import com.utn.corralon.features.product.dto.ProductResponseDTO;
 import com.utn.corralon.features.product.entity.ProductEntity;
-import com.utn.corralon.features.supplier.SupplierEntity;
+import com.utn.corralon.features.supplier.entity.SupplierEntity;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +17,7 @@ public class ProductMapper {
         this.modelMapper = modelMapper;
     }
 
-    public ProductResponseDTO toDTO(ProductEntity product) {
+    public ProductResponseDTO toResponse(ProductEntity product) {
         ProductResponseDTO response =
                 modelMapper.map(product, ProductResponseDTO.class);
 

@@ -1,7 +1,7 @@
 package com.utn.corralon.features.cart_item;
 
 import com.utn.corralon.features.cart.cartEntity;
-import com.utn.corralon.features.productVariant.productVariantEntity;
+import com.utn.corralon.features.productVariant.entity.ProductVariantEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,7 +30,7 @@ public class cartItemEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="product_variant_id",nullable = false)
-    private productVariantEntity productVariant;
+    private ProductVariantEntity productVariant;
 
     @Column(name="quantity", nullable = false)
     private Integer quantity;
