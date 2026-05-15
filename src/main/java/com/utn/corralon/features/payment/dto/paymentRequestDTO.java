@@ -1,7 +1,7 @@
 package com.utn.corralon.features.payment.dto;
 
-import com.utn.corralon.features.payment.paymentMethod;
-import com.utn.corralon.features.payment.paymentStatus;
+import com.utn.corralon.features.payment.entity.PaymentMethod;
+import com.utn.corralon.features.payment.entity.PaymentStatus;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -17,10 +17,10 @@ public class paymentRequestDTO {
     @NotNull
     private UUID orderId;
     @NotNull
-    private paymentMethod paymentMethod;
+    private PaymentMethod paymentMethod;
     @NotNull
     private BigDecimal amount;
     @NotNull
-    private paymentStatus status;
+    private PaymentStatus status;
 
 }

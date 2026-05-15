@@ -1,6 +1,6 @@
 package com.utn.corralon.features.notifications.dto;
 
-import com.utn.corralon.features.notifications.notificationType;
+import com.utn.corralon.features.notifications.entity.RotificationType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -18,5 +18,5 @@ public class notificationRequestDTO {
     @NotBlank
     private String message;
     @NotNull
-    private notificationType type;
+    private RotificationType type;
 }

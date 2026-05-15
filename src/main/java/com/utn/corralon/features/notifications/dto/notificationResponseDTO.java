@@ -1,6 +1,6 @@
 package com.utn.corralon.features.notifications.dto;
 
-import com.utn.corralon.features.notifications.notificationType;
+import com.utn.corralon.features.notifications.entity.RotificationType;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -10,5 +10,5 @@ public record notificationResponseDTO(
         String message,
         LocalDateTime createdAt,
         Boolean read,
-        notificationType type
+        RotificationType type
 ) { }
