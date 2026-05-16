@@ -1,16 +1,33 @@
 package com.utn.corralon.features.address.dto;
 
 
-import java.util.UUID;
+import jakarta.validation.constraints.NotBlank;
+import lombok.*;
 
-public record AddressResponseDTO(
-        UUID externalId,
-        String street,
-        String streetNumber,
-        String floor,
-        String apartmentNumber,
-        String city,
-        String zipCode,
-        Long userId
-) {}
+import java.util.UUID;
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+
+public class AddressResponseDTO{
+
+    private UUID externalId;
+
+    private String street;
+
+    private String streetNumber;
+
+    private String floor;
+
+    private String apartmentNumber;
+
+    private String city;
+
+    private String zipCode;
+
+    private UUID userExternalId;
+
+}
 

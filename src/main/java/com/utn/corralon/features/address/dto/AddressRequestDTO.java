@@ -16,7 +16,10 @@ public class AddressRequestDTO {
     @NotBlank
     private String streetNumber;
 
+    @NotBlank
     private String floor;
+
+    @NotBlank
     private String apartmentNumber;
 
     @NotBlank
