@@ -1,6 +1,7 @@
 package com.utn.corralon.features.brand.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.util.UUID;
@@ -12,12 +13,7 @@ import java.util.UUID;
 @Builder
 public class BrandResponseDTO {
 
-    @NotBlank
     private UUID externalId;
-
-    @NotBlank
     private String name;
-
-    @NotBlank
     private Boolean active;
 }

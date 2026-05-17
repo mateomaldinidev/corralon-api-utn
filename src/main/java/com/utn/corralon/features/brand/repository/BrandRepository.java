@@ -11,4 +11,5 @@ import java.util.UUID;
 public interface BrandRepository extends JpaRepository<BrandEntity, Long> {
 
     Optional<BrandEntity> findByExternalId(UUID externalId);
+    boolean existsByName(String name);
 }

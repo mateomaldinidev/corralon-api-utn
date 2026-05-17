@@ -1,5 +1,6 @@
 package com.utn.corralon.features.brand.mapper;
 
+import com.utn.corralon.features.brand.dto.BrandRequestDTO;
 import com.utn.corralon.features.brand.entity.BrandEntity;
 import com.utn.corralon.features.brand.dto.BrandResponseDTO;
 import jakarta.validation.constraints.NotNull;
@@ -19,12 +20,12 @@ public class BrandMapper {
         return modelMapper.map(brand, BrandResponseDTO.class);
     }
 
-    public BrandEntity toEntity(@NotNull BrandResponseDTO dto) {
+    public BrandEntity toEntity(@NotNull BrandRequestDTO dto) {
         return modelMapper.map(dto, BrandEntity.class);
     }
 
     public void updateEntity(BrandEntity brand,
-                             BrandResponseDTO dto) {
+                             BrandRequestDTO dto) {
         modelMapper.map(dto, brand);
     }
 

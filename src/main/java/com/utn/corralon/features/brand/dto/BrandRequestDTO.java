@@ -11,6 +11,5 @@ import lombok.*;
 public class BrandRequestDTO {
     @NotBlank
     private String name;
-    @NotBlank
-    private Boolean active;
+
 }
