@@ -16,12 +16,11 @@ public class AddressRequestDTO {
     @NotBlank
     private String streetNumber;
 
-    @NotBlank
+
     private String floor;
 
-    @NotBlank
     private String apartmentNumber;
-
+//nota: le saque el @NotBlank a floor y apartmentNumber porque si yo vivo en una casa (que es lo más comun para comprar materiales de construccion en un corralon), no tengo piso ni número de departamento y si lo dejo en blanco tira error
     @NotBlank
     private String city;
 

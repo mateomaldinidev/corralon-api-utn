@@ -45,4 +45,9 @@ public class AddressController {
         addressService.delete(externalId);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/user/{userExternalId}")
+    public ResponseEntity<List<AddressResponseDTO>> getAllByUserExternalId(@PathVariable UUID userExternalId){
+        return ResponseEntity.ok(addressService.getAllByUserExternalId(userExternalId));
+    }
 }

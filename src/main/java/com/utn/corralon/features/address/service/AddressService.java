@@ -64,4 +64,11 @@ public class AddressService implements IAddressService {
         addressRepository.delete(entity);
     }
 
+    @Override
+    public List<AddressResponseDTO> getAllByUserExternalId(UUID userExternalId) {
+        return addressRepository.findAllByUserExternalId(userExternalId).stream()
+                .map(addressMapper::toResponse)
+                .toList();
+    }
+
 }

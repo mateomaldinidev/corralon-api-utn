@@ -17,4 +17,6 @@ public interface IAddressService {
     AddressResponseDTO update(UUID externalId, AddressRequestDTO dto);
 
     void delete(UUID externalId);
+
+    List<AddressResponseDTO> getAllByUserExternalId(UUID userExternalId);
 }
