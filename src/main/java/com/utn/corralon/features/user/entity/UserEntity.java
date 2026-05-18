@@ -1,7 +1,7 @@
 package com.utn.corralon.features.user.entity;
 
 import com.utn.corralon.features.address.entity.AddressEntity;
-import com.utn.corralon.features.role.entity.RoleEntity;
+import com.utn.corralon.features.user.enums.RoleEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
@@ -39,9 +39,12 @@ public class UserEntity {
     @Column(name = "password", nullable = false)
     private String password;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "role_id", nullable = false)
-    private RoleEntity role;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
+    private RoleEnum role;
+
+    @Column(name = "active", nullable = false)
+    private Boolean active = true;
 
     @Column(name = "createdAt", nullable = false)
     private LocalDateTime createdAt;
