@@ -3,7 +3,6 @@ package com.utn.corralon.features.address.mapper;
 import com.utn.corralon.features.address.dto.AddressRequestDTO;
 import com.utn.corralon.features.address.entity.AddressEntity;
 import com.utn.corralon.features.address.dto.AddressResponseDTO;
-import jakarta.validation.constraints.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 

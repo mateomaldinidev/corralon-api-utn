@@ -36,7 +36,7 @@ public class OrderItemEntity {
     private Integer quantity;
 
     @Column(name="unit_price",nullable = false,precision = 19, scale = 2)
-    private BigDecimal unit_price;
+    private BigDecimal unitPrice;
 
     @Column(name="subtotal",nullable = false,precision = 19, scale = 2)
     private BigDecimal subtotal; // SE LO SUMAMOS AUNQUE NO ESTE EN EL DER PORQUE ES IMPORTANTE YA QUE HAY QUE TENER UN HISTORIAL DE PRECIOS

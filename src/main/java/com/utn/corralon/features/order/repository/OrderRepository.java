@@ -1,9 +1,14 @@
 package com.utn.corralon.features.order.repository;
 
+import com.utn.corralon.features.address.entity.AddressEntity;
 import com.utn.corralon.features.order.entity.OrderEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+import java.util.UUID;
+
 @Repository
 public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
+    Optional<OrderEntity> findByExternalId(UUID externalId);
 }
