@@ -39,7 +39,7 @@ public class OrderEntity {
     private BigDecimal total;
 
     @Column(name="created_at",nullable = false)
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 
     @Column(name="active",nullable = false)
     private Boolean active;

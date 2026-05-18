@@ -29,6 +29,7 @@ public class AddressRequestDTO {
 
     @NotNull
     private Long userId;
+    private Long userExternalId;
 }
 
 
