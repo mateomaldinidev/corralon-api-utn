@@ -1,6 +1,8 @@
 package com.utn.corralon.features.user.dto;
 
+import com.utn.corralon.features.user.enums.RoleEnum;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Getter
@@ -21,5 +23,6 @@ public class UserRequestDTO {
     @NotBlank
     private String password;
 
-
+    @NotNull
+    private RoleEnum role;
 }
