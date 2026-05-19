@@ -1,6 +1,7 @@
 package com.utn.corralon.features.product.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.UUID;
@@ -11,22 +12,24 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 public class ProductRequestDTO {
-    @NotBlank
+
+    @NotBlank(message = "Name is required")
+    @Size(max = 255, message = "Name must be less than 255 characters")
+    private String name;
+
+    @NotBlank(message = "Description is required")
+    @Size(max = 255, message = "Description must be less than 255 characters")
     private String description;
 
-    @NotBlank
+    @NotBlank(message = "Active is required")
     private boolean active;
 
-    @NotBlank
+    @NotBlank(message = "Supplier is required")
     private UUID supplierId;
 
-    @NotBlank
+    @NotBlank(message = "Category is required")
     private UUID categoryId;
 
-    @NotBlank
+    @NotBlank(message = "Brand is required")
     private UUID brandId;
-
-    public boolean getActive() {
-        return true;    }//VER ES PARA SACAR EL ERROR
-
 }

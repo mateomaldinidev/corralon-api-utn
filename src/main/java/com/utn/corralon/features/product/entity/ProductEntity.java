@@ -26,6 +26,9 @@ public class ProductEntity {
     @Column(name = "externalId", nullable = false, unique = true, updatable = false)
     private UUID externalId = UUID.randomUUID();
 
+    @Column(name = "name", nullable = false)
+    private String name;
+
     @Column(name = "description", nullable = false)
     private String description;
 

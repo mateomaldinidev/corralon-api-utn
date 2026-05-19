@@ -2,7 +2,8 @@ package com.utn.corralon.features.productVariant.controller;
 
 import com.utn.corralon.features.productVariant.dto.ProductVariantRequestDTO;
 import com.utn.corralon.features.productVariant.dto.ProductVariantResponseDTO;
-import com.utn.corralon.features.productVariant.service.ProductVariantService;
+import com.utn.corralon.features.productVariant.service.IProductVariantService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,14 +15,14 @@ import java.util.UUID;
 @RequestMapping("/product-variants")
 public class ProductVariantController {
 
-    private final ProductVariantService productVariantService;
+    private final IProductVariantService productVariantService;
 
-    public ProductVariantController(ProductVariantService productVariantService) {
+    public ProductVariantController(IProductVariantService productVariantService) {
         this.productVariantService = productVariantService;
     }
 
     @GetMapping("/{externalId}")
-    public ResponseEntity<ProductVariantResponseDTO> getById(@PathVariable UUID externalId) {
+    public ResponseEntity<ProductVariantResponseDTO> getById(@Valid @PathVariable UUID externalId) {
         return ResponseEntity.ok(productVariantService.getById(externalId));
     }
 
@@ -31,12 +32,13 @@ public class ProductVariantController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductVariantResponseDTO> create(@RequestBody ProductVariantRequestDTO productVariantRequestDTO) {
+    public ResponseEntity<ProductVariantResponseDTO> create(@Valid@RequestBody ProductVariantRequestDTO productVariantRequestDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(productVariantService.create(productVariantRequestDTO));
     }
 
     @PutMapping("/{externalId}")
     public ResponseEntity<ProductVariantResponseDTO> update(
+            @Valid
             @PathVariable UUID externalId,
             @RequestBody ProductVariantRequestDTO productVariantRequestDTO) {
         return ResponseEntity.ok(
@@ -44,7 +46,7 @@ public class ProductVariantController {
     }
 
     @DeleteMapping("/{externalId}")
-    public ResponseEntity<Void> delete(@PathVariable UUID externalId) {
+    public ResponseEntity<Void> delete(@Valid @PathVariable UUID externalId) {
         productVariantService.delete(externalId);
         return ResponseEntity.noContent().build();
     }

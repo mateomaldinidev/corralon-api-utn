@@ -2,6 +2,7 @@ package com.utn.corralon.features.productVariant.entity;
 
 import com.utn.corralon.features.product.entity.ProductEntity;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Positive;
 import lombok.*;
 
 import java.math.BigDecimal;

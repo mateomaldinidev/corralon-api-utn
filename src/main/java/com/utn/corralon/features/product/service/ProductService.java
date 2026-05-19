@@ -1,5 +1,6 @@
 package com.utn.corralon.features.product.service;
 
+import com.utn.corralon.exception.ResourceNotFoundException;
 import com.utn.corralon.features.brand.entity.BrandEntity;
 import com.utn.corralon.features.brand.repository.BrandRepository;
 import com.utn.corralon.features.category.entity.CategoryEntity;
@@ -7,7 +8,6 @@ import com.utn.corralon.features.category.repository.CategoryRepository;
 import com.utn.corralon.features.product.dto.ProductRequestDTO;
 import com.utn.corralon.features.product.dto.ProductResponseDTO;
 import com.utn.corralon.features.product.entity.ProductEntity;
-import com.utn.corralon.features.product.exception.ProductNotFoundException;
 import com.utn.corralon.features.product.mapper.ProductMapper;
 import com.utn.corralon.features.product.repository.ProductRepository;
 import com.utn.corralon.features.supplier.entity.SupplierEntity;
@@ -33,7 +33,7 @@ public class ProductService implements IProductService{
     public ProductResponseDTO getById(UUID externalId) {
         ProductEntity product = productRepository
                 .findByExternalId(externalId)
-                .orElseThrow(() -> new ProductNotFoundException(externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found. ID: " + externalId));
         return productMapper.toResponse(product);
     }
 
@@ -50,20 +50,20 @@ public class ProductService implements IProductService{
         SupplierEntity supplier =
                 supplierRepository.findByExternalId(
                         productRequestDTO.getSupplierId())
-                        .orElseThrow(() -> new ProductNotFoundException(
-                                productRequestDTO.getSupplierId()));
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                "Supplier not found. ID: " + productRequestDTO.getSupplierId()));
 
         CategoryEntity category =
                 categoryRepository.findByExternalId(
                         productRequestDTO.getCategoryId())
-                        .orElseThrow(() -> new ProductNotFoundException(
-                            productRequestDTO.getCategoryId()));
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                "Category not found. ID: " + productRequestDTO.getCategoryId()));
 
         BrandEntity brand =
                 brandRepository.findByExternalId(
                         productRequestDTO.getBrandId())
-                        .orElseThrow(() -> new ProductNotFoundException(
-                                productRequestDTO.getBrandId()));
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                "Brand not found. ID: " + productRequestDTO.getBrandId()));
 
         ProductEntity product = productMapper.toEntity(
                 productRequestDTO,
@@ -82,22 +82,22 @@ public class ProductService implements IProductService{
             ProductRequestDTO productRequestDTO) {
         ProductEntity product = productRepository
                 .findByExternalId(externalId)
-                .orElseThrow(() -> new ProductNotFoundException(externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found. ID: " + externalId));
 
         SupplierEntity supplier =
                 supplierRepository.findByExternalId(
                         productRequestDTO.getSupplierId())
-                        .orElseThrow(() -> new ProductNotFoundException(externalId));
+                        .orElseThrow(() -> new ResourceNotFoundException("Supplier not found. ID: " + productRequestDTO.getSupplierId()));
 
         CategoryEntity category =
                 categoryRepository.findByExternalId(
                         productRequestDTO.getCategoryId())
-                        .orElseThrow(() -> new ProductNotFoundException(externalId));
+                        .orElseThrow(() -> new ResourceNotFoundException("Category not found. ID: " + productRequestDTO.getCategoryId()));
 
         BrandEntity brand =
                 brandRepository.findByExternalId(
                         productRequestDTO.getBrandId())
-                        .orElseThrow(() -> new ProductNotFoundException(externalId));
+                        .orElseThrow(() -> new ResourceNotFoundException("Brand not found. ID: " + productRequestDTO.getBrandId()));
 
         productMapper.updateEntity(
                 product,
@@ -116,7 +116,7 @@ public class ProductService implements IProductService{
     public void delete(UUID externalId) {
         ProductEntity product = productRepository
                 .findByExternalId(externalId)
-                .orElseThrow(() -> new ProductNotFoundException(externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found. ID: " + externalId));
         productRepository.delete(product);
     }
 }
