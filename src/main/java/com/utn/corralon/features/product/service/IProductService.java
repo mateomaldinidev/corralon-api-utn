@@ -10,6 +10,7 @@ import java.util.UUID;
 public interface IProductService {
     ProductResponseDTO getById(UUID externalId);
     List<ProductResponseDTO> getAll();
+    List<ProductResponseDTO> search(String name, Boolean active, UUID supplierId, UUID categoryId, UUID brandId);
     ProductResponseDTO create(ProductRequestDTO productRequestDTO);
     ProductResponseDTO update(UUID externalId,
                               ProductRequestDTO productRequestDTO);

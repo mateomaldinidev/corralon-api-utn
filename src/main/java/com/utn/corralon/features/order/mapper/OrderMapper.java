@@ -8,6 +8,7 @@ import com.utn.corralon.features.order.dto.OrderResponseDTO;
 import com.utn.corralon.features.order.entity.OrderEntity;
 import com.utn.corralon.features.orderItem.entity.OrderItemEntity;
 import com.utn.corralon.features.orderItem.mapper.OrderItemMapper;
+import com.utn.corralon.features.productVariant.repository.ProductVariantRepository;
 import com.utn.corralon.features.user.entity.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -22,6 +23,7 @@ public class OrderMapper {
 
     private final ModelMapper modelMapper;
     private final OrderItemMapper orderItemMapper;
+    private final ProductVariantRepository productVariantRepository;
 
     public OrderEntity toEntity(
             OrderRequestDTO dto,
@@ -40,7 +42,7 @@ public class OrderMapper {
         List<OrderItemEntity> items = dto.getItems().stream()
                 .map(itemDto -> {
                     ProductVariantEntity variant =
-                            productVariantRepository.findByExternalId( //implementarlo en el service de productVariant
+                            productVariantRepository.findByExternalId(
                                             itemDto.getProductVariantExternalId())
                                     .orElseThrow(() ->
                                             new ResourceNotFoundException(

@@ -1,5 +1,6 @@
 package com.utn.corralon.features.product.service;
 
+import com.utn.corralon.exception.BusinessRuleException;
 import com.utn.corralon.exception.ResourceNotFoundException;
 import com.utn.corralon.features.brand.entity.BrandEntity;
 import com.utn.corralon.features.brand.repository.BrandRepository;
@@ -10,9 +11,11 @@ import com.utn.corralon.features.product.dto.ProductResponseDTO;
 import com.utn.corralon.features.product.entity.ProductEntity;
 import com.utn.corralon.features.product.mapper.ProductMapper;
 import com.utn.corralon.features.product.repository.ProductRepository;
+import com.utn.corralon.features.product.specification.ProductSpecification;
 import com.utn.corralon.features.supplier.entity.SupplierEntity;
 import com.utn.corralon.features.supplier.repository.SupplierRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -65,6 +68,10 @@ public class ProductService implements IProductService{
                         .orElseThrow(() -> new ResourceNotFoundException(
                                 "Brand not found. ID: " + productRequestDTO.getBrandId()));
 
+        if(!productRepository.existByNameAndBrand(productRequestDTO.getName(), brand)){
+            throw new BusinessRuleException("Product already exists for this brand.");
+        }
+
         ProductEntity product = productMapper.toEntity(
                 productRequestDTO,
                 supplier,
@@ -83,6 +90,10 @@ public class ProductService implements IProductService{
         ProductEntity product = productRepository
                 .findByExternalId(externalId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found. ID: " + externalId));
+
+        if (!product.isActive()) {
+            throw new BusinessRuleException("Cannot assign inactive product");
+        }
 
         SupplierEntity supplier =
                 supplierRepository.findByExternalId(
@@ -117,6 +128,40 @@ public class ProductService implements IProductService{
         ProductEntity product = productRepository
                 .findByExternalId(externalId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found. ID: " + externalId));
+
+        if(!product.isActive()){
+            throw new BusinessRuleException("Product already inactive.");
+        }
+        product.setActive(false);
+        product.getProductVariants().forEach(variant -> variant.setActive(false));
+
         productRepository.delete(product);
     }
+
+    @Override
+    public List<ProductResponseDTO> search(
+            String name,
+            Boolean active,
+            UUID supplierId,
+            UUID categoryId,
+            UUID brandId
+    ){
+        Specification<ProductEntity> specification =
+                Specification.where(
+                        ProductSpecification.hasName(name)
+                ).and(
+                        ProductSpecification.isActive(active)
+                ).and(
+                        ProductSpecification.hasSupplier(supplierId)
+                ).and(
+                        ProductSpecification.hasCategory(categoryId)
+                ).and(
+                        ProductSpecification.hasBrand(brandId)
+                );
+        return productRepository.findAll(specification)
+                .stream()
+                .map(productMapper::toResponse)
+                .toList();
+    }
+
 }
