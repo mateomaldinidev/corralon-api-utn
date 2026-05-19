@@ -12,11 +12,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 public class ProductResponseDTO{
-    @NotBlank
+
     private UUID externalId;
-    @NotBlank
+    private String name;
     private String description;
-    @NotBlank
     private Boolean active;
 
     private UUID supplierId;

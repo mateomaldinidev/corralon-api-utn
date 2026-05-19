@@ -1,12 +1,11 @@
 package com.utn.corralon.features.productVariant.service;
 
+import com.utn.corralon.exception.ResourceNotFoundException;
 import com.utn.corralon.features.product.entity.ProductEntity;
-import com.utn.corralon.features.product.exception.ProductNotFoundException;
 import com.utn.corralon.features.product.repository.ProductRepository;
 import com.utn.corralon.features.productVariant.dto.ProductVariantRequestDTO;
 import com.utn.corralon.features.productVariant.dto.ProductVariantResponseDTO;
 import com.utn.corralon.features.productVariant.entity.ProductVariantEntity;
-import com.utn.corralon.features.productVariant.exception.ProductVariantNotFoundException;
 import com.utn.corralon.features.productVariant.mapper.ProductVariantMapper;
 import com.utn.corralon.features.productVariant.repository.ProductVariantRepository;
 import lombok.AllArgsConstructor;
@@ -28,7 +27,7 @@ public class ProductVariantService implements IProductVariantService {
     public ProductVariantResponseDTO getById(UUID externalId) {
         ProductVariantEntity variant = productVariantRepository
                 .findByExternalId(externalId)
-                .orElseThrow(() -> new ProductVariantNotFoundException(externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Product variant not found. ID: " + externalId));
 
         return productVariantMapper.toResponse(variant);
     }
@@ -46,8 +45,8 @@ public class ProductVariantService implements IProductVariantService {
         ProductEntity product =
                 productRepository.findByExternalId(
                         productVariantRequestDTO.getProductId()
-                ).orElseThrow(() -> new ProductNotFoundException(
-                        productVariantRequestDTO.getProductId()));
+                ).orElseThrow(() -> new ResourceNotFoundException(
+                        "Product not found. ID: " + productVariantRequestDTO.getProductId()));
 
         ProductVariantEntity variant = productVariantMapper.toEntity(
                 productVariantRequestDTO,
@@ -62,12 +61,13 @@ public class ProductVariantService implements IProductVariantService {
     public ProductVariantResponseDTO update(UUID externalId, ProductVariantRequestDTO productVariantRequestDTO) {
         ProductVariantEntity variant =
                 productVariantRepository.findByExternalId(externalId)
-                        .orElseThrow(() -> new ProductVariantNotFoundException(externalId));
+                        .orElseThrow(() -> new ResourceNotFoundException(
+                                "Product variant not found. ID: " + externalId));
 
         ProductEntity product = productRepository
                 .findByExternalId(productVariantRequestDTO.getProductId())
-                .orElseThrow(() -> new ProductNotFoundException(
-                        productVariantRequestDTO.getProductId()));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Product not found. ID: " + productVariantRequestDTO.getProductId()));
 
         productVariantMapper.updateEntity(variant, productVariantRequestDTO, product);
 
@@ -79,7 +79,8 @@ public class ProductVariantService implements IProductVariantService {
     public void delete(UUID externalId) {
         ProductVariantEntity variant = productVariantRepository
                 .findByExternalId(externalId)
-                .orElseThrow(() -> new ProductVariantNotFoundException(externalId));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Product variant not found. ID: " + externalId));
 
         productVariantRepository.delete(variant);
     }
