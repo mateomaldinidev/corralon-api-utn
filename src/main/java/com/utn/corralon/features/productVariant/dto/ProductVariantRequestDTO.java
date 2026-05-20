@@ -1,6 +1,7 @@
 package com.utn.corralon.features.productVariant.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -18,26 +19,26 @@ public class ProductVariantRequestDTO {
     @Size(max = 255, message = "Attribute must be less than 255 characters")
     private String attribute;
 
-    @NotBlank(message = "Price is required")
+    @NotNull(message = "Price is required")
     @Positive(message = "Price must be positive")
     private BigDecimal price;
 
-    @NotBlank(message = "Stock is required")
+    @NotNull(message = "Stock is required")
     @Positive(message = "Stock must be positive")
     private Integer stock;
 
-    @NotBlank(message = "Active is required")
+    @NotNull(message = "Active is required")
     private Boolean active;
 
-    @NotBlank(message = "Wholesale price is required")
+    @NotNull(message = "Wholesale price is required")
     @Positive(message = "Wholesale price must be positive")
     private BigDecimal wholesalePrice;
 
-    @NotBlank(message = "Whole min stock is required")
+    @NotNull(message = "Whole min stock is required")
     @Positive(message = "Whole min stock must be positive")
     private BigDecimal wholeMinStock;
 
-    @NotBlank(message = "Product is required")
+    @NotNull(message = "Product is required")
     private UUID productId;
 
 }

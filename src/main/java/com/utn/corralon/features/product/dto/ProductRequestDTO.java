@@ -1,6 +1,7 @@
 package com.utn.corralon.features.product.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -21,15 +22,15 @@ public class ProductRequestDTO {
     @Size(max = 255, message = "Description must be less than 255 characters")
     private String description;
 
-    @NotBlank(message = "Active is required")
+    @NotNull(message = "Active is required")
     private boolean active;
 
-    @NotBlank(message = "Supplier is required")
+    @NotNull(message = "Supplier is required")
     private UUID supplierId;
 
-    @NotBlank(message = "Category is required")
+    @NotNull(message = "Category is required")
     private UUID categoryId;
 
-    @NotBlank(message = "Brand is required")
+    @NotNull(message = "Brand is required")
     private UUID brandId;
 }

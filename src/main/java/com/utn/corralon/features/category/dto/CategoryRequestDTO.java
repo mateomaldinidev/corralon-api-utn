@@ -1,5 +1,7 @@
 package com.utn.corralon.features.category.dto;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok. *;
 
 @Getter
@@ -8,8 +10,9 @@ import lombok. *;
 @NoArgsConstructor
 @Builder
 public class CategoryRequestDTO {
-    @NotBlank
+    @NotBlank(message = "Name is required")
+    @Size(max = 255, message = "Name must be less than 255 characters")
     private String name;
-    @NotBlank
+    @NotNull(message = "Active is required")
     private boolean active;
 }
