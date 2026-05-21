@@ -12,24 +12,16 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 public class ProductVariantResponseDTO {
-    @NotBlank
     private UUID externalId;
-    @NotBlank
     private String attribute;
-    @NotBlank
     private BigDecimal price;
-    @NotBlank
     private Integer stock;
-    @NotBlank
     private Boolean active;
-    @NotBlank
     private BigDecimal wholesalePrice;
-    @NotBlank
     private BigDecimal wholeMinStock;
-    @NotBlank
+
     private UUID productId;
-    @NotBlank
-    private String productDescription;
+    private String productName;
 }
 
 
