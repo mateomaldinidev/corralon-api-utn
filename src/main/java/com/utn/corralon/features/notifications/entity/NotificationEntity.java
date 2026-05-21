@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -23,7 +24,8 @@ public class NotificationEntity {
     private Long id;
 
     @Column(name = "externalId", nullable = false, unique = true, updatable = false)
-        private UUID externalId = UUID.randomUUID();
+    @UuidGenerator
+    private UUID externalId = UUID.randomUUID();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

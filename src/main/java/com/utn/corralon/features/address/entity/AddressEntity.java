@@ -3,6 +3,7 @@ package com.utn.corralon.features.address.entity;
 import com.utn.corralon.features.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.util.UUID;
 
@@ -20,6 +21,7 @@ public class AddressEntity {
     private Long id;
 
     @Column(name = "externalId", nullable = false, unique = true, updatable = false)
+    @UuidGenerator
     private UUID externalId = UUID.randomUUID();
 
     @Column(name = "street", nullable = false)

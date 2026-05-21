@@ -5,6 +5,7 @@ import com.utn.corralon.features.orderItem.entity.OrderItemEntity;
 import com.utn.corralon.features.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -25,6 +26,7 @@ public class OrderEntity {
     private Long id;
 
     @Column(name="externalId",nullable = false,unique = true,updatable = false)
+    @UuidGenerator
      private UUID externalId= UUID.randomUUID();
 
     @ManyToOne(fetch= FetchType.LAZY)
