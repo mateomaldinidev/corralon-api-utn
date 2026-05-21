@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,6 +26,7 @@ public class CartEntity {
     private Long id;
 
     @Column(name="externalId",nullable = false,unique = true,updatable = false)
+    @UuidGenerator
     private UUID externalId= UUID.randomUUID();
 
     @ManyToOne(fetch = FetchType.LAZY)

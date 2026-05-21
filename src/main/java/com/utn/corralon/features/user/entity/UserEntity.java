@@ -5,6 +5,7 @@ import com.utn.corralon.features.user.enums.RoleEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,6 +25,7 @@ public class UserEntity {
     private Long id;
 
     @Column(name = "externalId", nullable = false, unique = true, updatable = false)
+    @UuidGenerator
     private UUID externalId = UUID.randomUUID();
 
     @Column(name = "email", nullable = false, unique = true)

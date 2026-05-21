@@ -141,7 +141,7 @@ public class ProductVariantService implements IProductVariantService {
                                 ProductVariantSpecification.hasBrand(brandId)
                         )
                         .and(
-                                ProductVariantSpecification.hasProductName(productName)
+                                ProductVariantSpecification.hasProductName(productName  )
                         ));
 
         return productVariantRepository.findAll(specification)
