@@ -4,6 +4,7 @@ import com.utn.corralon.features.cart.entity.CartEntity;
 import com.utn.corralon.features.productVariant.entity.ProductVariantEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

@@ -4,6 +4,7 @@ package com.utn.corralon.features.payment.entity;
 import com.utn.corralon.features.order.entity.OrderEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ public class PaymentEntity {
     private Long id;
 
     @Column(name = "externalId", nullable = false, unique = true, updatable = false)
+    @UuidGenerator
     private UUID externalId = UUID.randomUUID();
 
     @ManyToOne(fetch = FetchType.LAZY)

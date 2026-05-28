@@ -6,6 +6,7 @@ import com.utn.corralon.features.category.entity.CategoryEntity;
 import com.utn.corralon.features.brand.entity.BrandEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,6 +25,7 @@ public class ProductEntity {
     private Long id;
 
     @Column(name = "externalId", nullable = false, unique = true, updatable = false)
+    @UuidGenerator
     private UUID externalId = UUID.randomUUID();
 
     @Column(name = "name", nullable = false)

@@ -1,6 +1,8 @@
 package com.utn.corralon.features.brand.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Getter
@@ -9,7 +11,10 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class BrandRequestDTO {
-    @NotBlank
+    @NotBlank(message = "Name is required")
+    @Size(max = 255, message = "Name must be less than 255 characters")
     private String name;
+    @NotNull(message = "Active is required")
+    private Boolean active;
 
 }

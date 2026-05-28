@@ -3,6 +3,7 @@ package com.utn.corralon.features.offer.entity;
 import com.utn.corralon.features.offer_product.entity.OfferProductEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -21,6 +22,7 @@ public class OfferEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(name="externalId",nullable = false,unique = true,updatable = false)
+    @UuidGenerator
     private UUID externalId = UUID.randomUUID();
 
     @Column(name="name",nullable = false)
