@@ -4,10 +4,7 @@ package com.utn.corralon.features.cart.entity;
 import com.utn.corralon.features.cart_item.entity.CartItemEntity;
 import com.utn.corralon.features.user.entity.UserEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,6 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 @Entity
 @Table(name="carts")
 public class CartEntity {
@@ -25,7 +23,7 @@ public class CartEntity {
     private Long id;
 
     @Column(name="externalId",nullable = false,unique = true,updatable = false)
-    private UUID externalId= UUID.randomUUID();
+    private UUID externalId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="user_id",nullable = false)
@@ -38,4 +36,28 @@ public class CartEntity {
     private List<CartItemEntity> cartItems;
 
 
+    public void addCartItem(CartItemEntity cartItem) {
+        cartItems.add(cartItem);
+        cartItem.setCart(this); // Sincroniza el lado ManyToOne
+    }
+
+    public void removeCartItem(CartItemEntity cartItem) {
+        cartItems.remove(cartItem);
+        cartItem.setCart(null); // Desvincula el lado ManyToOne
+    }
+
+    // Callbacks de JPA para gestionar campos automáticamente
+    @PrePersist // Se ejecuta antes de que la entidad sea persistida por primera vez
+    protected void onCreate() {
+        if (externalId == null) {
+            externalId = UUID.randomUUID(); // Genera el UUID si no se ha establecido
+        }
+        lastUpdated = LocalDateTime.now(); // Establece la fecha de creación
+    }
+
+
+    @PreUpdate // Se ejecuta antes de que la entidad sea actualizada
+    protected void onUpdate() {
+        lastUpdated = LocalDateTime.now(); // Actualiza la fecha de última modificación
+    }
 }

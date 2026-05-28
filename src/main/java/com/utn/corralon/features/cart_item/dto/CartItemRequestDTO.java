@@ -1,5 +1,6 @@
 package com.utn.corralon.features.cart_item.dto;
 
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
@@ -11,11 +12,11 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 public class CartItemRequestDTO {
-    @NotNull
-    private UUID cartId;
-    @NotNull
+    @NotNull(message = "Product variant ID cannot be null")
     private UUID productVariantId;
-    @NotNull
+
+    @NotNull(message = "Quantity cannot be null")
+    @Min(value = 1, message = "Quantity must be at least 1")
     private Integer quantity;
 
 
