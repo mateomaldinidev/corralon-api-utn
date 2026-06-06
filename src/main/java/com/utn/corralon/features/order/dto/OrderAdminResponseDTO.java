@@ -10,18 +10,16 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-@Setter
 @Getter
-public class OrderResponseDTO {
+@Setter
+public class OrderAdminResponseDTO {
+
     private UUID externalId;
-
-    private BigDecimal total;
-
+    private UUID userExternalId;
+    private String customerName;
     private UUID addressExternalId;
-
-    private LocalDateTime createdAt;
-
+    private BigDecimal total;
     private OrderStatus status;
-
+    private LocalDateTime createdAt;
     private List<OrderItemResponseDTO> items;
 }

@@ -1,7 +1,9 @@
 package com.utn.corralon.features.order.controller;
 
-import com.utn.corralon.features.order.dto.OrderRequestDTO;
+import com.utn.corralon.features.order.dto.CreateOrderRequestDTO;
+import com.utn.corralon.features.order.dto.OrderAdminResponseDTO;
 import com.utn.corralon.features.order.dto.OrderResponseDTO;
+import com.utn.corralon.features.order.dto.OrderSummaryDTO;
 import com.utn.corralon.features.order.service.IOrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,18 +15,16 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/orders")
+@RequestMapping("/api/orders")
 @RequiredArgsConstructor
 public class OrderController {
 
     private final IOrderService orderService;
 
     @PostMapping
-    public ResponseEntity<OrderResponseDTO> create(
-            @Valid @RequestBody OrderRequestDTO dto
-    ) {
+    public ResponseEntity<OrderResponseDTO> create(@Valid @RequestBody CreateOrderRequestDTO dto, @RequestParam UUID userExternalId) {
 
-        OrderResponseDTO response = orderService.create(dto);
+        OrderResponseDTO response = orderService.createOrder(dto, userExternalId);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -32,39 +32,38 @@ public class OrderController {
     }
 
     @GetMapping
-    public ResponseEntity<List<OrderResponseDTO>> getAll() {
+    public ResponseEntity<List<OrderAdminResponseDTO>> getAll() {
 
         return ResponseEntity.ok(orderService.getAll());
     }
 
     @GetMapping("/{externalId}")
-    public ResponseEntity<OrderResponseDTO> getByExternalId(
-            @PathVariable UUID externalId
-    ) {
+    public ResponseEntity<OrderResponseDTO> getByExternalId(@PathVariable UUID externalId) {
 
         return ResponseEntity.ok(
                 orderService.getByExternalId(externalId)
         );
     }
 
-    @PutMapping("/{externalId}")
-    public ResponseEntity<OrderResponseDTO> update(
-            @PathVariable UUID externalId,
-            @Valid @RequestBody OrderRequestDTO dto
-    ) {
+    @PatchMapping("/{externalId}/cancel")
+    public ResponseEntity<Void> cancelOrder(@PathVariable UUID externalId) {
 
-        return ResponseEntity.ok(
-                orderService.update(externalId, dto)
-        );
-    }
-
-    @DeleteMapping("/{externalId}")
-    public ResponseEntity<Void> delete(
-            @PathVariable UUID externalId
-    ) {
-
-        orderService.delete(externalId);
+        orderService.cancelOrder(externalId);
 
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/user/{userExternalId}")
+    public ResponseEntity<List<OrderSummaryDTO>> getOrdersByUser(
+            @PathVariable UUID userExternalId) {
+
+        return ResponseEntity.ok(orderService.getOrdersByUser(userExternalId));
+    }
+
+    @GetMapping("/admin/{externalId}")
+    public ResponseEntity<OrderAdminResponseDTO> getAdminOrder(
+            @PathVariable UUID externalId) {
+
+        return ResponseEntity.ok(orderService.getAdminOrder(externalId));
     }
 }

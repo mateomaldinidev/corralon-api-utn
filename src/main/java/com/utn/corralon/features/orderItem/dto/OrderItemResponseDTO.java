@@ -13,8 +13,6 @@ import java.util.UUID;
 public class OrderItemResponseDTO {
     private UUID externalId;
 
-    private UUID orderExternalId;
-
     private UUID productVariantExternalId;
 
     private Integer quantity;
