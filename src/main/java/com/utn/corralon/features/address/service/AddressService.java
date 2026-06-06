@@ -25,7 +25,7 @@ public class AddressService implements IAddressService {
     public AddressResponseDTO create(AddressRequestDTO dto) {
         AddressEntity entity = addressMapper.toEntity(dto);
         UserEntity user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found", userId));
         entity.setUser(user);
         AddressEntity savedEntity = addressRepository.save(entity);
         return addressMapper.toResponse(savedEntity);
@@ -41,17 +41,17 @@ public class AddressService implements IAddressService {
     @Override
     public AddressResponseDTO getByExternalId(UUID externalId) {
         AddressEntity entity = addressRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found", userId));
         return addressMapper.toResponse(entity);
     }
 
     @Override
     public AddressResponseDTO update(UUID externalId, AddressRequestDTO dto){
         AddressEntity entity = addressRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found", userId));
         addressMapper.updateEntity(entity, dto);
         UserEntity user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found", userId));
         entity.setUser(user);
         AddressEntity updatedEntity = addressRepository.save(entity);
         return addressMapper.toResponse(updatedEntity);
@@ -60,7 +60,7 @@ public class AddressService implements IAddressService {
     @Override
     public void delete(UUID externalId) {
         AddressEntity entity = addressRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Address not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found", userId));
         addressRepository.delete(entity);
     }
 

@@ -1,8 +1,10 @@
 package com.utn.corralon.exception;
 
+import java.util.UUID;
+
 public class ResourceNotFoundException extends RuntimeException {
 
-    public ResourceNotFoundException(String message) {
+    public ResourceNotFoundException(String message, UUID userId) {
         super(message);
     }
 }

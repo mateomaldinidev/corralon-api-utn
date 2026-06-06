@@ -41,8 +41,8 @@ public class ProductVariantEntity {
     @Column(name = "whole_sale_price", nullable = false)
     private BigDecimal wholesalePrice;
 
-    @Column(name = "whole_min_stock", nullable = false)
-    private BigDecimal wholeMinStock;
+    @Column(name = "wholesale_min_qty", nullable = false) // Nombre de columna más descriptivo
+    private Integer wholesaleMinQty; // Tipo Integer para cantidad
 
     @ManyToOne()
     @JoinColumn(name = "product_id", nullable = false)

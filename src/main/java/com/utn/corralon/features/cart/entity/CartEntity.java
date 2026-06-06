@@ -26,7 +26,7 @@ public class CartEntity {
     private UUID externalId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="user_id",nullable = false)
+    @JoinColumn(name="user_id",nullable = false, unique = true)
     private UserEntity user;
 
     @Column(name="last_updated",nullable = false)

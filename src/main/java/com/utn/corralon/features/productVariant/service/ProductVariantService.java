@@ -31,7 +31,7 @@ public class ProductVariantService implements IProductVariantService {
     public ProductVariantResponseDTO getById(UUID externalId) {
         ProductVariantEntity variant = productVariantRepository
                 .findByExternalIdAndActiveTrue(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product variant not found. ID: " + externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Product variant not found. ID: " + externalId, userId));
 
         return productVariantMapper.toResponse(variant);
     }
@@ -50,7 +50,7 @@ public class ProductVariantService implements IProductVariantService {
                 productRepository.findByExternalId(
                         productVariantRequestDTO.getProductId()
                 ).orElseThrow(() -> new ResourceNotFoundException(
-                        "Product not found. ID: " + productVariantRequestDTO.getProductId()));
+                        "Product not found. ID: " + productVariantRequestDTO.getProductId(), userId));
         if (!product.isActive())
         {
             throw new BusinessRuleException("Cannot create variant for inactive product");
@@ -76,12 +76,12 @@ public class ProductVariantService implements IProductVariantService {
         ProductVariantEntity variant =
                 productVariantRepository.findByExternalId(externalId)
                         .orElseThrow(() -> new ResourceNotFoundException(
-                                "Product variant not found. ID: " + externalId));
+                                "Product variant not found. ID: " + externalId, userId));
 
         ProductEntity product = productRepository
                 .findByExternalId(productVariantRequestDTO.getProductId())
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Product not found. ID: " + productVariantRequestDTO.getProductId()));
+                        "Product not found. ID: " + productVariantRequestDTO.getProductId(), userId));
         if (!product.isActive()) {
             throw new BusinessRuleException("Cannot assign inactive product");
         }
@@ -97,7 +97,7 @@ public class ProductVariantService implements IProductVariantService {
         ProductVariantEntity variant = productVariantRepository
                 .findByExternalId(externalId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Product variant not found. ID: " + externalId));
+                        "Product variant not found. ID: " + externalId, userId));
 
         if (!variant.getActive()) {
             throw new BusinessRuleException("Product variant alreadt inactive.");
