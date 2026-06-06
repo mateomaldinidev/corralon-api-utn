@@ -92,7 +92,7 @@ public class OrderService implements IOrderService {
 
         OrderEntity order = orderRepository
                 .findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Ordren no encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Orden no encontrada",externalId));
 
         return orderMapper.toResponse(order);
     }
@@ -124,7 +124,7 @@ public class OrderService implements IOrderService {
 
         return orderRepository
                 .findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Orden no encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Orden no encontrada",externalId));
     }
 
 
@@ -137,7 +137,7 @@ public class OrderService implements IOrderService {
                 .findByExternalId(externalId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "Orden no encontrada"));
+                                "Orden no encontrada",externalId));
 
         if (order.getStatus() == OrderStatus.CANCELLED) {
              throw new BadRequestException("La orden ya fue cancelada");
@@ -196,7 +196,7 @@ public class OrderService implements IOrderService {
 
         return userRepository
                 .findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado",externalId));
     }
 
     private AddressEntity findAddress(
@@ -204,14 +204,14 @@ public class OrderService implements IOrderService {
 
         return addressRepository
                 .findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Dirección no encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Dirección no encontrada",externalId));
     }
 
     private CartEntity findCart(UserEntity user) {
 
         return cartRepository
                 .findByUser(user)
-                .orElseThrow(() -> new ResourceNotFoundException("Carrito no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Carrito no encontrado",user.getExternalId()));
     }
 
 
