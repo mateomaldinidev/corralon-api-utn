@@ -3,8 +3,10 @@ package com.utn.corralon.features.cart.controller;
 import com.utn.corralon.features.cart.dto.CartRequestDTO;
 import com.utn.corralon.features.cart.dto.CartResponseDTO;
 import com.utn.corralon.features.cart.service.CartService;
+import com.utn.corralon.features.cart_item.dto.CartItemQuantityUpdateDTO;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -28,6 +30,15 @@ public class CartController {
     @GetMapping("/{userId}")
     public ResponseEntity<CartResponseDTO> getCartByUserId(@PathVariable UUID userId) {
         return ResponseEntity.ok(cartService.getCartByUserId(userId));
+    }
+    //  actualizar la cantidad de un ítem especifico del carrito
+    @PatchMapping("/{userId}/items/{productVariantId}")
+    @PreAuthorize("hasRole('ADMIN') or (hasRole('CUSTOMER') and #userId == authentication.principal.id)") // Ejemplo con Spring Security
+    public ResponseEntity<CartResponseDTO> updateCartItemQuantity(
+            @PathVariable UUID userId,
+            @PathVariable UUID productVariantId,
+            @Valid @RequestBody CartItemQuantityUpdateDTO updateDTO) {
+        return ResponseEntity.ok(cartService.updateCartItemQuantity(userId, productVariantId, updateDTO));
     }
 
     @DeleteMapping("/{userId}")

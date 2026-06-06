@@ -32,7 +32,7 @@ public class OrderItemService implements IOrderItemService {
         OrderEntity order = orderRepository
                 .findByExternalId(dto.getOrderExternalId())
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Order not found")
+                        new ResourceNotFoundException("Order not found", userId)
                 );
 
         ProductVariantEntity variant =
@@ -42,8 +42,8 @@ public class OrderItemService implements IOrderItemService {
                         )
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
-                                        "Product variant not found"
-                                )
+                                        "Product variant not found",
+                                        userId)
                         );
 
         OrderItemEntity entity = orderItemMapper.toEntity(
@@ -75,8 +75,8 @@ public class OrderItemService implements IOrderItemService {
                 .findByExternalId(externalId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "Order item not found"
-                        )
+                                "Order item not found",
+                                userId)
                 );
 
         return orderItemMapper.toResponseDTO(entity);
@@ -92,14 +92,14 @@ public class OrderItemService implements IOrderItemService {
                 .findByExternalId(externalId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "Order item not found"
-                        )
+                                "Order item not found",
+                                userId)
                 );
 
         OrderEntity order = orderRepository
                 .findByExternalId(dto.getOrderExternalId())
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Order not found")
+                        new ResourceNotFoundException("Order not found", userId)
                 );
 
         ProductVariantEntity variant =
@@ -109,8 +109,8 @@ public class OrderItemService implements IOrderItemService {
                         )
                         .orElseThrow(() ->
                                 new ResourceNotFoundException(
-                                        "Product variant not found"
-                                )
+                                        "Product variant not found",
+                                        userId)
                         );
 
         entity.setOrder(order);
@@ -131,8 +131,8 @@ public class OrderItemService implements IOrderItemService {
                 .findByExternalId(externalId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "Order item not found"
-                        )
+                                "Order item not found",
+                                userId)
                 );
 
         orderItemRepository.delete(entity);

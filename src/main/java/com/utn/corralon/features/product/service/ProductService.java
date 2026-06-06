@@ -36,7 +36,7 @@ public class ProductService implements IProductService{
     public ProductResponseDTO getById(UUID externalId) {
         ProductEntity product = productRepository
                 .findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found. ID: " + externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found. ID: " + externalId, userId));
         return productMapper.toResponse(product);
     }
 
@@ -54,19 +54,19 @@ public class ProductService implements IProductService{
                 supplierRepository.findByExternalId(
                         productRequestDTO.getSupplierId())
                         .orElseThrow(() -> new ResourceNotFoundException(
-                                "Supplier not found. ID: " + productRequestDTO.getSupplierId()));
+                                "Supplier not found. ID: " + productRequestDTO.getSupplierId(), userId));
 
         CategoryEntity category =
                 categoryRepository.findByExternalId(
                         productRequestDTO.getCategoryId())
                         .orElseThrow(() -> new ResourceNotFoundException(
-                                "Category not found. ID: " + productRequestDTO.getCategoryId()));
+                                "Category not found. ID: " + productRequestDTO.getCategoryId(), userId));
 
         BrandEntity brand =
                 brandRepository.findByExternalId(
                         productRequestDTO.getBrandId())
                         .orElseThrow(() -> new ResourceNotFoundException(
-                                "Brand not found. ID: " + productRequestDTO.getBrandId()));
+                                "Brand not found. ID: " + productRequestDTO.getBrandId(), userId));
 
         if(!productRepository.existByNameAndBrand(productRequestDTO.getName(), brand)){
             throw new BusinessRuleException("Product already exists for this brand.");
@@ -89,7 +89,7 @@ public class ProductService implements IProductService{
             ProductRequestDTO productRequestDTO) {
         ProductEntity product = productRepository
                 .findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found. ID: " + externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found. ID: " + externalId, userId));
 
         if (!product.isActive()) {
             throw new BusinessRuleException("Cannot assign inactive product");
@@ -98,17 +98,17 @@ public class ProductService implements IProductService{
         SupplierEntity supplier =
                 supplierRepository.findByExternalId(
                         productRequestDTO.getSupplierId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Supplier not found. ID: " + productRequestDTO.getSupplierId()));
+                        .orElseThrow(() -> new ResourceNotFoundException("Supplier not found. ID: " + productRequestDTO.getSupplierId(), userId));
 
         CategoryEntity category =
                 categoryRepository.findByExternalId(
                         productRequestDTO.getCategoryId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Category not found. ID: " + productRequestDTO.getCategoryId()));
+                        .orElseThrow(() -> new ResourceNotFoundException("Category not found. ID: " + productRequestDTO.getCategoryId(), userId));
 
         BrandEntity brand =
                 brandRepository.findByExternalId(
                         productRequestDTO.getBrandId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Brand not found. ID: " + productRequestDTO.getBrandId()));
+                        .orElseThrow(() -> new ResourceNotFoundException("Brand not found. ID: " + productRequestDTO.getBrandId(), userId));
 
         productMapper.updateEntity(
                 product,
@@ -127,7 +127,7 @@ public class ProductService implements IProductService{
     public void delete(UUID externalId) {
         ProductEntity product = productRepository
                 .findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found. ID: " + externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found. ID: " + externalId, userId));
 
         if(!product.isActive()){
             throw new BusinessRuleException("Product already inactive.");
