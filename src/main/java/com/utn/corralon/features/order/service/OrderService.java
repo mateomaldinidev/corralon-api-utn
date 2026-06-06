@@ -3,22 +3,27 @@ package com.utn.corralon.features.order.service;
 import com.utn.corralon.exception.ResourceNotFoundException;
 import com.utn.corralon.features.address.entity.AddressEntity;
 import com.utn.corralon.features.address.repository.AddressRepository;
-import com.utn.corralon.features.order.dto.OrderRequestDTO;
+import com.utn.corralon.features.cart.entity.CartEntity;
+import com.utn.corralon.features.cart.repository.CartRepository;
+import com.utn.corralon.features.cart_item.entity.CartItemEntity;
+import com.utn.corralon.features.order.dto.CreateOrderRequestDTO;
+import com.utn.corralon.features.order.dto.OrderAdminResponseDTO;
 import com.utn.corralon.features.order.dto.OrderResponseDTO;
+import com.utn.corralon.features.order.dto.OrderSummaryDTO;
 import com.utn.corralon.features.order.entity.OrderEntity;
 import com.utn.corralon.features.order.mapper.OrderMapper;
+import com.utn.corralon.features.order.orderEnum.OrderStatus;
 import com.utn.corralon.features.order.repository.OrderRepository;
 import com.utn.corralon.features.orderItem.entity.OrderItemEntity;
-import com.utn.corralon.features.orderItem.mapper.OrderItemMapper;
 import com.utn.corralon.features.productVariant.entity.ProductVariantEntity;
-import com.utn.corralon.features.productVariant.repository.ProductVariantRepository;
 import com.utn.corralon.features.user.entity.UserEntity;
 import com.utn.corralon.features.user.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import com.utn.corralon.exception.BadRequestException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,79 +33,57 @@ public class OrderService implements IOrderService {
 
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
-    private final OrderItemMapper orderItemMapper;
-
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
-    private final ProductVariantRepository productVariantRepository;
+    private final CartRepository cartRepository;
 
     @Override
-    public OrderResponseDTO create(OrderRequestDTO dto) {
+    @Transactional
+    public OrderResponseDTO createOrder(CreateOrderRequestDTO request, UUID userExternalId) {
 
-        UserEntity user = userRepository
-                .findByExternalId(dto.getUserExternalId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found", userId)
-                );
+        UserEntity user = findUser(userExternalId);
 
-        AddressEntity address = addressRepository
-                .findByExternalId(dto.getAddressExternalId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Address not found", userId)
-                );
+        AddressEntity address =
+                findAddress(request.getAddressId());
 
-        OrderEntity order = new OrderEntity();
+        validateAddressOwnership(user, address);
 
-        order.setUser(user);
-        order.setAddress(address);
-        order.setActive(dto.getActive());
-        order.setCreatedAt(LocalDateTime.now());
+        CartEntity cart = findCart(user);
 
-        List<OrderItemEntity> items = dto.getItems().stream()
-                .map(itemDto -> {
+        validateCart(cart);
 
-                    ProductVariantEntity variant =
-                            productVariantRepository
-                                    .findByExternalId(
-                                            itemDto.getProductVariantExternalId()
-                                    )
-                                    .orElseThrow(() ->
-                                            new ResourceNotFoundException(
-                                                    "Product variant not found",
-                                                    userId)
-                                    );
+        validateStock(cart);
 
-                    return orderItemMapper.toEntity(
-                            itemDto,
-                            order,
-                            variant
-                    );
-                })
-                .toList();
+        OrderEntity order = OrderEntity.builder()
+                .user(user)
+                .address(address)
+                .build();
 
-        order.setItems(items);
+        BigDecimal total = BigDecimal.ZERO;
 
-        BigDecimal total = items.stream()
-                .map(item ->
-                        item.getUnitPrice()
-                                .multiply(
-                                        BigDecimal.valueOf(item.getQuantity())
-                                )
-                )
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        for (CartItemEntity cartItem : cart.getCartItems()) {
+            OrderItemEntity orderItem = buildOrderItem(cartItem);
+            order.addItem(orderItem);
+            total = total.add(orderItem.getSubtotal());
+            discountStock(cartItem);
+        }
 
         order.setTotal(total);
 
         OrderEntity savedOrder = orderRepository.save(order);
 
-        return orderMapper.toResponseDTO(savedOrder);
+        cart.getCartItems().clear();
+
+        cartRepository.save(cart);
+
+        return orderMapper.toResponse(savedOrder);
     }
 
     @Override
-    public List<OrderResponseDTO> getAll() {
+    public List<OrderAdminResponseDTO> getAll() {
 
         return orderRepository.findAll().stream()
-                .map(orderMapper::toResponseDTO)
+                .map(orderMapper::toAdminResponse)
                 .toList();
     }
 
@@ -109,91 +92,159 @@ public class OrderService implements IOrderService {
 
         OrderEntity order = orderRepository
                 .findByExternalId(externalId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Order not found", userId)
-                );
+                .orElseThrow(() -> new ResourceNotFoundException("Ordren no encontrada"));
 
-        return orderMapper.toResponseDTO(order);
+        return orderMapper.toResponse(order);
     }
 
     @Override
-    public OrderResponseDTO update(
-            UUID externalId,
-            OrderRequestDTO dto
-    ) {
+    public List<OrderSummaryDTO> getOrdersByUser(
+            UUID userExternalId) {
 
-        OrderEntity order = orderRepository
-                .findByExternalId(externalId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Order not found", userId)
-                );
+        findUser(userExternalId);
 
-        UserEntity user = userRepository
-                .findByExternalId(dto.getUserExternalId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found", userId)
-                );
-
-        AddressEntity address = addressRepository
-                .findByExternalId(dto.getAddressExternalId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Address not found", userId)
-                );
-
-        order.setUser(user);
-        order.setAddress(address);
-        order.setActive(dto.getActive());
-
-        List<OrderItemEntity> items = dto.getItems().stream()
-                .map(itemDto -> {
-
-                    ProductVariantEntity variant =
-                            productVariantRepository
-                                    .findByExternalId(
-                                            itemDto.getProductVariantExternalId()
-                                    )
-                                    .orElseThrow(() ->
-                                            new ResourceNotFoundException(
-                                                    "Product variant not found",
-                                                    userId)
-                                    );
-
-                    return orderItemMapper.toEntity(
-                            itemDto,
-                            order,
-                            variant
-                    );
-                })
+        return orderRepository
+                .findByUserExternalId(userExternalId)
+                .stream()
+                .map(orderMapper::toSummary)
                 .toList();
-
-        order.getItems().clear();
-        order.getItems().addAll(items);
-
-        BigDecimal total = items.stream()
-                .map(item ->
-                        item.getUnitPrice()
-                                .multiply(
-                                        BigDecimal.valueOf(item.getQuantity())
-                                )
-                )
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-        order.setTotal(total);
-
-        OrderEntity updatedOrder = orderRepository.save(order);
-
-        return orderMapper.toResponseDTO(updatedOrder);
     }
 
     @Override
-    public void delete(UUID externalId) {
+    public OrderAdminResponseDTO getAdminOrder(
+            UUID externalId) {
+
+        OrderEntity order = findOrder(externalId);
+
+        return orderMapper.toAdminResponse(order);
+    }
+
+    private OrderEntity findOrder(
+            UUID externalId) {
+
+        return orderRepository
+                .findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Orden no encontrada"));
+    }
+
+
+
+    @Override
+    @Transactional
+    public void cancelOrder(UUID externalId) {
 
         OrderEntity order = orderRepository
                 .findByExternalId(externalId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Order not found", userId)
-                );
+                        new ResourceNotFoundException(
+                                "Orden no encontrada"));
 
-        orderRepository.delete(order);
+        if (order.getStatus() == OrderStatus.CANCELLED) {
+             throw new BadRequestException("La orden ya fue cancelada");
+        }
+
+        if (order.getStatus() == OrderStatus.SHIPPED ||
+                order.getStatus() == OrderStatus.DELIVERED) {
+
+            throw new BadRequestException("La orden no puede cancelarse");
+        }
+
+        restoreStock(order);
+
+        order.setStatus(OrderStatus.CANCELLED);
+
+        orderRepository.save(order);
     }
+
+    private void restoreStock(OrderEntity order) {
+
+        for (OrderItemEntity item : order.getItems()) {
+
+            ProductVariantEntity variant = item.getProductVariant();
+
+            variant.setStock(variant.getStock() + item.getQuantity());
+        }
+    }
+
+    private OrderItemEntity buildOrderItem(
+            CartItemEntity cartItem) {
+
+        ProductVariantEntity variant =
+                cartItem.getProductVariant();
+
+        BigDecimal unitPrice =
+                variant.getPrice();
+
+        BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(cartItem.getQuantity()));
+
+        return OrderItemEntity.builder()
+                .productVariant(variant)
+                .quantity(cartItem.getQuantity())
+                .unitPrice(unitPrice)
+                .subtotal(subtotal)
+                .build();
+    }
+
+    private void discountStock(
+            CartItemEntity cartItem) {
+
+        ProductVariantEntity variant = cartItem.getProductVariant();
+
+        variant.setStock(variant.getStock() - cartItem.getQuantity());
+    }
+    private UserEntity findUser(UUID externalId) {
+
+        return userRepository
+                .findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+    }
+
+    private AddressEntity findAddress(
+            UUID externalId) {
+
+        return addressRepository
+                .findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Dirección no encontrada"));
+    }
+
+    private CartEntity findCart(UserEntity user) {
+
+        return cartRepository
+                .findByUser(user)
+                .orElseThrow(() -> new ResourceNotFoundException("Carrito no encontrado"));
+    }
+
+
+    private void validateCart(CartEntity cart) {
+
+        if (cart.getCartItems() == null ||
+                cart.getCartItems().isEmpty()) {
+
+           throw new BadRequestException("El carrito está vacío");
+        }
+    }
+
+    private void validateAddressOwnership(
+            UserEntity user,
+            AddressEntity address) {
+
+        if (!address.getUser().getId().equals(user.getId())) {
+
+           throw new BadRequestException("La dirección no pertenece al usuario");
+        }
+    }
+
+    private void validateStock(CartEntity cart) {
+
+        for (CartItemEntity item : cart.getCartItems()) {
+
+            ProductVariantEntity variant = item.getProductVariant();
+
+            if (variant.getStock() < item.getQuantity()) {
+
+                throw new BadRequestException("Stock insuficiente para " + variant.getProduct().getName());
+            }
+        }
+    }
+
 }

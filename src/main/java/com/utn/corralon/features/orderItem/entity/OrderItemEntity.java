@@ -7,6 +7,8 @@ import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -15,7 +17,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name="oder_items")
+@Table(name="order_items")
 public class OrderItemEntity {
 
     @Id
@@ -23,8 +25,7 @@ public class OrderItemEntity {
     private Long id;
 
     @Column(name="externalId",nullable = false,unique = true,updatable = false)
-    @UuidGenerator
-    private UUID externalId= UUID.randomUUID();
+    private UUID externalId;
 
     @ManyToOne(fetch= FetchType.LAZY)
     @JoinColumn(name="order_id",nullable = false)
@@ -34,7 +35,7 @@ public class OrderItemEntity {
     @JoinColumn(name="product_variant_id",nullable = false)
     private ProductVariantEntity productVariant;
 
-    @Column(name="quantity",nullable = false)
+    @Column(nullable = false)
     private Integer quantity;
 
     @Column(name="unit_price",nullable = false,precision = 19, scale = 2)
@@ -42,4 +43,12 @@ public class OrderItemEntity {
 
     @Column(name="subtotal",nullable = false,precision = 19, scale = 2)
     private BigDecimal subtotal; // SE LO SUMAMOS AUNQUE NO ESTE EN EL DER PORQUE ES IMPORTANTE YA QUE HAY QUE TENER UN HISTORIAL DE PRECIOS
+
+    @PrePersist
+    public void prePersist() {
+        if (externalId == null) {
+            externalId = UUID.randomUUID();
+        }
+    }
+
 }
