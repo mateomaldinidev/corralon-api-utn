@@ -42,12 +42,12 @@ public class BrandService implements IBrandService {
     public BrandResponseDTO getByExternalId(UUID externalId) {
         return brandRepository.findByExternalId(externalId)
                 .map(brandMapper::toResponse)
-                .orElseThrow(() -> new ResourceNotFoundException("Brand not found ID: " + externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Brand not found ID: " + externalId, userId));
     }
     @Override
     public BrandResponseDTO update(UUID externalId, BrandRequestDTO dto) {
         BrandEntity entity = brandRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Cannot be updated. Brand not found."));
+                .orElseThrow(() -> new ResourceNotFoundException("Cannot be updated. Brand not found.", userId));
 
         brandMapper.updateEntity(entity, dto);
         BrandEntity updated = brandRepository.save(entity);
@@ -57,7 +57,7 @@ public class BrandService implements IBrandService {
     @Override
     public void delete(UUID externalId) {
         BrandEntity entity = brandRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Cannot be updated. Brand not found."));
+                .orElseThrow(() -> new ResourceNotFoundException("Cannot be updated. Brand not found.", userId));
         entity.setActive(false);
         brandRepository.save(entity);
     }

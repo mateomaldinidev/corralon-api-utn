@@ -47,7 +47,7 @@ public class OrderMapper {
                                     .orElseThrow(() ->
                                             new ResourceNotFoundException(
                                                     "Product variant not found: "
-                                                            + itemDto.getProductVariantExternalId())
+                                                            + itemDto.getProductVariantExternalId(), userId)
                                     );
 
                     return orderItemMapper.toEntity(

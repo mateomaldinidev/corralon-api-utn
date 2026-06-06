@@ -40,13 +40,13 @@ public class OrderService implements IOrderService {
         UserEntity user = userRepository
                 .findByExternalId(dto.getUserExternalId())
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found")
+                        new ResourceNotFoundException("User not found", userId)
                 );
 
         AddressEntity address = addressRepository
                 .findByExternalId(dto.getAddressExternalId())
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Address not found")
+                        new ResourceNotFoundException("Address not found", userId)
                 );
 
         OrderEntity order = new OrderEntity();
@@ -66,8 +66,8 @@ public class OrderService implements IOrderService {
                                     )
                                     .orElseThrow(() ->
                                             new ResourceNotFoundException(
-                                                    "Product variant not found"
-                                            )
+                                                    "Product variant not found",
+                                                    userId)
                                     );
 
                     return orderItemMapper.toEntity(
@@ -110,7 +110,7 @@ public class OrderService implements IOrderService {
         OrderEntity order = orderRepository
                 .findByExternalId(externalId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Order not found")
+                        new ResourceNotFoundException("Order not found", userId)
                 );
 
         return orderMapper.toResponseDTO(order);
@@ -125,19 +125,19 @@ public class OrderService implements IOrderService {
         OrderEntity order = orderRepository
                 .findByExternalId(externalId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Order not found")
+                        new ResourceNotFoundException("Order not found", userId)
                 );
 
         UserEntity user = userRepository
                 .findByExternalId(dto.getUserExternalId())
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found")
+                        new ResourceNotFoundException("User not found", userId)
                 );
 
         AddressEntity address = addressRepository
                 .findByExternalId(dto.getAddressExternalId())
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Address not found")
+                        new ResourceNotFoundException("Address not found", userId)
                 );
 
         order.setUser(user);
@@ -154,8 +154,8 @@ public class OrderService implements IOrderService {
                                     )
                                     .orElseThrow(() ->
                                             new ResourceNotFoundException(
-                                                    "Product variant not found"
-                                            )
+                                                    "Product variant not found",
+                                                    userId)
                                     );
 
                     return orderItemMapper.toEntity(
@@ -191,7 +191,7 @@ public class OrderService implements IOrderService {
         OrderEntity order = orderRepository
                 .findByExternalId(externalId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Order not found")
+                        new ResourceNotFoundException("Order not found", userId)
                 );
 
         orderRepository.delete(order);

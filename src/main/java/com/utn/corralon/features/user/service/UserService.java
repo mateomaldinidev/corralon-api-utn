@@ -47,14 +47,14 @@ public class UserService implements IUserService {
         return userRepository.findByExternalId(externalId)
                 .filter(UserEntity::getActive)
                 .map(userMapper::toResponse)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found ID: " + externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found ID: " + externalId, userId));
     }
 
     @Override
     public UserResponseDTO update(UUID externalId, UserRequestDTO dto) {
         UserEntity entity = userRepository.findByExternalId(externalId)
                 .filter(UserEntity::getActive)
-                .orElseThrow(() -> new ResourceNotFoundException("Cannot be updated. User not found."));
+                .orElseThrow(() -> new ResourceNotFoundException("Cannot be updated. User not found.", userId));
 
         userMapper.updateEntity(entity, dto);
         if (!entity.getPassword().equals(dto.getPassword())) {
@@ -69,7 +69,7 @@ public class UserService implements IUserService {
     public void delete(UUID externalId) {
         UserEntity entity = userRepository.findByExternalId(externalId)
                 .filter(UserEntity::getActive)
-                .orElseThrow(() -> new ResourceNotFoundException("Cannot be deleted. User not found."));
+                .orElseThrow(() -> new ResourceNotFoundException("Cannot be deleted. User not found.", userId));
         entity.setActive(false);
         userRepository.save(entity);
     }
