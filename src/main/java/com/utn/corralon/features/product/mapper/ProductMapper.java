@@ -6,20 +6,19 @@ import com.utn.corralon.features.product.dto.ProductRequestDTO;
 import com.utn.corralon.features.product.dto.ProductResponseDTO;
 import com.utn.corralon.features.product.entity.ProductEntity;
 import com.utn.corralon.features.supplier.entity.SupplierEntity;
+import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
+
+@AllArgsConstructor
 
 @Component
 public class ProductMapper {
     private final ModelMapper modelMapper;
 
-    public ProductMapper(ModelMapper modelMapper) {
-        this.modelMapper = modelMapper;
-    }
 
     public ProductResponseDTO toResponse(ProductEntity product) {
-        ProductResponseDTO response =
-                modelMapper.map(product, ProductResponseDTO.class);
+        ProductResponseDTO response = modelMapper.map(product, ProductResponseDTO.class);
 
         response.setSupplierId(product.getSupplier().getExternalId());
         response.setSupplierName(product.getSupplier().getName());

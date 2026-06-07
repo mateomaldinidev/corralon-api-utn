@@ -1,9 +1,6 @@
 package com.utn.corralon.features.productVariant.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -24,19 +21,14 @@ public class ProductVariantRequestDTO {
     private BigDecimal price;
 
     @NotNull(message = "Stock is required")
-    @Positive(message = "Stock must be positive")
+    @Min(value = 0, message = "Stock cannot be negative")
     private Integer stock;
 
-    @NotNull(message = "Active is required")
-    private Boolean active;
-
-    @NotNull(message = "Wholesale price is required")
     @Positive(message = "Wholesale price must be positive")
     private BigDecimal wholesalePrice;
 
-    @NotNull(message = "Whole min stock is required")
-    @Positive(message = "Whole min stock must be positive")
-    private BigDecimal wholeMinStock;
+    @Min(value = 1, message = "Wholesale minimum quantity must be at least 1")
+    private Integer wholesaleMinQty;
 
     @NotNull(message = "Product is required")
     private UUID productId;

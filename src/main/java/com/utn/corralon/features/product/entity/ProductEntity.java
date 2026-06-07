@@ -26,7 +26,7 @@ public class ProductEntity {
 
     @Column(name = "externalId", nullable = false, unique = true, updatable = false)
     @UuidGenerator
-    private UUID externalId = UUID.randomUUID();
+    private UUID externalId;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -37,18 +37,18 @@ public class ProductEntity {
     @Column(name = "active", nullable = false)
     private boolean active;
 
-    @OneToMany(mappedBy = "product")
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY)
     private List<ProductVariantEntity> productVariants;
 
     @ManyToOne()
-    @JoinColumn(name = "supplier_id", nullable = false)
+    @JoinColumn(name = "supplierId", nullable = false)
     private SupplierEntity supplier;
 
     @ManyToOne()
-    @JoinColumn(name = "category_id", nullable = false)
+    @JoinColumn(name = "categoryId", nullable = false)
     private CategoryEntity category;
 
     @ManyToOne()
-    @JoinColumn(name = "brand_id", nullable = false)
+    @JoinColumn(name = "brandId", nullable = false)
     private BrandEntity brand;
 }
