@@ -6,25 +6,17 @@ import com.utn.corralon.features.address.entity.AddressEntity;
 import com.utn.corralon.features.address.repository.AddressRepository;
 import com.utn.corralon.features.cart.entity.CartEntity;
 import com.utn.corralon.features.cart.repository.CartRepository;
-import com.utn.corralon.features.cart_item.entity.CartItemEntity;
-import com.utn.corralon.features.order.dto.CreateOrderRequestDTO;
 import com.utn.corralon.features.order.dto.OrderAdminResponseDTO;
-import com.utn.corralon.features.cart.entity.CartEntity;
-import com.utn.corralon.features.order.OrderStatus;
-import com.utn.corralon.features.order.dto.OrderRequestDTO;
+import com.utn.corralon.features.order.enums.OrderStatus;
 import com.utn.corralon.features.order.dto.OrderResponseDTO;
 import com.utn.corralon.features.order.dto.OrderSummaryDTO;
 import com.utn.corralon.features.order.entity.OrderEntity;
 import com.utn.corralon.features.order.mapper.OrderMapper;
-import com.utn.corralon.features.order.orderEnum.OrderStatus;
 import com.utn.corralon.features.order.repository.OrderRepository;
 import com.utn.corralon.features.orderItem.entity.OrderItemEntity;
 import com.utn.corralon.features.orderItem.mapper.OrderItemMapper;
 import com.utn.corralon.features.productVariant.entity.ProductVariantEntity;
 import com.utn.corralon.features.productVariant.repository.ProductVariantRepository;
-import com.utn.corralon.features.stockMovement.entity.StockMovementEntity;
-import com.utn.corralon.features.stockMovement.enums.StockMovementType;
-import com.utn.corralon.features.stockMovement.repository.StockMovementRepository;
 import com.utn.corralon.features.user.entity.UserEntity;
 import com.utn.corralon.features.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -126,6 +118,7 @@ public class OrderService implements IOrderService {
         order.setTotal(total);
 
         OrderEntity savedOrder = orderRepository.save(order);
+
         return orderMapper.toResponseDTO(savedOrder);
     }
 
@@ -135,7 +128,7 @@ public class OrderService implements IOrderService {
 
         return orderRepository.findAll()
                 .stream()
-                .map(orderMapper::toResponseDTO)
+                .map(orderMapper::toAdminResponse)
                 .toList();
     }
 
@@ -145,20 +138,20 @@ public class OrderService implements IOrderService {
 
         OrderEntity order = orderRepository
                 .findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Orden no encontrada",externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found",externalId));
 
-        return orderMapper.toResponse(order);
+        return orderMapper.toResponseDTO(order);
     }
 
-    //GET DELETE
+
     @Override
     public List<OrderSummaryDTO> getOrdersByUser(
-            UUID userExternalId) {
-
+            UUID userExternalId)
+    {
         findUser(userExternalId);
 
         return orderRepository
-                .findByUserExternalId(userExternalId)
+                .findByUser_ExternalId(userExternalId)
                 .stream()
                 .map(orderMapper::toSummary)
                 .toList();
@@ -178,11 +171,10 @@ public class OrderService implements IOrderService {
 
         return orderRepository
                 .findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Orden no encontrada",externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found",externalId));
     }
 
-
-
+    @Override
     @Transactional
     public void cancelOrder(UUID externalId) {
 
@@ -190,16 +182,14 @@ public class OrderService implements IOrderService {
                 .findByExternalId(externalId)
                 .orElseThrow(() ->
                         new ResourceNotFoundException(
-                                "Orden no encontrada",externalId));
+                                "Order not found: ",externalId));
 
         if (order.getStatus() == OrderStatus.CANCELLED) {
-             throw new BadRequestException("La orden ya fue cancelada");
+             throw new BadRequestException("Order is already cancelled");
         }
 
-        if (order.getStatus() == OrderStatus.SHIPPED ||
-                order.getStatus() == OrderStatus.DELIVERED) {
-
-            throw new BadRequestException("La orden no puede cancelarse");
+        if(order.getStatus() == OrderStatus.PAID){
+            throw new BusinessRuleException("Paid orders cannot be cancelled");
         }
 
         restoreStock(order);
@@ -209,6 +199,7 @@ public class OrderService implements IOrderService {
         orderRepository.save(order);
     }
 
+
     private void restoreStock(OrderEntity order) {
 
         for (OrderItemEntity item : order.getItems()) {
@@ -216,9 +207,10 @@ public class OrderService implements IOrderService {
             ProductVariantEntity variant = item.getProductVariant();
 
             variant.setStock(variant.getStock() + item.getQuantity());
+
+            productVariantRepository.save(variant);
         }
     }
-
 
 
     private BigDecimal calculateUnitPrice(
@@ -234,6 +226,15 @@ public class OrderService implements IOrderService {
         return variant.getPrice();
     }
 
+    private UserEntity findUser(UUID externalId) {
 
+        return userRepository
+                .findByExternalId(externalId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Usuar not found.",
+                                externalId
+                        ));
+    }
 
 }

@@ -1,11 +1,9 @@
 package com.utn.corralon.features.order.controller;
 
-import com.utn.corralon.features.order.dto.CreateOrderRequestDTO;
 import com.utn.corralon.features.order.dto.OrderAdminResponseDTO;
 import com.utn.corralon.features.order.dto.OrderResponseDTO;
 import com.utn.corralon.features.order.dto.OrderSummaryDTO;
 import com.utn.corralon.features.order.service.IOrderService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +19,7 @@ public class OrderController {
 
     private final IOrderService orderService;
 
-    @GetMapping
+    @GetMapping("/admin") //solo para admin porque devuelve informaciòn administrativa
     public ResponseEntity<List<OrderAdminResponseDTO>> getAll() {
 
         return ResponseEntity
@@ -41,7 +39,7 @@ public class OrderController {
 
 
     @DeleteMapping("/{externalId}")
-    public ResponseEntity<Void> cancel(
+    public ResponseEntity<Void> cancelOrder(
             @PathVariable UUID externalId
     ) {
 

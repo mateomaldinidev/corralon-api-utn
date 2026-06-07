@@ -1,6 +1,6 @@
 package com.utn.corralon.features.order.dto;
 
-import com.utn.corralon.features.order.orderEnum.OrderStatus;
+import com.utn.corralon.features.order.enums.OrderStatus;
 import lombok.Getter;
 import lombok.Setter;
 
