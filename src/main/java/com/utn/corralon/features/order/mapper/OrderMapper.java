@@ -2,6 +2,7 @@ package com.utn.corralon.features.order.mapper;
 
 import com.utn.corralon.exception.ResourceNotFoundException;
 import com.utn.corralon.features.address.entity.AddressEntity;
+import com.utn.corralon.features.order.OrderStatus;
 import com.utn.corralon.features.productVariant.entity.ProductVariantEntity;
 import com.utn.corralon.features.order.dto.OrderRequestDTO;
 import com.utn.corralon.features.order.dto.OrderResponseDTO;
@@ -23,55 +24,33 @@ public class OrderMapper {
 
     private final ModelMapper modelMapper;
     private final OrderItemMapper orderItemMapper;
-    private final ProductVariantRepository productVariantRepository;
 
-    public OrderEntity toEntity(
-            OrderRequestDTO dto,
-            UserEntity user,
-            AddressEntity address
-    ) {
 
-        OrderEntity entity = new OrderEntity();
+    public OrderEntity toEntity(UserEntity user, AddressEntity address)
+    {
 
-        entity.setUser(user);
-        entity.setAddress(address);
-        entity.setTotal(dto.getTotal());
-        entity.setActive(dto.getActive());
-        entity.setCreatedAt(LocalDateTime.now());
+        OrderEntity order =
+                OrderEntity.builder()
+                        .user(user)
+                        .address(address)
+                        .createdAt(LocalDateTime.now())
+                        .status(OrderStatus.PENDING_PAYMENT)
+                        .build();
 
-        List<OrderItemEntity> items = dto.getItems().stream()
-                .map(itemDto -> {
-                    ProductVariantEntity variant =
-                            productVariantRepository.findByExternalId(
-                                            itemDto.getProductVariantExternalId())
-                                    .orElseThrow(() ->
-                                            new ResourceNotFoundException(
-                                                    "Product variant not found: "
-                                                            + itemDto.getProductVariantExternalId(), userId)
-                                    );
-
-                    return orderItemMapper.toEntity(
-                            itemDto,
-                            entity,
-                            variant
-                    );
-                })
-                .toList();
-
-        entity.setItems(items);
-
-        return entity;
+        return order;
     }
+
+
     public OrderResponseDTO toResponseDTO(OrderEntity orderEntity) {
 
-        OrderResponseDTO dto =
-                modelMapper.map(orderEntity, OrderResponseDTO.class);
+        OrderResponseDTO dto = modelMapper.map(orderEntity, OrderResponseDTO.class);
 
         dto.setUserExternalId(orderEntity.getUser().getExternalId());
         dto.setAddressExternalId(orderEntity.getAddress().getExternalId());
 
         dto.setItems(
-                orderEntity.getItems().stream()
+                orderEntity.getItems()
+                        .stream()
                         .map(orderItemMapper::toResponseDTO)
                         .toList()
         );

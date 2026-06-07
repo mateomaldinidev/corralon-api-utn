@@ -19,22 +19,12 @@ public class OrderController {
 
     private final IOrderService orderService;
 
-    @PostMapping
-    public ResponseEntity<OrderResponseDTO> create(
-            @Valid @RequestBody OrderRequestDTO dto
-    ) {
-
-        OrderResponseDTO response = orderService.create(dto);
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(response);
-    }
-
     @GetMapping
     public ResponseEntity<List<OrderResponseDTO>> getAll() {
 
-        return ResponseEntity.ok(orderService.getAll());
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(orderService.getAll());
     }
 
     @GetMapping("/{externalId}")
@@ -42,29 +32,21 @@ public class OrderController {
             @PathVariable UUID externalId
     ) {
 
-        return ResponseEntity.ok(
-                orderService.getByExternalId(externalId)
-        );
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(orderService.getByExternalId(externalId));
     }
 
-    @PutMapping("/{externalId}")
-    public ResponseEntity<OrderResponseDTO> update(
-            @PathVariable UUID externalId,
-            @Valid @RequestBody OrderRequestDTO dto
-    ) {
-
-        return ResponseEntity.ok(
-                orderService.update(externalId, dto)
-        );
-    }
 
     @DeleteMapping("/{externalId}")
-    public ResponseEntity<Void> delete(
+    public ResponseEntity<Void> cancel(
             @PathVariable UUID externalId
     ) {
 
         orderService.delete(externalId);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity
+                .noContent()
+                .build();
     }
 }

@@ -6,18 +6,17 @@ import com.utn.corralon.features.orderItem.dto.OrderItemRequestDTO;
 import com.utn.corralon.features.orderItem.dto.OrderItemResponseDTO;
 import com.utn.corralon.features.orderItem.entity.OrderItemEntity;
 import com.utn.corralon.features.productVariant.entity.ProductVariantEntity;
+import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 
+@RequiredArgsConstructor
 @Component
+
 public class OrderItemMapper {
     private final ModelMapper modelMapper;
-
-    public OrderItemMapper(ModelMapper modelMapper) {
-        this.modelMapper = modelMapper;
-    }
 
     public OrderItemResponseDTO toResponseDTO(OrderItemEntity entity) {
 
@@ -32,28 +31,24 @@ public class OrderItemMapper {
                 entity.getProductVariant().getExternalId()
         );
 
-        dto.setSubtotal(
-                entity.getUnitPrice()
-                        .multiply(BigDecimal.valueOf(entity.getQuantity()))
-        );
-
         return dto;
     }
 
     public OrderItemEntity toEntity(
-            OrderItemRequestDTO dto,
             OrderEntity order,
-            ProductVariantEntity variant
+            ProductVariantEntity variant,
+            Integer quantity,
+            BigDecimal unitPrice,
+            BigDecimal subtotal
     ) {
 
-        OrderItemEntity entity = new OrderItemEntity();
-
-        entity.setOrder(order);
-        entity.setProductVariant(variant);
-        entity.setQuantity(dto.getQuantity());
-        entity.setUnitPrice(dto.getUnitPrice());
-
-        return entity;
+        return OrderItemEntity.builder()
+                .order(order)
+                .productVariant(variant)
+                .quantity(quantity)
+                .unitPrice(unitPrice)
+                .subtotal(subtotal)
+                .build();
     }
 }
 

@@ -23,12 +23,4 @@ public class OrderRequestDTO {
     @NotNull
     private UUID addressExternalId;
 
-    @NotNull
-    private BigDecimal total;
-
-    @NotNull
-    private Boolean active;
-
-    @NotEmpty
-    private List<OrderItemRequestDTO> items;
 }
