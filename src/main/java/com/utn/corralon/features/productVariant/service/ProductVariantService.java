@@ -40,7 +40,7 @@ public class ProductVariantService implements IProductVariantService {
     public ProductVariantResponseDTO create(ProductVariantRequestDTO productVariantRequestDTO) {
         ProductEntity product = productRepository.findByExternalId(productVariantRequestDTO.getProductId())
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Product not found. ID: " + productVariantRequestDTO.getProductId(), userId)
+                        "Product not found. ID: " + productVariantRequestDTO.getProductId(), productVariantRequestDTO.getProductId()) // Corregido: userId -> productVariantRequestDTO.getProductId()
                 );
 
         if (!product.isActive())
@@ -72,7 +72,7 @@ public class ProductVariantService implements IProductVariantService {
         ProductEntity product = productRepository
                 .findByExternalId(productVariantRequestDTO.getProductId())
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Product not found. ID: " + productVariantRequestDTO.getProductId(), userId));
+                        "Product not found. ID: " + productVariantRequestDTO.getProductId(), productVariantRequestDTO.getProductId())); // Corregido: userId -> productVariantRequestDTO.getProductId()
         if (!product.isActive()) {
             throw new BusinessRuleException("Cannot assign inactive product");
         }
@@ -106,7 +106,7 @@ public class ProductVariantService implements IProductVariantService {
     public void activate(UUID externalId) {
         ProductVariantEntity variant = productVariantRepository.findByExternalId(externalId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Product variant not found", userId)
+                        new ResourceNotFoundException("Product variant not found", externalId) // Corregido: userId -> externalId
                 );
 
         if(variant.getActive()) {
@@ -249,7 +249,7 @@ public class ProductVariantService implements IProductVariantService {
     private ProductVariantEntity getActiveVariant(UUID variantId) {
         return productVariantRepository.findByExternalIdAndActiveTrue(variantId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException( "Product variant not found", userId)
+                        new ResourceNotFoundException( "Product variant not found", variantId) // Corregido: userId -> variantId
                 );
     }
 
