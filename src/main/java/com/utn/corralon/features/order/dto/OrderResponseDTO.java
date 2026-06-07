@@ -1,6 +1,6 @@
 package com.utn.corralon.features.order.dto;
 
-import com.utn.corralon.features.order.OrderStatus;
+import com.utn.corralon.features.order.enums.OrderStatus;
 import com.utn.corralon.features.orderItem.dto.OrderItemResponseDTO;
 import lombok.*;
 
