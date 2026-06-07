@@ -26,8 +26,8 @@ public class PaymentEntity {
     @UuidGenerator
     private UUID externalId = UUID.randomUUID();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", nullable = false, unique = true)
     private OrderEntity order;
 
     @Column(name = "payment_method", nullable = false)

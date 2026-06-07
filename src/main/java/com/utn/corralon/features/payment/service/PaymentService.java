@@ -1,0 +1,122 @@
+package com.utn.corralon.features.payment.service;
+
+import com.utn.corralon.exception.BusinessRuleException;
+import com.utn.corralon.exception.ResourceNotFoundException;
+import com.utn.corralon.features.order.entity.OrderEntity;
+import com.utn.corralon.features.order.enums.OrderStatus;
+import com.utn.corralon.features.order.repository.OrderRepository;
+import com.utn.corralon.features.orderItem.entity.OrderItemEntity;
+import com.utn.corralon.features.payment.dto.PaymentRequestDTO;
+import com.utn.corralon.features.payment.dto.PaymentResponseDTO;
+import com.utn.corralon.features.payment.entity.PaymentEntity;
+import com.utn.corralon.features.payment.entity.PaymentStatus;
+import com.utn.corralon.features.payment.mapper.PaymentMapper;
+import com.utn.corralon.features.payment.repository.PaymentRepository;
+import com.utn.corralon.features.productVariant.entity.ProductVariantEntity;
+import com.utn.corralon.features.productVariant.repository.ProductVariantRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+public class PaymentService implements IPaymentService {
+
+    private final PaymentRepository paymentRepository;
+    private final OrderRepository orderRepository;
+    private final ProductVariantRepository productVariantRepository;
+    private final PaymentMapper paymentMapper;
+
+    @Override
+    public PaymentResponseDTO pay(PaymentRequestDTO request) {
+
+        OrderEntity order = orderRepository.findByExternalId(request.getOrderId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Order not found", request.getOrderId()));
+
+        if (order.getStatus() != OrderStatus.PENDING_PAYMENT) {
+            throw new BusinessRuleException("Order is not pending payment");
+        }
+
+        if (request.getAmount().compareTo(order.getTotal()) != 0) {
+            throw new BusinessRuleException("Invalid payment amount");
+        }
+
+        // 1. Crear payment en estado PENDING
+        PaymentEntity payment = PaymentEntity.builder()
+                .order(order)
+                .amount(order.getTotal())
+                .paymentMethod(request.getPaymentMethod())
+                .paymentStatus(PaymentStatus.PENDING)
+                .createdAt(LocalDateTime.now())
+                .build();
+
+        payment = paymentRepository.save(payment);
+
+        // 2. Simular pago
+        PaymentStatus result = simulateCard(request);
+
+        // 3. CASO APPROVED
+        if (result == PaymentStatus.APPROVED) {
+
+            payment.setPaymentStatus(PaymentStatus.APPROVED);
+            order.setStatus(OrderStatus.PAID);
+
+            orderRepository.save(order);
+            paymentRepository.save(payment);
+
+            return paymentMapper.toDTO(payment);
+        }
+
+        // 4. CASO REJECTED → rollback stock + cancelar orden
+        payment.setPaymentStatus(PaymentStatus.REJECTED);
+        order.setStatus(OrderStatus.CANCELLED);
+
+        restoreStock(order);
+
+        orderRepository.save(order);
+        paymentRepository.save(payment);
+
+        return paymentMapper.toDTO(payment);
+    }
+
+    // ------------------------
+    // STOCK ROLLBACK
+    // ------------------------
+    private void restoreStock(OrderEntity order) {
+
+        for (OrderItemEntity item : order.getItems()) {
+
+            ProductVariantEntity variant = item.getProductVariant();
+
+            variant.setStock(
+                    variant.getStock() + item.getQuantity()
+            );
+
+            productVariantRepository.save(variant);
+        }
+    }
+
+    // ------------------------
+    // SIMULACIÓN TARJETA
+    // ------------------------
+    private PaymentStatus simulateCard(PaymentRequestDTO request) {
+
+        return Math.random() > 0.3
+                ? PaymentStatus.APPROVED
+                : PaymentStatus.REJECTED;
+    }
+
+    public PaymentResponseDTO getByOrderId(UUID orderId) {
+
+        PaymentEntity payment = paymentRepository.findByOrder_ExternalId(orderId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Payment not found for order", orderId));
+
+        return paymentMapper.toDTO(payment);
+    }
+}
