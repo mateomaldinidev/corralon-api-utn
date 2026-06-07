@@ -1,5 +1,6 @@
 package com.utn.corralon.features.order.service;
 
+import com.utn.corralon.exception.BusinessRuleException;
 import com.utn.corralon.exception.ResourceNotFoundException;
 import com.utn.corralon.features.address.entity.AddressEntity;
 import com.utn.corralon.features.address.repository.AddressRepository;
@@ -8,6 +9,9 @@ import com.utn.corralon.features.cart.repository.CartRepository;
 import com.utn.corralon.features.cart_item.entity.CartItemEntity;
 import com.utn.corralon.features.order.dto.CreateOrderRequestDTO;
 import com.utn.corralon.features.order.dto.OrderAdminResponseDTO;
+import com.utn.corralon.features.cart.entity.CartEntity;
+import com.utn.corralon.features.order.OrderStatus;
+import com.utn.corralon.features.order.dto.OrderRequestDTO;
 import com.utn.corralon.features.order.dto.OrderResponseDTO;
 import com.utn.corralon.features.order.dto.OrderSummaryDTO;
 import com.utn.corralon.features.order.entity.OrderEntity;
@@ -15,7 +19,12 @@ import com.utn.corralon.features.order.mapper.OrderMapper;
 import com.utn.corralon.features.order.orderEnum.OrderStatus;
 import com.utn.corralon.features.order.repository.OrderRepository;
 import com.utn.corralon.features.orderItem.entity.OrderItemEntity;
+import com.utn.corralon.features.orderItem.mapper.OrderItemMapper;
 import com.utn.corralon.features.productVariant.entity.ProductVariantEntity;
+import com.utn.corralon.features.productVariant.repository.ProductVariantRepository;
+import com.utn.corralon.features.stockMovement.entity.StockMovementEntity;
+import com.utn.corralon.features.stockMovement.enums.StockMovementType;
+import com.utn.corralon.features.stockMovement.repository.StockMovementRepository;
 import com.utn.corralon.features.user.entity.UserEntity;
 import com.utn.corralon.features.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -29,64 +38,108 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class OrderService implements IOrderService {
 
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
+    private final OrderItemMapper orderItemMapper;
+    private final ProductVariantRepository productVariantRepository;
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
     private final CartRepository cartRepository;
 
+    //CREATE
     @Override
     @Transactional
-    public OrderResponseDTO createOrder(CreateOrderRequestDTO request, UUID userExternalId) {
+    public OrderResponseDTO createFromCart(
+            CartEntity cart, UUID addressId
+    ) {
+        AddressEntity address = addressRepository.findByExternalId(addressId)
+                        .orElseThrow(() ->
+                                new ResourceNotFoundException("Address not found", userId)
+                        );
 
-        UserEntity user = findUser(userExternalId);
-
-        AddressEntity address =
-                findAddress(request.getAddressId());
-
-        validateAddressOwnership(user, address);
-
-        CartEntity cart = findCart(user);
-
-        validateCart(cart);
-
-        validateStock(cart);
-
-        OrderEntity order = OrderEntity.builder()
-                .user(user)
-                .address(address)
-                .build();
-
-        BigDecimal total = BigDecimal.ZERO;
-
-        for (CartItemEntity cartItem : cart.getCartItems()) {
-            OrderItemEntity orderItem = buildOrderItem(cartItem);
-            order.addItem(orderItem);
-            total = total.add(orderItem.getSubtotal());
-            discountStock(cartItem);
+        if (!address.getUser().getExternalId()
+                .equals(cart.getUser().getExternalId())) {
+            throw new BusinessRuleException("Address does not belong to user");
         }
 
+        if (cart.getCartItems().isEmpty()) {
+            throw new BusinessRuleException("Cart is empty");
+        }
+
+        OrderEntity order = orderMapper.toEntity( cart.getUser(), address);
+
+        List<OrderItemEntity> items =
+                cart.getCartItems()
+                        .stream()
+                        .map(cartItem  -> {
+
+                            ProductVariantEntity variant =
+                                    cartItem.getProductVariant();
+
+                            if (!variant.getActive()) {
+                                throw new BusinessRuleException("Product variant is inactive");
+                            }
+
+                            if (variant.getStock() < cartItem.getQuantity())
+                            {
+                                throw new BusinessRuleException("Insufficient stock");
+                            }
+
+                            BigDecimal unitPrice = calculateUnitPrice(variant,
+                                    cartItem.getQuantity());
+
+                            BigDecimal subtotal =
+                                    unitPrice.multiply(
+                                            BigDecimal.valueOf(
+                                                    cartItem.getQuantity())
+                                    );
+
+                            variant.setStock(
+                                    variant.getStock() - cartItem.getQuantity()
+                            );
+
+                            productVariantRepository.save(variant);
+
+
+                            return orderItemMapper.toEntity(
+                                    order,
+                                    variant,
+                                    cartItem.getQuantity(),
+                                    unitPrice,
+                                    subtotal
+                            );
+                        })
+                        .toList();
+
+        BigDecimal total = items
+                .stream()
+                .map(OrderItemEntity::getSubtotal)
+                .reduce(
+                        BigDecimal.ZERO,
+                        BigDecimal::add
+                );
+
+        order.setItems(items);
         order.setTotal(total);
 
         OrderEntity savedOrder = orderRepository.save(order);
-
-        cart.getCartItems().clear();
-
-        cartRepository.save(cart);
-
-        return orderMapper.toResponse(savedOrder);
+        return orderMapper.toResponseDTO(savedOrder);
     }
 
+    //GET ALL
     @Override
     public List<OrderAdminResponseDTO> getAll() {
 
-        return orderRepository.findAll().stream()
-                .map(orderMapper::toAdminResponse)
+        return orderRepository.findAll()
+                .stream()
+                .map(orderMapper::toResponseDTO)
                 .toList();
     }
 
+    //GET BY EXTERNAL ID
     @Override
     public OrderResponseDTO getByExternalId(UUID externalId) {
 
@@ -97,6 +150,7 @@ public class OrderService implements IOrderService {
         return orderMapper.toResponse(order);
     }
 
+    //GET DELETE
     @Override
     public List<OrderSummaryDTO> getOrdersByUser(
             UUID userExternalId) {
@@ -129,7 +183,6 @@ public class OrderService implements IOrderService {
 
 
 
-    @Override
     @Transactional
     public void cancelOrder(UUID externalId) {
 
@@ -166,85 +219,21 @@ public class OrderService implements IOrderService {
         }
     }
 
-    private OrderItemEntity buildOrderItem(
-            CartItemEntity cartItem) {
-
-        ProductVariantEntity variant =
-                cartItem.getProductVariant();
-
-        BigDecimal unitPrice =
-                variant.getPrice();
-
-        BigDecimal subtotal = unitPrice.multiply(BigDecimal.valueOf(cartItem.getQuantity()));
-
-        return OrderItemEntity.builder()
-                .productVariant(variant)
-                .quantity(cartItem.getQuantity())
-                .unitPrice(unitPrice)
-                .subtotal(subtotal)
-                .build();
-    }
-
-    private void discountStock(
-            CartItemEntity cartItem) {
-
-        ProductVariantEntity variant = cartItem.getProductVariant();
-
-        variant.setStock(variant.getStock() - cartItem.getQuantity());
-    }
-    private UserEntity findUser(UUID externalId) {
-
-        return userRepository
-                .findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado",externalId));
-    }
-
-    private AddressEntity findAddress(
-            UUID externalId) {
-
-        return addressRepository
-                .findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Dirección no encontrada",externalId));
-    }
-
-    private CartEntity findCart(UserEntity user) {
-
-        return cartRepository
-                .findByUser(user)
-                .orElseThrow(() -> new ResourceNotFoundException("Carrito no encontrado",user.getExternalId()));
-    }
 
 
-    private void validateCart(CartEntity cart) {
+    private BigDecimal calculateUnitPrice(
+            ProductVariantEntity variant,
+            Integer quantity
+    ) {
 
-        if (cart.getCartItems() == null ||
-                cart.getCartItems().isEmpty()) {
-
-           throw new BadRequestException("El carrito está vacío");
+        if (variant.getWholesaleMinQty() != null && quantity >= variant.getWholesaleMinQty())
+        {
+            return variant.getWholesalePrice();
         }
+
+        return variant.getPrice();
     }
 
-    private void validateAddressOwnership(
-            UserEntity user,
-            AddressEntity address) {
 
-        if (!address.getUser().getId().equals(user.getId())) {
-
-           throw new BadRequestException("La dirección no pertenece al usuario");
-        }
-    }
-
-    private void validateStock(CartEntity cart) {
-
-        for (CartItemEntity item : cart.getCartItems()) {
-
-            ProductVariantEntity variant = item.getProductVariant();
-
-            if (variant.getStock() < item.getQuantity()) {
-
-                throw new BadRequestException("Stock insuficiente para " + variant.getProduct().getName());
-            }
-        }
-    }
 
 }

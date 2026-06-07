@@ -21,36 +21,35 @@ public class OrderController {
 
     private final IOrderService orderService;
 
-    @PostMapping
-    public ResponseEntity<OrderResponseDTO> create(@Valid @RequestBody CreateOrderRequestDTO dto, @RequestParam UUID userExternalId) {
-
-        OrderResponseDTO response = orderService.createOrder(dto, userExternalId);
-
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(response);
-    }
-
     @GetMapping
     public ResponseEntity<List<OrderAdminResponseDTO>> getAll() {
 
-        return ResponseEntity.ok(orderService.getAll());
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(orderService.getAll());
     }
 
     @GetMapping("/{externalId}")
-    public ResponseEntity<OrderResponseDTO> getByExternalId(@PathVariable UUID externalId) {
+    public ResponseEntity<OrderResponseDTO> getByExternalId(
+            @PathVariable UUID externalId) {
 
-        return ResponseEntity.ok(
-                orderService.getByExternalId(externalId)
-        );
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(orderService.getByExternalId(externalId));
     }
 
-    @PatchMapping("/{externalId}/cancel")
-    public ResponseEntity<Void> cancelOrder(@PathVariable UUID externalId) {
+
+
+    @DeleteMapping("/{externalId}")
+    public ResponseEntity<Void> cancel(
+            @PathVariable UUID externalId
+    ) {
 
         orderService.cancelOrder(externalId);
 
-        return ResponseEntity.noContent().build();
+        return ResponseEntity
+                .noContent()
+                .build();
     }
 
     @GetMapping("/user/{userExternalId}")

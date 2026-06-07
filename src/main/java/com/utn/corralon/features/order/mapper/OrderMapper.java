@@ -2,10 +2,9 @@ package com.utn.corralon.features.order.mapper;
 
 import com.utn.corralon.exception.ResourceNotFoundException;
 import com.utn.corralon.features.address.entity.AddressEntity;
-import com.utn.corralon.features.order.dto.OrderAdminResponseDTO;
-import com.utn.corralon.features.order.dto.OrderSummaryDTO;
+import com.utn.corralon.features.order.OrderStatus;
 import com.utn.corralon.features.productVariant.entity.ProductVariantEntity;
-import com.utn.corralon.features.order.dto.CreateOrderRequestDTO;
+import com.utn.corralon.features.order.dto.OrderRequestDTO;
 import com.utn.corralon.features.order.dto.OrderResponseDTO;
 import com.utn.corralon.features.order.entity.OrderEntity;
 import com.utn.corralon.features.orderItem.entity.OrderItemEntity;
@@ -24,31 +23,39 @@ import java.util.List;
 public class OrderMapper {
 
     private final ModelMapper modelMapper;
+    private final OrderItemMapper orderItemMapper;
 
 
-    public OrderResponseDTO toResponse(OrderEntity order) {
+    public OrderEntity toEntity(UserEntity user, AddressEntity address)
+    {
 
-        OrderResponseDTO dto = modelMapper.map(order, OrderResponseDTO.class);
+        OrderEntity order =
+                OrderEntity.builder()
+                        .user(user)
+                        .address(address)
+                        .createdAt(LocalDateTime.now())
+                        .status(OrderStatus.PENDING_PAYMENT)
+                        .build();
 
-        dto.setAddressExternalId(order.getAddress().getExternalId());
+        return order;
+    }
+
+
+    public OrderResponseDTO toResponseDTO(OrderEntity orderEntity) {
+
+        OrderResponseDTO dto = modelMapper.map(orderEntity, OrderResponseDTO.class);
+
+        dto.setUserExternalId(orderEntity.getUser().getExternalId());
+        dto.setAddressExternalId(orderEntity.getAddress().getExternalId());
+
+        dto.setItems(
+                orderEntity.getItems()
+                        .stream()
+                        .map(orderItemMapper::toResponseDTO)
+                        .toList()
+        );
 
         return dto;
     }
 
-    public OrderAdminResponseDTO toAdminResponse(OrderEntity order) {
-
-        OrderAdminResponseDTO dto = modelMapper.map(order, OrderAdminResponseDTO.class);
-
-        dto.setUserExternalId(order.getUser().getExternalId());
-
-        dto.setAddressExternalId(order.getAddress().getExternalId());
-
-        return dto;
-    }
-
-    public OrderSummaryDTO toSummary(OrderEntity order) {
-
-        return modelMapper.map(order, OrderSummaryDTO.class);
-    }
 }
-
