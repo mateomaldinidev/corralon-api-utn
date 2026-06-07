@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/brands")
+@RequestMapping("/api/brands")
 @RequiredArgsConstructor
 
 public class BrandController {
@@ -45,5 +45,18 @@ public class BrandController {
     public ResponseEntity<Void> delete(@PathVariable UUID externalId) {
         brandService.delete(externalId);
         return ResponseEntity.noContent().build();
+    }
+
+    // Nuevo endpoint para activar una marca
+    @PatchMapping("/{externalId}/activate") // PATCH es más semantico para activar/desactivar
+    public ResponseEntity<Void> activate(@PathVariable UUID externalId) {
+        brandService.activate(externalId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // Nuevo endpoint para obtener marcas inactivas
+    @GetMapping("/inactive")
+    public ResponseEntity<List<BrandResponseDTO>> getInactive() {
+        return ResponseEntity.ok(brandService.getInactive());
     }
 }
