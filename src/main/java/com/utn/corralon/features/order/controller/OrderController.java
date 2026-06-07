@@ -1,7 +1,9 @@
 package com.utn.corralon.features.order.controller;
 
-import com.utn.corralon.features.order.dto.OrderRequestDTO;
+import com.utn.corralon.features.order.dto.CreateOrderRequestDTO;
+import com.utn.corralon.features.order.dto.OrderAdminResponseDTO;
 import com.utn.corralon.features.order.dto.OrderResponseDTO;
+import com.utn.corralon.features.order.dto.OrderSummaryDTO;
 import com.utn.corralon.features.order.service.IOrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,14 +15,14 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/orders")
+@RequestMapping("/api/orders")
 @RequiredArgsConstructor
 public class OrderController {
 
     private final IOrderService orderService;
 
     @GetMapping
-    public ResponseEntity<List<OrderResponseDTO>> getAll() {
+    public ResponseEntity<List<OrderAdminResponseDTO>> getAll() {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -29,8 +31,7 @@ public class OrderController {
 
     @GetMapping("/{externalId}")
     public ResponseEntity<OrderResponseDTO> getByExternalId(
-            @PathVariable UUID externalId
-    ) {
+            @PathVariable UUID externalId) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -38,15 +39,30 @@ public class OrderController {
     }
 
 
+
     @DeleteMapping("/{externalId}")
     public ResponseEntity<Void> cancel(
             @PathVariable UUID externalId
     ) {
 
-        orderService.delete(externalId);
+        orderService.cancelOrder(externalId);
 
         return ResponseEntity
                 .noContent()
                 .build();
+    }
+
+    @GetMapping("/user/{userExternalId}")
+    public ResponseEntity<List<OrderSummaryDTO>> getOrdersByUser(
+            @PathVariable UUID userExternalId) {
+
+        return ResponseEntity.ok(orderService.getOrdersByUser(userExternalId));
+    }
+
+    @GetMapping("/admin/{externalId}")
+    public ResponseEntity<OrderAdminResponseDTO> getAdminOrder(
+            @PathVariable UUID externalId) {
+
+        return ResponseEntity.ok(orderService.getAdminOrder(externalId));
     }
 }

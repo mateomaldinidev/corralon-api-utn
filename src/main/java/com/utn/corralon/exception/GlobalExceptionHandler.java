@@ -2,12 +2,11 @@ package com.utn.corralon.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.MethodArgumentNotValidException; // Importar esta clase
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.util.HashMap; // Importar HashMap
-import java.util.Map;   // Importar Map
+import java.util.HashMap;
+import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -25,7 +24,6 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.CONFLICT)
                 .body(ex.getMessage());
     }
-
     @ExceptionHandler(StockInsufficientException.class)
     public ResponseEntity<String> handleStockInsufficient(StockInsufficientException ex) {
         return ResponseEntity
@@ -37,6 +35,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleBusinessRule(BusinessRuleException ex) {
         return ResponseEntity
                 .status(HttpStatus.CONFLICT)
+                .body(ex.getMessage());
+    }
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<String> handleBadRequest(BadRequestException ex) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
                 .body(ex.getMessage());
     }
 

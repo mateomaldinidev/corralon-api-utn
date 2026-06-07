@@ -5,11 +5,18 @@ import com.utn.corralon.exception.ResourceNotFoundException;
 import com.utn.corralon.features.address.entity.AddressEntity;
 import com.utn.corralon.features.address.repository.AddressRepository;
 import com.utn.corralon.features.cart.entity.CartEntity;
+import com.utn.corralon.features.cart.repository.CartRepository;
+import com.utn.corralon.features.cart_item.entity.CartItemEntity;
+import com.utn.corralon.features.order.dto.CreateOrderRequestDTO;
+import com.utn.corralon.features.order.dto.OrderAdminResponseDTO;
+import com.utn.corralon.features.cart.entity.CartEntity;
 import com.utn.corralon.features.order.OrderStatus;
 import com.utn.corralon.features.order.dto.OrderRequestDTO;
 import com.utn.corralon.features.order.dto.OrderResponseDTO;
+import com.utn.corralon.features.order.dto.OrderSummaryDTO;
 import com.utn.corralon.features.order.entity.OrderEntity;
 import com.utn.corralon.features.order.mapper.OrderMapper;
+import com.utn.corralon.features.order.orderEnum.OrderStatus;
 import com.utn.corralon.features.order.repository.OrderRepository;
 import com.utn.corralon.features.orderItem.entity.OrderItemEntity;
 import com.utn.corralon.features.orderItem.mapper.OrderItemMapper;
@@ -22,10 +29,10 @@ import com.utn.corralon.features.user.entity.UserEntity;
 import com.utn.corralon.features.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import com.utn.corralon.exception.BadRequestException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,8 +44,10 @@ public class OrderService implements IOrderService {
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
     private final OrderItemMapper orderItemMapper;
-
+    private final ProductVariantRepository productVariantRepository;
+    private final UserRepository userRepository;
     private final AddressRepository addressRepository;
+    private final CartRepository cartRepository;
 
     //CREATE
     @Override
@@ -88,6 +97,12 @@ public class OrderService implements IOrderService {
                                                     cartItem.getQuantity())
                                     );
 
+                            variant.setStock(
+                                    variant.getStock() - cartItem.getQuantity()
+                            );
+
+                            productVariantRepository.save(variant);
+
 
                             return orderItemMapper.toEntity(
                                     order,
@@ -116,7 +131,7 @@ public class OrderService implements IOrderService {
 
     //GET ALL
     @Override
-    public List<OrderResponseDTO> getAll() {
+    public List<OrderAdminResponseDTO> getAll() {
 
         return orderRepository.findAll()
                 .stream()
@@ -130,34 +145,81 @@ public class OrderService implements IOrderService {
 
         OrderEntity order = orderRepository
                 .findByExternalId(externalId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Order not found", userId)
-                );
+                .orElseThrow(() -> new ResourceNotFoundException("Orden no encontrada",externalId));
 
-        return orderMapper.toResponseDTO(order);
+        return orderMapper.toResponse(order);
     }
 
     //GET DELETE
     @Override
+    public List<OrderSummaryDTO> getOrdersByUser(
+            UUID userExternalId) {
+
+        findUser(userExternalId);
+
+        return orderRepository
+                .findByUserExternalId(userExternalId)
+                .stream()
+                .map(orderMapper::toSummary)
+                .toList();
+    }
+
+    @Override
+    public OrderAdminResponseDTO getAdminOrder(
+            UUID externalId) {
+
+        OrderEntity order = findOrder(externalId);
+
+        return orderMapper.toAdminResponse(order);
+    }
+
+    private OrderEntity findOrder(
+            UUID externalId) {
+
+        return orderRepository
+                .findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Orden no encontrada",externalId));
+    }
+
+
+
     @Transactional
-    public void delete(UUID externalId) {
+    public void cancelOrder(UUID externalId) {
 
         OrderEntity order = orderRepository
                 .findByExternalId(externalId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Order not found", userId)
-                );
+                        new ResourceNotFoundException(
+                                "Orden no encontrada",externalId));
 
-        if (order.getStatus().equals(OrderStatus.CANCELLED)) {
-            throw new BusinessRuleException(
-                    "Order is already cancelled"
-            );
+        if (order.getStatus() == OrderStatus.CANCELLED) {
+             throw new BadRequestException("La orden ya fue cancelada");
         }
+
+        if (order.getStatus() == OrderStatus.SHIPPED ||
+                order.getStatus() == OrderStatus.DELIVERED) {
+
+            throw new BadRequestException("La orden no puede cancelarse");
+        }
+
+        restoreStock(order);
 
         order.setStatus(OrderStatus.CANCELLED);
 
         orderRepository.save(order);
     }
+
+    private void restoreStock(OrderEntity order) {
+
+        for (OrderItemEntity item : order.getItems()) {
+
+            ProductVariantEntity variant = item.getProductVariant();
+
+            variant.setStock(variant.getStock() + item.getQuantity());
+        }
+    }
+
+
 
     private BigDecimal calculateUnitPrice(
             ProductVariantEntity variant,
