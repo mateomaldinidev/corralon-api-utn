@@ -1,5 +1,6 @@
 package com.utn.corralon.features.brand.service;
 
+import com.utn.corralon.exception.BusinessRuleException;
 import com.utn.corralon.exception.ResourceNotFoundException;
 import com.utn.corralon.features.brand.dto.BrandRequestDTO;
 import com.utn.corralon.features.brand.dto.BrandResponseDTO;
@@ -8,6 +9,7 @@ import com.utn.corralon.features.brand.mapper.BrandMapper;
 import com.utn.corralon.features.brand.repository.BrandRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,35 +21,44 @@ public class BrandService implements IBrandService {
     private final BrandMapper brandMapper;
 
     @Override
+    @Transactional
     public BrandResponseDTO create(BrandRequestDTO dto) {
-        // Validamos si ya existe (como hablamos antes)
-        if (brandRepository.existsByName(dto.getName())) {
-            throw new RuntimeException("La marca ya existe");
+        if (brandRepository.existsByNameAndActiveTrue(dto.getName())) {
+            throw new BusinessRuleException("Brand with name '" + dto.getName() + "' already exists.");
         }
         BrandEntity entity = brandMapper.toEntity(dto);
-        entity.setActive(true);
+        if (entity.getActive() == null) {
+            entity.setActive(true);
+        }
         BrandEntity saved = brandRepository.save(entity);
         return brandMapper.toResponse(saved);
     }
 
     @Override
     public List<BrandResponseDTO> getAll() {
-        return brandRepository.findAll().stream()
+        return brandRepository.findAllByActiveTrue().stream()
                 .map(brandMapper::toResponse)
                 .toList();
     }
 
     @Override
-
     public BrandResponseDTO getByExternalId(UUID externalId) {
-        return brandRepository.findByExternalId(externalId)
+        return brandRepository.findByExternalIdAndActiveTrue(externalId)
                 .map(brandMapper::toResponse)
-                .orElseThrow(() -> new ResourceNotFoundException("Brand not found ID: " + externalId, userId));
+                .orElseThrow(() -> new ResourceNotFoundException("Brand not found with ID: " + externalId, externalId));
     }
+
     @Override
+    @Transactional
     public BrandResponseDTO update(UUID externalId, BrandRequestDTO dto) {
-        BrandEntity entity = brandRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Cannot be updated. Brand not found.", userId));
+        BrandEntity entity = brandRepository.findByExternalIdAndActiveTrue(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Brand not found with ID: " + externalId, externalId));
+
+        // Validar si el nuevo nombre ya existe en otra marca activa
+        if (brandRepository.existsByNameAndActiveTrue(dto.getName()) &&
+                !entity.getName().equalsIgnoreCase(dto.getName())) { // Solo si el nombre cambió y ya existe
+            throw new BusinessRuleException("Brand with name '" + dto.getName() + "' already exists.");
+        }
 
         brandMapper.updateEntity(entity, dto);
         BrandEntity updated = brandRepository.save(entity);
@@ -55,11 +66,31 @@ public class BrandService implements IBrandService {
     }
 
     @Override
+    @Transactional
     public void delete(UUID externalId) {
-        BrandEntity entity = brandRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Cannot be updated. Brand not found.", userId));
+        BrandEntity entity = brandRepository.findByExternalIdAndActiveTrue(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Brand not found with ID: " + externalId, externalId));
         entity.setActive(false);
         brandRepository.save(entity);
     }
-}
 
+    @Override
+    @Transactional
+    public void activate(UUID externalId) {
+        BrandEntity entity = brandRepository.findByExternalId(externalId) // Busca activa o inactiva
+                .orElseThrow(() -> new ResourceNotFoundException("Brand not found with ID: " + externalId, externalId));
+
+        if (entity.getActive()) {
+            throw new BusinessRuleException("Brand with ID: " + externalId + " is already active.");
+        }
+        entity.setActive(true);
+        brandRepository.save(entity);
+    }
+
+    @Override
+    public List<BrandResponseDTO> getInactive() {
+        return brandRepository.findAllByActiveFalse().stream()
+                .map(brandMapper::toResponse)
+                .toList();
+    }
+}
