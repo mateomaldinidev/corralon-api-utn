@@ -49,7 +49,7 @@ public class OrderService implements IOrderService {
     ) {
         AddressEntity address = addressRepository.findByExternalId(addressId)
                         .orElseThrow(() ->
-                                new ResourceNotFoundException("Address not found", userId)
+                                new ResourceNotFoundException("Address not found", addressId)
                         );
 
         if (!address.getUser().getExternalId()
@@ -116,6 +116,7 @@ public class OrderService implements IOrderService {
 
         order.setItems(items);
         order.setTotal(total);
+        order.setStatus(OrderStatus.PENDING_PAYMENT);
 
         OrderEntity savedOrder = orderRepository.save(order);
 
