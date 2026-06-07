@@ -16,17 +16,9 @@ import java.util.UUID;
 public class OrderItemRequestDTO {
 
     @NotNull
-    private UUID orderExternalId;
-
-    @NotNull
     private UUID productVariantExternalId;
 
     @NotNull
     @Min(1)
     private Integer quantity;
-
-    @NotNull
-    @Positive
-    private BigDecimal unitPrice;
-
 }

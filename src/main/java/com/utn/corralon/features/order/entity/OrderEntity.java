@@ -1,6 +1,7 @@
 package com.utn.corralon.features.order.entity;
 
 import com.utn.corralon.features.address.entity.AddressEntity;
+import com.utn.corralon.features.order.OrderStatus;
 import com.utn.corralon.features.orderItem.entity.OrderItemEntity;
 import com.utn.corralon.features.user.entity.UserEntity;
 import jakarta.persistence.*;
@@ -43,8 +44,8 @@ public class OrderEntity {
     @Column(name="created_at",nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name="active",nullable = false)
-    private Boolean active;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItemEntity> items;

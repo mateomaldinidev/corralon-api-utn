@@ -1,5 +1,6 @@
 package com.utn.corralon.features.order.dto;
 
+import com.utn.corralon.features.order.OrderStatus;
 import com.utn.corralon.features.orderItem.dto.OrderItemResponseDTO;
 import lombok.*;
 
@@ -25,7 +26,7 @@ public class OrderResponseDTO {
 
     private LocalDateTime createdAt;
 
-    private Boolean active;
+    private OrderStatus status;
 
     private List<OrderItemResponseDTO> items;
 }

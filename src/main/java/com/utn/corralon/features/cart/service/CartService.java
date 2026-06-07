@@ -9,13 +9,15 @@ import com.utn.corralon.features.cart.entity.CartEntity;
 import com.utn.corralon.features.cart.repository.CartRepository;
 import com.utn.corralon.features.cart_item.dto.CartItemRequestDTO;
 import com.utn.corralon.features.cart_item.dto.CartItemResponseDTO;
-import com.utn.corralon.features.cart_item.dto.CartItemQuantityUpdateDTO; // Importar el DTO de actualización
+import com.utn.corralon.features.cart_item.dto.CartItemQuantityUpdateDTO;
 import com.utn.corralon.features.cart_item.entity.CartItemEntity;
-import com.utn.corralon.features.cart_item.repository.CartItemRepository;
+import com.utn.corralon.features.order.dto.OrderResponseDTO;
+import com.utn.corralon.features.order.service.OrderService;
 import com.utn.corralon.features.productVariant.entity.ProductVariantEntity;
 import com.utn.corralon.features.productVariant.repository.ProductVariantRepository;
 import com.utn.corralon.features.user.entity.UserEntity;
 import com.utn.corralon.features.user.repository.UserRepository;
+import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,30 +29,19 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.Map;
 
+@AllArgsConstructor
+
 @Service
 public class CartService {
     private final CartRepository cartRepository;
-    private final CartItemRepository cartItemRepository;
     private final UserRepository userRepository;
     private final ProductVariantRepository productVariantRepository;
     private final ModelMapper modelMapper;
-
-    public CartService(CartRepository cartRepository,
-                       CartItemRepository cartItemRepository,
-                       UserRepository userRepository,
-                       ProductVariantRepository productVariantRepository,
-                       ModelMapper modelMapper) {
-        this.cartRepository = cartRepository;
-        this.cartItemRepository = cartItemRepository;
-        this.userRepository = userRepository;
-        this.productVariantRepository = productVariantRepository;
-        this.modelMapper = modelMapper;
-    }
+    private final OrderService orderService;
 
     @Transactional
     public CartResponseDTO createOrUpdateCart(CartRequestDTO cartRequest) {
-        UserEntity user = userRepository.findByExternalId(cartRequest.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User", cartRequest.getUserId()));
+        UserEntity user = getActiveUser(cartRequest.getUserId());
 
         CartEntity cart = cartRepository.findByUser(user)
                 .orElseGet(() -> CartEntity.builder()
@@ -85,7 +76,7 @@ public class CartService {
                         .orElseThrow(() -> new ResourceNotFoundException("ProductVariant", productVariantId));
 
                 // Validar si el producto está activo
-                if (Boolean.FALSE.equals(productVariant.getActive())) {
+                if (!productVariant.getActive()) {
                     throw new BusinessRuleException("Product variant with ID " + productVariantId + " is not active and cannot be added to cart.");
                 }
 
@@ -110,7 +101,7 @@ public class CartService {
                     .orElseThrow(() -> new ResourceNotFoundException("ProductVariant", newItemRequest.getProductVariantId()));
 
             // Validar si el producto está activo
-            if (Boolean.FALSE.equals(productVariant.getActive())) {
+            if (!productVariant.getActive()) {
                 throw new BusinessRuleException("Product variant with ID " + newItemRequest.getProductVariantId() + " is not active and cannot be added to cart.");
             }
 
@@ -131,12 +122,11 @@ public class CartService {
     }
 
     @Transactional
-    public CartResponseDTO updateCartItemQuantity(UUID userId, UUID productVariantId, CartItemQuantityUpdateDTO updateDTO) {
-        UserEntity user = userRepository.findByExternalId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", userId));
+    public CartResponseDTO updateCartItemQuantity(UUID userExternalId, UUID productVariantId, CartItemQuantityUpdateDTO updateDTO) {
+        UserEntity user = getActiveUser(userExternalId);
 
         CartEntity cart = cartRepository.findByUser(user)
-                .orElseThrow(() -> new ResourceNotFoundException("Cart", userId));
+                .orElseThrow(() -> new ResourceNotFoundException("Cart", userExternalId));
 
         // Buscar el CartItemEntity específico
         CartItemEntity cartItemToUpdate = cart.getCartItems().stream()
@@ -153,7 +143,7 @@ public class CartService {
             ProductVariantEntity productVariant = cartItemToUpdate.getProductVariant();
 
             // Validar si el producto está activo (aunque ya esté en el carrito, podría haberse desactivado)
-            if (Boolean.FALSE.equals(productVariant.getActive())) {
+            if (!productVariant.getActive()) {
                 throw new BusinessRuleException("Product variant with ID " + productVariantId + " is not active and cannot be updated in cart.");
             }
 
@@ -169,23 +159,21 @@ public class CartService {
     }
 
 
-    public CartResponseDTO getCartByUserId(UUID userId) {
-        UserEntity user = userRepository.findByExternalId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", userId));
+    public CartResponseDTO getCartByUserId(UUID userExternalId) {
+        UserEntity user = getActiveUser(userExternalId);
 
         CartEntity cart = cartRepository.findByUser(user)
-                .orElseThrow(() -> new ResourceNotFoundException("Cart", userId));
+                .orElseThrow(() -> new ResourceNotFoundException("Cart", userExternalId));
 
         return mapCartToResponseDTO(cart);
     }
 
     @Transactional
-    public void clearCart(UUID userId) {
-        UserEntity user = userRepository.findByExternalId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", userId));
+    public void clearCart(UUID userExternalId) {
+        UserEntity user = getActiveUser(userExternalId);
 
         CartEntity cart = cartRepository.findByUser(user)
-                .orElseThrow(() -> new ResourceNotFoundException("Cart", userId));
+                .orElseThrow(() -> new ResourceNotFoundException("Cart", userExternalId));
 
         if (!cart.getCartItems().isEmpty()) {
             cart.getCartItems().clear();
@@ -203,13 +191,10 @@ public class CartService {
                     itemResponseDTO.setVariantAttribute(cartItemEntity.getProductVariant().getAttribute());
 
                     ProductVariantEntity productVariant = cartItemEntity.getProductVariant();
-                    BigDecimal unitPrice;
-                    if (productVariant.getWholesaleMinQty() != null &&
-                            cartItemEntity.getQuantity() >= productVariant.getWholesaleMinQty()) {
-                        unitPrice = productVariant.getWholesalePrice();
-                    } else {
-                        unitPrice = productVariant.getPrice();
-                    }
+                    BigDecimal unitPrice = calculateUnitPrice(
+                            productVariant,
+                            cartItemEntity.getQuantity());
+
                     itemResponseDTO.setUnitPrice(unitPrice);
 
                     return itemResponseDTO;
@@ -223,6 +208,57 @@ public class CartService {
         responseDTO.setTotalAmount(totalAmount);
 
         return responseDTO;
+    }
+
+    private UserEntity getActiveUser(UUID userId) {
+        UserEntity user = userRepository.findByExternalId(userId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found", userId)
+                );
+
+        if (!user.getActive()) {
+            throw new BusinessRuleException("User is inactive");
+        }
+
+        return user;
+    }
+
+    private BigDecimal calculateUnitPrice(
+            ProductVariantEntity variant,
+            Integer quantity
+    ) {
+
+        if (variant.getWholesaleMinQty() != null && quantity >= variant.getWholesaleMinQty())
+        {
+            return variant.getWholesalePrice();
+        }
+
+        return variant.getPrice();
+    }
+
+    public CartEntity getCartEntityByUserId(UUID userExternalId) {
+        UserEntity user = getActiveUser(userExternalId);
+
+        return cartRepository.findByUser(user)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Cart not found", userExternalId)
+                );
+    }
+
+    @Transactional
+    public OrderResponseDTO checkout(UUID userId, UUID adressId) {
+        CartEntity cart = getCartEntityByUserId(userId);
+
+        if(cart.getCartItems().isEmpty()) {
+            throw new BusinessRuleException("Cart is empty");
+        }
+
+        OrderResponseDTO order = orderService.createFromCart(cart, adressId);
+
+        cart.getCartItems().clear();
+        cartRepository.save(cart);
+
+        return order;
     }
 
 }
