@@ -16,4 +16,6 @@ public interface ProductVariantRepository extends JpaRepository<ProductVariantEn
     Optional<ProductVariantEntity> findByExternalIdAndActiveTrue(UUID externalId);
 
     boolean existsByProductAndAttribute(ProductEntity product, String attribute);
+
+    Optional<ProductVariantEntity>findByProductAndAttribute(ProductEntity product, String attribute);
 }

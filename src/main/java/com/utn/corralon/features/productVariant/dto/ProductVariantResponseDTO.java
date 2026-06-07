@@ -18,7 +18,7 @@ public class ProductVariantResponseDTO {
     private Integer stock;
     private Boolean active;
     private BigDecimal wholesalePrice;
-    private BigDecimal wholeMinStock;
+    private Integer wholesaleMinQty;
 
     private UUID productId;
     private String productName;
