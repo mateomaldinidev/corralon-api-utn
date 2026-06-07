@@ -26,7 +26,7 @@ public class UserEntity {
 
     @Column(name = "externalId", nullable = false, unique = true, updatable = false)
     @UuidGenerator
-    private UUID externalId = UUID.randomUUID();
+    private UUID externalId;
 
     @Column(name = "email", nullable = false, unique = true)
     @Email(message = "Email is not valid", regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+@[a-zA-Z0-9.-]+$")

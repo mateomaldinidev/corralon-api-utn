@@ -1,9 +1,8 @@
 package com.utn.corralon.features.order.dto;
 
-import com.utn.corralon.features.order.orderEnum.OrderStatus;
+import com.utn.corralon.features.order.OrderStatus;
 import com.utn.corralon.features.orderItem.dto.OrderItemResponseDTO;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -12,12 +11,18 @@ import java.util.UUID;
 
 @Setter
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+
 public class OrderResponseDTO {
     private UUID externalId;
 
-    private BigDecimal total;
+    private UUID userExternalId;
 
     private UUID addressExternalId;
+
+    private BigDecimal total;
 
     private LocalDateTime createdAt;
 
