@@ -1,4 +1,4 @@
-package com.utn.corralon.features.order;
+package com.utn.corralon.features.order.enums;
 
 public enum OrderStatus {
     PENDING_PAYMENT,
