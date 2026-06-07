@@ -20,7 +20,4 @@ public class PaymentRequestDTO {
     private PaymentMethod paymentMethod;
     @NotNull
     private BigDecimal amount;
-    @NotNull
-    private PaymentStatus status;
-
 }
