@@ -21,7 +21,7 @@ public class ProductVariantMapper {
                         variant,
                         ProductVariantResponseDTO.class);
         dto.setProductId(variant.getProduct().getExternalId());
-        dto.setProductName(variant.getProduct().getDescription());
+        dto.setProductName(variant.getProduct().getName());
         return dto;
     }
 

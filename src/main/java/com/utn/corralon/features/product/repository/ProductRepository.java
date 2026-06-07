@@ -14,6 +14,10 @@ import java.util.UUID;
 public interface ProductRepository extends JpaRepository<ProductEntity, Long>, JpaSpecificationExecutor<ProductEntity> {
 
     Optional<ProductEntity> findByExternalId(UUID externalId);
+    Optional<ProductEntity> findByExternalIdAndActiveTrue(UUID externalId);
+    Optional<ProductEntity> findByNameAndBrand(String name, BrandEntity brand);
+
+
 
     boolean existByNameAndBrand(String name, BrandEntity brand);
 }

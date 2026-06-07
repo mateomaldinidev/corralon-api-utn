@@ -22,9 +22,6 @@ public class ProductRequestDTO {
     @Size(max = 255, message = "Description must be less than 255 characters")
     private String description;
 
-    @NotNull(message = "Active is required")
-    private boolean active;
-
     @NotNull(message = "Supplier is required")
     private UUID supplierId;
 

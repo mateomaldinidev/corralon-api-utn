@@ -1,12 +1,13 @@
 package com.utn.corralon.features.productVariant.entity;
 
 import com.utn.corralon.features.product.entity.ProductEntity;
+import com.utn.corralon.features.stockMovement.entity.StockMovementEntity;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Positive;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -15,7 +16,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "product_variants")
+@Table(name = "productVariants")
 public class ProductVariantEntity {
 
     @Id
@@ -24,7 +25,7 @@ public class ProductVariantEntity {
 
     @Column(name = "externalId", nullable = false, unique = true, updatable = false)
     @UuidGenerator
-    private UUID externalId = UUID.randomUUID();
+    private UUID externalId;
 
     @Column(name = "attribute", nullable = false)
     private String attribute;
@@ -35,17 +36,21 @@ public class ProductVariantEntity {
     @Column(name = "stock", nullable = false)
     private Integer stock;
 
+    @Builder.Default
     @Column(name = "active", nullable = false)
-    private Boolean active;
+    private Boolean active = true;
 
-    @Column(name = "whole_sale_price", nullable = false)
+    @Column(name = "wholeSalePrice")
     private BigDecimal wholesalePrice;
 
-    @Column(name = "wholesale_min_qty", nullable = false) // Nombre de columna más descriptivo
-    private Integer wholesaleMinQty; // Tipo Integer para cantidad
+    @Column(name = "wholesaleMinQty")
+    private Integer wholesaleMinQty;
 
-    @ManyToOne()
-    @JoinColumn(name = "product_id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "productId", nullable = false)
     private ProductEntity product;
+
+    @OneToMany(mappedBy = "variant")
+    private List<StockMovementEntity> stockMovements;
 
 }
