@@ -1,5 +1,6 @@
 package com.utn.corralon.features.product.service;
 
+import com.utn.corralon.features.product.dto.ProductDeleteResponseDTO;
 import com.utn.corralon.features.product.dto.ProductRequestDTO;
 import com.utn.corralon.features.product.dto.ProductResponseDTO;
 
@@ -9,11 +10,11 @@ import java.util.UUID;
 
 public interface IProductService {
     ProductResponseDTO getById(UUID externalId);
-    List<ProductResponseDTO> getAll();
-    List<ProductResponseDTO> search(String name, Boolean active, UUID supplierId, UUID categoryId, UUID brandId);
+    List<ProductResponseDTO> search(String name, UUID supplierId, UUID categoryId, UUID brandId);
     ProductResponseDTO create(ProductRequestDTO productRequestDTO);
     ProductResponseDTO update(UUID externalId,
                               ProductRequestDTO productRequestDTO);
-    void delete(UUID externalId);
-
+    ProductDeleteResponseDTO delete(UUID externalId);
+    void activate(UUID externalId);
+    List<ProductResponseDTO> getInactive(String name, UUID supplierId, UUID categoryId, UUID brandId);
 }
