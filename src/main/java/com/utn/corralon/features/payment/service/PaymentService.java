@@ -35,8 +35,7 @@ public class PaymentService implements IPaymentService {
     public PaymentResponseDTO pay(PaymentRequestDTO request) {
 
         OrderEntity order = orderRepository.findByExternalId(request.getOrderId())
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Order not found", request.getOrderId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found wit ID: ", request.getOrderId()));
 
         if (order.getStatus() != OrderStatus.PENDING_PAYMENT) {
             throw new BusinessRuleException("Order is not pending payment");
@@ -46,7 +45,7 @@ public class PaymentService implements IPaymentService {
             throw new BusinessRuleException("Invalid payment amount");
         }
 
-        // 1. Crear payment en estado PENDING
+        // Crear payment en estado PENDING
         PaymentEntity payment = PaymentEntity.builder()
                 .order(order)
                 .amount(order.getTotal())
@@ -57,10 +56,10 @@ public class PaymentService implements IPaymentService {
 
         payment = paymentRepository.save(payment);
 
-        // 2. Simular pago
+        // Simular pago
         PaymentStatus result = simulateCard(request);
 
-        // 3. CASO APPROVED
+        // CASO APPROVED
         if (result == PaymentStatus.APPROVED) {
 
             payment.setPaymentStatus(PaymentStatus.APPROVED);
@@ -72,7 +71,7 @@ public class PaymentService implements IPaymentService {
             return paymentMapper.toDTO(payment);
         }
 
-        // 4. CASO REJECTED → rollback stock + cancelar orden
+        // CASO REJECTED → rollback stock + cancelar orden
         payment.setPaymentStatus(PaymentStatus.REJECTED);
         order.setStatus(OrderStatus.CANCELLED);
 
@@ -84,9 +83,7 @@ public class PaymentService implements IPaymentService {
         return paymentMapper.toDTO(payment);
     }
 
-    // ------------------------
     // STOCK ROLLBACK
-    // ------------------------
     private void restoreStock(OrderEntity order) {
 
         for (OrderItemEntity item : order.getItems()) {
@@ -101,9 +98,8 @@ public class PaymentService implements IPaymentService {
         }
     }
 
-    // ------------------------
+
     // SIMULACIÓN TARJETA
-    // ------------------------
     private PaymentStatus simulateCard(PaymentRequestDTO request) {
 
         return Math.random() > 0.3
@@ -115,7 +111,7 @@ public class PaymentService implements IPaymentService {
 
         PaymentEntity payment = paymentRepository.findByOrder_ExternalId(orderId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Payment not found for order", orderId));
+                        new ResourceNotFoundException("Payment not found for order ID: ", orderId));
 
         return paymentMapper.toDTO(payment);
     }

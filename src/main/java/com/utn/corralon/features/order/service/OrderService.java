@@ -49,7 +49,7 @@ public class OrderService implements IOrderService {
     ) {
         AddressEntity address = addressRepository.findByExternalId(addressId)
                         .orElseThrow(() ->
-                                new ResourceNotFoundException("Address not found", addressId)
+                                new ResourceNotFoundException("Address not found with ID: ", addressId)
                         );
 
         if (!address.getUser().getExternalId()
@@ -68,8 +68,7 @@ public class OrderService implements IOrderService {
                         .stream()
                         .map(cartItem  -> {
 
-                            ProductVariantEntity variant =
-                                    cartItem.getProductVariant();
+                            ProductVariantEntity variant = cartItem.getProductVariant();
 
                             if (!variant.getActive()) {
                                 throw new BusinessRuleException("Product variant is inactive");
@@ -80,39 +79,24 @@ public class OrderService implements IOrderService {
                                 throw new BusinessRuleException("Insufficient stock");
                             }
 
-                            BigDecimal unitPrice = calculateUnitPrice(variant,
-                                    cartItem.getQuantity());
+                            BigDecimal unitPrice = calculateUnitPrice(variant, cartItem.getQuantity());
 
                             BigDecimal subtotal =
-                                    unitPrice.multiply(
-                                            BigDecimal.valueOf(
-                                                    cartItem.getQuantity())
-                                    );
+                                    unitPrice.multiply(BigDecimal.valueOf(cartItem.getQuantity()));
 
-                            variant.setStock(
-                                    variant.getStock() - cartItem.getQuantity()
-                            );
+                            variant.setStock(variant.getStock() - cartItem.getQuantity());
 
                             productVariantRepository.save(variant);
 
 
-                            return orderItemMapper.toEntity(
-                                    order,
-                                    variant,
-                                    cartItem.getQuantity(),
-                                    unitPrice,
-                                    subtotal
-                            );
+                            return orderItemMapper.toEntity(order, variant, cartItem.getQuantity(), unitPrice, subtotal);
                         })
                         .toList();
 
         BigDecimal total = items
                 .stream()
                 .map(OrderItemEntity::getSubtotal)
-                .reduce(
-                        BigDecimal.ZERO,
-                        BigDecimal::add
-                );
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         order.setItems(items);
         order.setTotal(total);
@@ -139,7 +123,7 @@ public class OrderService implements IOrderService {
 
         OrderEntity order = orderRepository
                 .findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Address not found",externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found with ID: ",externalId));
 
         return orderMapper.toResponseDTO(order);
     }
@@ -159,20 +143,18 @@ public class OrderService implements IOrderService {
     }
 
     @Override
-    public OrderAdminResponseDTO getAdminOrder(
-            UUID externalId) {
+    public OrderAdminResponseDTO getAdminOrder(UUID externalId) {
 
         OrderEntity order = findOrder(externalId);
 
         return orderMapper.toAdminResponse(order);
     }
 
-    private OrderEntity findOrder(
-            UUID externalId) {
+    private OrderEntity findOrder(UUID externalId) {
 
         return orderRepository
                 .findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Address not found",externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found with ID: ",externalId));
     }
 
     @Override
@@ -181,9 +163,7 @@ public class OrderService implements IOrderService {
 
         OrderEntity order = orderRepository
                 .findByExternalId(externalId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Order not found: ",externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found wit ID ",externalId));
 
         if (order.getStatus() == OrderStatus.CANCELLED) {
              throw new BadRequestException("Order is already cancelled");
@@ -214,10 +194,7 @@ public class OrderService implements IOrderService {
     }
 
 
-    private BigDecimal calculateUnitPrice(
-            ProductVariantEntity variant,
-            Integer quantity
-    ) {
+    private BigDecimal calculateUnitPrice(ProductVariantEntity variant, Integer quantity) {
 
         if (variant.getWholesaleMinQty() != null && quantity >= variant.getWholesaleMinQty())
         {
@@ -231,11 +208,7 @@ public class OrderService implements IOrderService {
 
         return userRepository
                 .findByExternalId(externalId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException(
-                                "Usuar not found.",
-                                externalId
-                        ));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuar not found wit ID: ", externalId));
     }
 
 }

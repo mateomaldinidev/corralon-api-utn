@@ -46,14 +46,14 @@ public class CategoryService implements ICategoryService {
     public CategoryResponseDTO getByExternalId(UUID externalId) {
         return categoryRepository.findByExternalIdAndActiveTrue(externalId)
                 .map(categoryMapper::toResponse)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: " + externalId, externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: ", externalId));
     }
 
     @Override
     @Transactional
     public CategoryResponseDTO update(UUID externalId, CategoryRequestDTO dto) {
         CategoryEntity entity = categoryRepository.findByExternalIdAndActiveTrue(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: " + externalId, externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: ", externalId));
 
         if (categoryRepository.existsByNameAndActiveTrue(dto.getName()) &&
             !entity.getName().equalsIgnoreCase(dto.getName())) {
@@ -69,7 +69,7 @@ public class CategoryService implements ICategoryService {
     @Transactional
     public void delete(UUID externalId) {
         CategoryEntity entity = categoryRepository.findByExternalIdAndActiveTrue(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: " + externalId, externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: ", externalId));
         entity.setActive(false);
         categoryRepository.save(entity);
     }
@@ -78,7 +78,7 @@ public class CategoryService implements ICategoryService {
     @Transactional
     public void activate(UUID externalId) {
         CategoryEntity entity = categoryRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: " + externalId, externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: ", externalId));
 
         if (entity.getActive()) {
             throw new BusinessRuleException("Category with ID: " + externalId + " is already active.");

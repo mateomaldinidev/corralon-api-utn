@@ -39,25 +39,18 @@ public class ProductVariantService implements IProductVariantService {
     @Override
     public ProductVariantResponseDTO create(ProductVariantRequestDTO productVariantRequestDTO) {
         ProductEntity product = productRepository.findByExternalId(productVariantRequestDTO.getProductId())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Product not found. ID: " + productVariantRequestDTO.getProductId(), productVariantRequestDTO.getProductId()) // Corregido: userId -> productVariantRequestDTO.getProductId()
-                );
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found. ID: ", productVariantRequestDTO.getProductId()));
 
         if (!product.isActive())
         {
             throw new BusinessRuleException("Cannot create variant for inactive product");
         }
-        if(productVariantRepository.existsByProductAndAttribute(
-                product,
-                productVariantRequestDTO.getAttribute()))
+        if(productVariantRepository.existsByProductAndAttribute(product, productVariantRequestDTO.getAttribute()))
         {
             throw new BusinessRuleException("Product variant already exists");
         }
 
-        ProductVariantEntity variant = productVariantMapper.toEntity(
-                productVariantRequestDTO,
-                product
-        );
+        ProductVariantEntity variant = productVariantMapper.toEntity(productVariantRequestDTO, product);
         productVariantRepository.save(variant);
         return productVariantMapper.toResponse(variant);
 
@@ -71,8 +64,7 @@ public class ProductVariantService implements IProductVariantService {
 
         ProductEntity product = productRepository
                 .findByExternalId(productVariantRequestDTO.getProductId())
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Product not found. ID: " + productVariantRequestDTO.getProductId(), productVariantRequestDTO.getProductId())); // Corregido: userId -> productVariantRequestDTO.getProductId()
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found. ID: " , productVariantRequestDTO.getProductId()));
         if (!product.isActive()) {
             throw new BusinessRuleException("Cannot assign inactive product");
         }
@@ -106,13 +98,10 @@ public class ProductVariantService implements IProductVariantService {
     public void activate(UUID externalId) {
         ProductVariantEntity variant = productVariantRepository.findByExternalId(externalId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Product variant not found", externalId) // Corregido: userId -> externalId
-                );
+                        new ResourceNotFoundException("Product variant not found with ID: ", externalId));
 
         if(variant.getActive()) {
-            throw new BusinessRuleException(
-                    "Product variant is already active"
-            );
+            throw new BusinessRuleException("Product variant is already active");
         }
 
         if(!variant.getProduct().isActive()) {
@@ -132,14 +121,7 @@ public class ProductVariantService implements IProductVariantService {
 
     //SEARCH WITH FILTERS (ACTIVES)
     @Override
-    public List<ProductVariantResponseDTO> search(String attribute,
-                                                  BigDecimal minPrice,
-                                                  BigDecimal maxPrice,
-                                                  Integer minStock,
-                                                  UUID productId,
-                                                  UUID categoryId,
-                                                  UUID brandId,
-                                                  String productName) {
+    public List<ProductVariantResponseDTO> search(String attribute, BigDecimal minPrice, BigDecimal maxPrice, Integer minStock, UUID productId, UUID categoryId, UUID brandId, String productName) {
         Specification<ProductVariantEntity> specification =
                 Specification
                         .where(ProductVariantSpecification.hasAttribute(attribute)
@@ -162,16 +144,7 @@ public class ProductVariantService implements IProductVariantService {
 
     //GET ALL INACTIVES
     @Override
-    public List<ProductVariantResponseDTO> getInactive(
-            String attribute,
-            BigDecimal minPrice,
-            BigDecimal maxPrice,
-            Integer minStock,
-            UUID productId,
-            UUID categoryId,
-            UUID brandId,
-            String productName
-    ) {
+    public List<ProductVariantResponseDTO> getInactive(String attribute, BigDecimal minPrice, BigDecimal maxPrice, Integer minStock, UUID productId, UUID categoryId, UUID brandId, String productName) {
 
         Specification<ProductVariantEntity> specification =
                 Specification
@@ -249,16 +222,12 @@ public class ProductVariantService implements IProductVariantService {
     private ProductVariantEntity getActiveVariant(UUID variantId) {
         return productVariantRepository.findByExternalIdAndActiveTrue(variantId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException( "Product variant not found", variantId) // Corregido: userId -> variantId
+                        new ResourceNotFoundException( "Product variant not found with ID:", variantId)
                 );
     }
 
     //metodo interno para crear un registro de movimiento de stock
-    private void createStockMovement(
-            ProductVariantEntity variant,
-            Integer quantity,
-            StockMovementType type,
-            String reason) {
+    private void createStockMovement(ProductVariantEntity variant, Integer quantity, StockMovementType type, String reason) {
         StockMovementEntity movement =
                 StockMovementEntity
                         .builder()
