@@ -11,5 +11,6 @@ import java.util.UUID;
 @Repository
 public interface AddressRepository extends JpaRepository<AddressEntity, Long> {
     Optional<AddressEntity> findByExternalId(UUID externalId);
-    List<AddressEntity> findAllByUserExternalId(UUID userExternalId);// busca todas las direcciones que pertenece a un usuario en especifico
+    //Accede al externalId de la entidad User relacionada
+    List<AddressEntity> findAllByUser_ExternalId(UUID userExternalId);
 }

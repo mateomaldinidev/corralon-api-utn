@@ -1,10 +1,10 @@
 package com.utn.corralon.features.notifications.dto;
 
-import com.utn.corralon.features.notifications.entity.NotificationType;
+import com.utn.corralon.features.notifications.enums.NotificationType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.hibernate.validator.constraints.UUID;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -13,10 +13,10 @@ import org.hibernate.validator.constraints.UUID;
 @Builder
 
 public class NotificationRequestDTO {
-    @NotNull
+    @NotNull(message = "User ID cannot be null")
     private UUID userId;
-    @NotBlank
+    @NotBlank(message = "Message cannot be blank")
     private String message;
-    @NotNull
+    @NotNull(message = "Notification type cannot be null")
     private NotificationType type;
 }
