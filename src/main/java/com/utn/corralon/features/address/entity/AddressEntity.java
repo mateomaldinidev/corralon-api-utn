@@ -28,9 +28,9 @@ public class AddressEntity {
     private String street;
     @Column(name = "streetNumber", nullable = false)
     private String streetNumber;
-    @Column(name = "floor", nullable = false)
+    @Column(name = "floor", nullable = true)
     private String floor;
-    @Column(name = "apartmentNumber", nullable = false)
+    @Column(name = "apartmentNumber", nullable = true)
     private String apartmentNumber;
     @Column(name = "city", nullable = false)
     private String city;

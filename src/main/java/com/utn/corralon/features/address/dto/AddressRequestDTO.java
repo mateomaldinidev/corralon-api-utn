@@ -4,32 +4,30 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class AddressRequestDTO {
-    @NotBlank
+    @NotBlank(message = "Street is required")
     private String street;
 
-    @NotBlank
+    @NotBlank(message = "Street number is required")
     private String streetNumber;
-
 
     private String floor;
 
     private String apartmentNumber;
-//nota: le saque el @NotBlank a floor y apartmentNumber porque si yo vivo en una casa (que es lo más comun para comprar materiales de construccion en un corralon), no tengo piso ni número de departamento y si lo dejo en blanco tira error
-    @NotBlank
+
+    @NotBlank(message = "City is required")
     private String city;
 
-    @NotBlank
+    @NotBlank(message = "Zip code is required")
     private String zipCode;
 
-    @NotNull
-    private Long userId;
-    private Long userExternalId;
+    @NotNull(message = "User ID cannot be null")
+    private UUID userExternalId;
 }
-
-
