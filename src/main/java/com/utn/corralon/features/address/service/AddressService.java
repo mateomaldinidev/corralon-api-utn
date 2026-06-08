@@ -10,6 +10,7 @@ import com.utn.corralon.features.user.entity.UserEntity;
 import com.utn.corralon.features.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -22,10 +23,12 @@ public class AddressService implements IAddressService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public AddressResponseDTO create(AddressRequestDTO dto) {
         AddressEntity entity = addressMapper.toEntity(dto);
-        UserEntity user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found", userId));
+        UserEntity user = userRepository.findByExternalId(dto.getUserExternalId()) // Buscar por externalId
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + dto.getUserExternalId(), dto.getUserExternalId())); // Corregido el ID
+
         entity.setUser(user);
         AddressEntity savedEntity = addressRepository.save(entity);
         return addressMapper.toResponse(savedEntity);
@@ -41,34 +44,43 @@ public class AddressService implements IAddressService {
     @Override
     public AddressResponseDTO getByExternalId(UUID externalId) {
         AddressEntity entity = addressRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Address not found", userId));
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found with ID: " + externalId, externalId));
         return addressMapper.toResponse(entity);
     }
 
     @Override
+    @Transactional
     public AddressResponseDTO update(UUID externalId, AddressRequestDTO dto){
         AddressEntity entity = addressRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Address not found", userId));
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found with ID: " + externalId, externalId));
+
         addressMapper.updateEntity(entity, dto);
-        UserEntity user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found", userId));
-        entity.setUser(user);
+
+        // Si el usuario asociado a la dirección cambia, buscar y asignar el nuevo usuario
+        if (!entity.getUser().getExternalId().equals(dto.getUserExternalId())) {
+            UserEntity user = userRepository.findByExternalId(dto.getUserExternalId()) // Buscar por externalId
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + dto.getUserExternalId(), dto.getUserExternalId()));
+            entity.setUser(user);
+        }
+
         AddressEntity updatedEntity = addressRepository.save(entity);
         return addressMapper.toResponse(updatedEntity);
     }
 
     @Override
+    @Transactional
     public void delete(UUID externalId) {
         AddressEntity entity = addressRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Address not found", userId));
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found with ID: " + externalId, externalId)); // Corregido el ID
         addressRepository.delete(entity);
     }
 
     @Override
     public List<AddressResponseDTO> getAllByUserExternalId(UUID userExternalId) {
-        return addressRepository.findAllByUserExternalId(userExternalId).stream()
+        // Se asume que getActiveUser() no es necesario aquí si solo se listan direcciones
+        // Si se necesita validar que el usuario esté activo, se podría llamar a getActiveUser(userExternalId)
+        return addressRepository.findAllByUser_ExternalId(userExternalId).stream()
                 .map(addressMapper::toResponse)
                 .toList();
     }
-
 }
