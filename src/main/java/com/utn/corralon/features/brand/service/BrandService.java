@@ -45,14 +45,14 @@ public class BrandService implements IBrandService {
     public BrandResponseDTO getByExternalId(UUID externalId) {
         return brandRepository.findByExternalIdAndActiveTrue(externalId)
                 .map(brandMapper::toResponse)
-                .orElseThrow(() -> new ResourceNotFoundException("Brand not found with ID: " + externalId, externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Brand not found with ID: ", externalId));
     }
 
     @Override
     @Transactional
     public BrandResponseDTO update(UUID externalId, BrandRequestDTO dto) {
         BrandEntity entity = brandRepository.findByExternalIdAndActiveTrue(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Brand not found with ID: " + externalId, externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Brand not found with ID: ", externalId));
 
         // Validar si el nuevo nombre ya existe en otra marca activa
         if (brandRepository.existsByNameAndActiveTrue(dto.getName()) &&
@@ -69,7 +69,7 @@ public class BrandService implements IBrandService {
     @Transactional
     public void delete(UUID externalId) {
         BrandEntity entity = brandRepository.findByExternalIdAndActiveTrue(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Brand not found with ID: " + externalId, externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Brand not found with ID: ", externalId));
         entity.setActive(false);
         brandRepository.save(entity);
     }
@@ -78,7 +78,7 @@ public class BrandService implements IBrandService {
     @Transactional
     public void activate(UUID externalId) {
         BrandEntity entity = brandRepository.findByExternalId(externalId) // Busca activa o inactiva
-                .orElseThrow(() -> new ResourceNotFoundException("Brand not found with ID: " + externalId, externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Brand not found with ID: ", externalId));
 
         if (entity.getActive()) {
             throw new BusinessRuleException("Brand with ID: " + externalId + " is already active.");

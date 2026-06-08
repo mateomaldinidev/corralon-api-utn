@@ -28,7 +28,7 @@ public class NotificationService implements INotificationService {
     @Transactional
     public NotificationResponseDTO create(NotificationRequestDTO dto) {
         UserEntity user = userRepository.findByExternalId(dto.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + dto.getUserId(), dto.getUserId()));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: ", dto.getUserId()));
 
         NotificationEntity notification = notificationMapper.toEntity(dto);
         notification.setUser(user);
@@ -43,7 +43,7 @@ public class NotificationService implements INotificationService {
     public List<NotificationResponseDTO> getAllByUserId(UUID userId) {
         // No es necesario buscar el UserEntity completo si solo necesitamos el userId para el repositorio
         if (!userRepository.existsByExternalId(userId)) {
-            throw new ResourceNotFoundException("User not found with ID: " + userId, userId);
+            throw new ResourceNotFoundException("User not found with ID: ", userId);
         }
 
         return notificationRepository.findAllByUser_ExternalIdOrderByCreatedAtDesc(userId).stream()
@@ -55,7 +55,7 @@ public class NotificationService implements INotificationService {
     @Transactional
     public NotificationResponseDTO markAsRead(UUID notificationExternalId) {
         NotificationEntity notification = notificationRepository.findByExternalId(notificationExternalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Notification not found with ID: " + notificationExternalId, notificationExternalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Notification not found with ID: ", notificationExternalId));
 
         notification.setRead(true);
         NotificationEntity updatedNotification = notificationRepository.save(notification);
@@ -66,7 +66,7 @@ public class NotificationService implements INotificationService {
     @Transactional
     public void delete(UUID notificationExternalId) {
         NotificationEntity notification = notificationRepository.findByExternalId(notificationExternalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Notification not found with ID: " + notificationExternalId, notificationExternalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Notification not found with ID: ", notificationExternalId));
         notificationRepository.delete(notification);
     }
 
@@ -75,7 +75,7 @@ public class NotificationService implements INotificationService {
     public void markAllAsReadByUserId(UUID userId) {
         // No es necesario buscar el UserEntity completo si solo necesitamos el userId para el repositorio
         if (!userRepository.existsByExternalId(userId)) {
-            throw new ResourceNotFoundException("User not found with ID: " + userId, userId);
+            throw new ResourceNotFoundException("User not found with ID: ", userId);
         }
 
         List<NotificationEntity> notifications = notificationRepository.findAllByUser_ExternalIdOrderByCreatedAtDesc(userId);

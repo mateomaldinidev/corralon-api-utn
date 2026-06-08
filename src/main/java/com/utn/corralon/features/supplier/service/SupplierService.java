@@ -55,14 +55,14 @@ public class SupplierService implements ISupplierService {
     public SupplierResponseDTO getByExternalId(UUID externalId) {
         return supplierRepository.findByExternalIdAndActiveTrue(externalId)
                 .map(supplierMapper::toResponse)
-                .orElseThrow(() -> new ResourceNotFoundException("Supplier not found with ID: " + externalId, externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Supplier not found with ID: ",externalId));
     }
 
     @Override
     @Transactional
     public SupplierResponseDTO update(UUID externalId, SupplierRequestDTO dto) {
         SupplierEntity entity = supplierRepository.findByExternalIdAndActiveTrue(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Supplier not found with ID: " + externalId, externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Supplier not found with ID: ", externalId));
 
         if (supplierRepository.existsByNameAndActiveTrue(dto.getName()) &&
             !entity.getName().equalsIgnoreCase(dto.getName())) {
@@ -78,7 +78,7 @@ public class SupplierService implements ISupplierService {
     @Transactional
     public void delete(UUID externalId) {
         SupplierEntity entity = supplierRepository.findByExternalIdAndActiveTrue(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Supplier not found with ID: " + externalId, externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Supplier not found with ID: ", externalId));
         entity.setActive(false);
         supplierRepository.save(entity);
     }
@@ -87,7 +87,7 @@ public class SupplierService implements ISupplierService {
     @Transactional
     public void activate(UUID externalId) {
         SupplierEntity entity = supplierRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Supplier not found with ID: " + externalId, externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Supplier not found with ID: ", externalId));
 
         if (entity.isActive()) {
             throw new BusinessRuleException("Supplier with ID: " + externalId + " is already active.");

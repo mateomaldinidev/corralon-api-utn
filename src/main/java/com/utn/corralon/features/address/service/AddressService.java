@@ -27,7 +27,7 @@ public class AddressService implements IAddressService {
     public AddressResponseDTO create(AddressRequestDTO dto) {
         AddressEntity entity = addressMapper.toEntity(dto);
         UserEntity user = userRepository.findByExternalId(dto.getUserExternalId()) // Buscar por externalId
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + dto.getUserExternalId(), dto.getUserExternalId())); // Corregido el ID
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: ", dto.getUserExternalId()));
 
         entity.setUser(user);
         AddressEntity savedEntity = addressRepository.save(entity);
@@ -44,7 +44,7 @@ public class AddressService implements IAddressService {
     @Override
     public AddressResponseDTO getByExternalId(UUID externalId) {
         AddressEntity entity = addressRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Address not found with ID: " + externalId, externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found with ID: ", externalId));
         return addressMapper.toResponse(entity);
     }
 
@@ -52,14 +52,14 @@ public class AddressService implements IAddressService {
     @Transactional
     public AddressResponseDTO update(UUID externalId, AddressRequestDTO dto){
         AddressEntity entity = addressRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Address not found with ID: " + externalId, externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found with ID: ", externalId));
 
         addressMapper.updateEntity(entity, dto);
 
         // Si el usuario asociado a la dirección cambia, buscar y asignar el nuevo usuario
         if (!entity.getUser().getExternalId().equals(dto.getUserExternalId())) {
             UserEntity user = userRepository.findByExternalId(dto.getUserExternalId()) // Buscar por externalId
-                    .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + dto.getUserExternalId(), dto.getUserExternalId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: ", dto.getUserExternalId()));
             entity.setUser(user);
         }
 
@@ -71,7 +71,7 @@ public class AddressService implements IAddressService {
     @Transactional
     public void delete(UUID externalId) {
         AddressEntity entity = addressRepository.findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Address not found with ID: " + externalId, externalId)); // Corregido el ID
+                .orElseThrow(() -> new ResourceNotFoundException("Address not found with ID: ",externalId));
         addressRepository.delete(entity);
     }
 

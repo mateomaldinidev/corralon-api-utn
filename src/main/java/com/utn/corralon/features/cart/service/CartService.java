@@ -73,7 +73,7 @@ public class CartService {
 
             if (incomingItemRequest != null) {
                 ProductVariantEntity productVariant = productVariantRepository.findByExternalId(productVariantId)
-                        .orElseThrow(() -> new ResourceNotFoundException("ProductVariant", productVariantId));
+                        .orElseThrow(() -> new ResourceNotFoundException("ProductVariant not found with ID: ", productVariantId));
 
                 // Validar si el producto está activo
                 if (!productVariant.getActive()) {
@@ -98,7 +98,7 @@ public class CartService {
         // 3. Añadir nuevos ítems (los que quedan en incomingItemsMap)
         for (CartItemRequestDTO newItemRequest : incomingItemsMap.values()) {
             ProductVariantEntity productVariant = productVariantRepository.findByExternalId(newItemRequest.getProductVariantId())
-                    .orElseThrow(() -> new ResourceNotFoundException("ProductVariant", newItemRequest.getProductVariantId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("ProductVariant not found with ID:", newItemRequest.getProductVariantId()));
 
             // Validar si el producto está activo
             if (!productVariant.getActive()) {
@@ -126,13 +126,13 @@ public class CartService {
         UserEntity user = getActiveUser(userExternalId);
 
         CartEntity cart = cartRepository.findByUser(user)
-                .orElseThrow(() -> new ResourceNotFoundException("Cart", userExternalId));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID:", user.getExternalId()));
 
         // Buscar el CartItemEntity específico
         CartItemEntity cartItemToUpdate = cart.getCartItems().stream()
                 .filter(item -> item.getProductVariant().getExternalId().equals(productVariantId))
                 .findFirst()
-                .orElseThrow(() -> new ResourceNotFoundException("CartItem", productVariantId));
+                .orElseThrow(() -> new ResourceNotFoundException("Cart item for product variant not found with ID: ", productVariantId ));
 
         Integer newQuantity = updateDTO.getQuantity();
 
@@ -163,7 +163,7 @@ public class CartService {
         UserEntity user = getActiveUser(userExternalId);
 
         CartEntity cart = cartRepository.findByUser(user)
-                .orElseThrow(() -> new ResourceNotFoundException("Cart", userExternalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Cart not found with ID: ", userExternalId));
 
         return mapCartToResponseDTO(cart);
     }
@@ -173,7 +173,7 @@ public class CartService {
         UserEntity user = getActiveUser(userExternalId);
 
         CartEntity cart = cartRepository.findByUser(user)
-                .orElseThrow(() -> new ResourceNotFoundException("Cart", userExternalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Cart not found with ID: ", userExternalId));
 
         if (!cart.getCartItems().isEmpty()) {
             cart.getCartItems().clear();
@@ -213,7 +213,7 @@ public class CartService {
     private UserEntity getActiveUser(UUID userId) {
         UserEntity user = userRepository.findByExternalId(userId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found", userId)
+                        new ResourceNotFoundException("User not found with ID: ", userId)
                 );
 
         if (!user.getActive()) {
@@ -241,8 +241,7 @@ public class CartService {
 
         return cartRepository.findByUser(user)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException("Cart not found", userExternalId)
-                );
+                        new ResourceNotFoundException("Cart not found with ID: ", userExternalId));
     }
 
     @Transactional

@@ -40,28 +40,20 @@ public class ProductService implements IProductService{
     @Transactional
     @Override
     public ProductResponseDTO create(ProductRequestDTO productRequestDTO) {
-        SupplierEntity supplier =
-                supplierRepository.findByExternalId(
-                                productRequestDTO.getSupplierId())
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException("Supplier not found. ID: " + productRequestDTO.getSupplierId(), productRequestDTO.getSupplierId())); // CAMBIO: userId -> productRequestDTO.getSupplierId()
+        SupplierEntity supplier = supplierRepository.findByExternalId(productRequestDTO.getSupplierId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Supplier not found with ID: ", productRequestDTO.getSupplierId()));
         if(!supplier.isActive()){
             throw new BusinessRuleException("Cannot assign inactive supplier");
         }
 
-        CategoryEntity category =
-                categoryRepository.findByExternalId(
-                                productRequestDTO.getCategoryId())
-                        .orElseThrow(() -> new ResourceNotFoundException(
-                                "Category not found. ID: " + productRequestDTO.getCategoryId(), productRequestDTO.getCategoryId())); // CAMBIO: userId -> productRequestDTO.getCategoryId()
+        CategoryEntity category = categoryRepository.findByExternalId(productRequestDTO.getCategoryId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: ", productRequestDTO.getCategoryId()));
         if(!category.getActive()){
             throw new BusinessRuleException("Cannot assign inactive category");
         }
         BrandEntity brand =
-                brandRepository.findByExternalId(
-                                productRequestDTO.getBrandId())
-                        .orElseThrow(() -> new ResourceNotFoundException(
-                                "Brand not found. ID: " + productRequestDTO.getBrandId(), productRequestDTO.getBrandId())); // CAMBIO: userId -> productRequestDTO.getBrandId()
+                brandRepository.findByExternalId(productRequestDTO.getBrandId())
+                        .orElseThrow(() -> new ResourceNotFoundException("Brand not found. ID: ", productRequestDTO.getBrandId()));
 
         if(!brand.getActive()){
             throw new BusinessRuleException("Cannot assign inactive brand");
@@ -72,11 +64,7 @@ public class ProductService implements IProductService{
             throw new BusinessRuleException("Product already exists for this brand.");
         }
 
-        ProductEntity product = productMapper.toEntity(
-                productRequestDTO,
-                supplier,
-                category,
-                brand);
+        ProductEntity product = productMapper.toEntity(productRequestDTO, supplier, category, brand);
 
         productRepository.save(product);
 
@@ -86,36 +74,33 @@ public class ProductService implements IProductService{
     //UPDATE
     @Transactional
     @Override
-    public ProductResponseDTO update(
-            UUID externalId,
-            ProductRequestDTO productRequestDTO) {
+    public ProductResponseDTO update(UUID externalId, ProductRequestDTO productRequestDTO) {
         ProductEntity product = productRepository
                 .findByExternalIdAndActiveTrue(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found. ID: " + externalId, externalId)); // CAMBIO: userId -> externalId
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: ", externalId));
 
         SupplierEntity supplier = supplierRepository.findByExternalId(productRequestDTO.getSupplierId())
-                .orElseThrow(() -> new ResourceNotFoundException("Supplier not found. ID: " + productRequestDTO.getSupplierId(), productRequestDTO.getSupplierId())); // CAMBIO: userId -> productRequestDTO.getSupplierId()
+                .orElseThrow(() -> new ResourceNotFoundException("Supplier not found with ID: ", productRequestDTO.getSupplierId()));
 
         if (!supplier.isActive()) {
             throw new BusinessRuleException("Cannot assign inactive supplier");
         }
 
         CategoryEntity category = categoryRepository.findByExternalId(productRequestDTO.getCategoryId())
-                .orElseThrow(() -> new ResourceNotFoundException("Category not found. ID: " + productRequestDTO.getCategoryId(), productRequestDTO.getCategoryId())); // CAMBIO: userId -> productRequestDTO.getCategoryId()
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: ", productRequestDTO.getCategoryId()));
 
         if (!category.getActive()) {
             throw new BusinessRuleException("Cannot assign inactive category");
         }
 
         BrandEntity brand = brandRepository.findByExternalId(productRequestDTO.getBrandId())
-                .orElseThrow(() -> new ResourceNotFoundException("Brand not found. ID: " + productRequestDTO.getBrandId(), productRequestDTO.getBrandId())); // CAMBIO: userId -> productRequestDTO.getBrandId()
+                .orElseThrow(() -> new ResourceNotFoundException("Brand not found. ID: ", productRequestDTO.getBrandId()));
 
         if (!brand.getActive()) {
             throw new BusinessRuleException("Cannot assign inactive brand");
         }
 
-        ProductEntity duplicated = productRepository.findByNameAndBrand(
-                        productRequestDTO.getName(), brand)
+        ProductEntity duplicated = productRepository.findByNameAndBrand(productRequestDTO.getName(), brand)
                 .orElse(null);
 
         if (duplicated != null && !duplicated.getExternalId().equals(product.getExternalId()))
@@ -123,13 +108,7 @@ public class ProductService implements IProductService{
             throw new BusinessRuleException("Product already exists for this brand.");
         }
 
-        productMapper.updateEntity(
-                product,
-                productRequestDTO,
-                supplier,
-                category,
-                brand
-        );
+        productMapper.updateEntity(product, productRequestDTO, supplier, category, brand);
 
         productRepository.save(product);
 
@@ -141,10 +120,9 @@ public class ProductService implements IProductService{
     @Override
     public ProductDeleteResponseDTO delete(UUID externalId) {
         ProductEntity product = productRepository.findByExternalIdAndActiveTrue(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found. ID: " + externalId, externalId)); // CAMBIO: userId -> externalId
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found. ID: ", externalId));
 
-        List<DisabledVariantDTO> disabledVariants =
-                product.getProductVariants()
+        List<DisabledVariantDTO> disabledVariants = product.getProductVariants()
                         .stream()
                         .map(variant -> {
 
@@ -178,9 +156,7 @@ public class ProductService implements IProductService{
     @Override
     public void activate(UUID externalId) {
         ProductEntity product = productRepository.findByExternalId(externalId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Product not found. ID: " + externalId, externalId) // CAMBIO: userId -> externalId
-                );
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found. ID: ", externalId));
 
         if (!product.isActive()) {
             throw new BusinessRuleException("Product is already active.");
@@ -204,12 +180,7 @@ public class ProductService implements IProductService{
 
     //SEARCH WITH FILTERS
     @Override
-    public List<ProductResponseDTO> search(
-            String name,
-            UUID supplierId,
-            UUID categoryId,
-            UUID brandId
-    ){
+    public List<ProductResponseDTO> search(String name, UUID supplierId, UUID categoryId, UUID brandId){
         Specification<ProductEntity> specification = Specification
                 .where(ProductSpecification.hasName(name))
                 .and(ProductSpecification.isActive(true))
@@ -225,12 +196,7 @@ public class ProductService implements IProductService{
 
     //LIST ALL INACTIVES
     @Override
-    public List<ProductResponseDTO> getInactive(
-            String name,
-            UUID supplierId,
-            UUID categoryId,
-            UUID brandId
-    ) {
+    public List<ProductResponseDTO> getInactive(String name, UUID supplierId, UUID categoryId, UUID brandId) {
 
         Specification<ProductEntity> specification = Specification
                 .where(ProductSpecification.hasName(name))
@@ -251,7 +217,7 @@ public class ProductService implements IProductService{
     public ProductResponseDTO getById(UUID externalId) {
         ProductEntity product = productRepository
                 .findByExternalIdAndActiveTrue(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found. ID: " + externalId, externalId)); // CAMBIO: userId -> externalId
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found. ID: ", externalId));
         return productMapper.toResponse(product);
     }
 
