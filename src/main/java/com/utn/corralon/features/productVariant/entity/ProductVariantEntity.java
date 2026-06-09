@@ -40,7 +40,7 @@ public class ProductVariantEntity {
     @Column(name = "active", nullable = false)
     private Boolean active = true;
 
-    @Column(name = "wholeSalePrice")
+    @Column(name = "wholesale_price")
     private BigDecimal wholesalePrice;
 
     @Column(name = "wholesaleMinQty")
