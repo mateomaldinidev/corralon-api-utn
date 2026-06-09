@@ -207,7 +207,9 @@ public class OrderService implements IOrderService {
 
     private BigDecimal calculateUnitPrice(ProductVariantEntity variant, Integer quantity) {
 
-        if (variant.getWholesaleMinQty() != null && quantity >= variant.getWholesaleMinQty()) {
+        if (variant.getWholesaleMinQty() != null
+                && variant.getWholesalePrice() != null
+                && quantity >= variant.getWholesaleMinQty()) {
             return variant.getWholesalePrice();
         }
 
