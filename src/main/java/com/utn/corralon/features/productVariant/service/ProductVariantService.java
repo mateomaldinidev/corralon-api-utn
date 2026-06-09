@@ -41,19 +41,18 @@ public class ProductVariantService implements IProductVariantService {
         ProductEntity product = productRepository.findByExternalId(productVariantRequestDTO.getProductId())
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found. ID: ", productVariantRequestDTO.getProductId()));
 
-        if (!product.isActive())
-        {
+        if (!product.isActive()) {
             throw new BusinessRuleException("Cannot create variant for inactive product");
         }
-        if(productVariantRepository.existsByProductAndAttribute(product, productVariantRequestDTO.getAttribute()))
-        {
+        if (productVariantRepository.existsByProductAndAttribute(product, productVariantRequestDTO.getAttribute())) {
             throw new BusinessRuleException("Product variant already exists");
         }
+
+        validateWholesaleConfig(productVariantRequestDTO);
 
         ProductVariantEntity variant = productVariantMapper.toEntity(productVariantRequestDTO, product);
         productVariantRepository.save(variant);
         return productVariantMapper.toResponse(variant);
-
     }
 
     //UPDATE
@@ -64,17 +63,19 @@ public class ProductVariantService implements IProductVariantService {
 
         ProductEntity product = productRepository
                 .findByExternalId(productVariantRequestDTO.getProductId())
-                .orElseThrow(() -> new ResourceNotFoundException("Product not found. ID: " , productVariantRequestDTO.getProductId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Product not found. ID: ", productVariantRequestDTO.getProductId()));
         if (!product.isActive()) {
             throw new BusinessRuleException("Cannot assign inactive product");
         }
         ProductVariantEntity duplicated = productVariantRepository
-                        .findByProductAndAttribute(product, productVariantRequestDTO.getAttribute())
-                        .orElse(null);
+                .findByProductAndAttribute(product, productVariantRequestDTO.getAttribute())
+                .orElse(null);
 
         if (duplicated != null && !duplicated.getExternalId().equals(variant.getExternalId())) {
             throw new BusinessRuleException("Product variant already exists");
         }
+
+        validateWholesaleConfig(productVariantRequestDTO);
 
         productVariantMapper.updateEntity(variant, productVariantRequestDTO, product);
 
@@ -100,12 +101,12 @@ public class ProductVariantService implements IProductVariantService {
                 .orElseThrow(() ->
                         new ResourceNotFoundException("Product variant not found with ID: ", externalId));
 
-        if(variant.getActive()) {
+        if (variant.getActive()) {
             throw new BusinessRuleException("Product variant is already active");
         }
 
-        if(!variant.getProduct().isActive()) {
-            throw new BusinessRuleException("Cannor activate variant of inactive product");
+        if (!variant.getProduct().isActive()) {
+            throw new BusinessRuleException("Cannot activate variant of inactive product");
         }
         variant.setActive(true);
         productVariantRepository.save(variant);
@@ -125,21 +126,20 @@ public class ProductVariantService implements IProductVariantService {
         Specification<ProductVariantEntity> specification =
                 Specification
                         .where(ProductVariantSpecification.hasAttribute(attribute)
-                        .and(ProductVariantSpecification.isActive(true))
-                        .and(ProductVariantSpecification.hasMinPrice(minPrice))
-                        .and(ProductVariantSpecification.hasMaxPrice(maxPrice))
-                        .and(ProductVariantSpecification.hasMinStock(minStock))
-                        .and(ProductVariantSpecification.hasProduct(productId))
-                        .and(ProductVariantSpecification.hasCategory(categoryId))
-                        .and(ProductVariantSpecification.hasBrand(brandId))
-                        .and(ProductVariantSpecification.hasProductName(productName)));
+                                .and(ProductVariantSpecification.isActive(true))
+                                .and(ProductVariantSpecification.hasMinPrice(minPrice))
+                                .and(ProductVariantSpecification.hasMaxPrice(maxPrice))
+                                .and(ProductVariantSpecification.hasMinStock(minStock))
+                                .and(ProductVariantSpecification.hasProduct(productId))
+                                .and(ProductVariantSpecification.hasCategory(categoryId))
+                                .and(ProductVariantSpecification.hasBrand(brandId))
+                                .and(ProductVariantSpecification.hasProductName(productName)));
 
         return productVariantRepository
                 .findAll(specification)
                 .stream()
                 .map(productVariantMapper::toResponse)
                 .toList();
-
     }
 
     //GET ALL INACTIVES
@@ -222,36 +222,37 @@ public class ProductVariantService implements IProductVariantService {
     private ProductVariantEntity getActiveVariant(UUID variantId) {
         return productVariantRepository.findByExternalIdAndActiveTrue(variantId)
                 .orElseThrow(() ->
-                        new ResourceNotFoundException( "Product variant not found with ID:", variantId)
+                        new ResourceNotFoundException("Product variant not found with ID:", variantId)
                 );
     }
 
     //metodo interno para crear un registro de movimiento de stock
     private void createStockMovement(ProductVariantEntity variant, Integer quantity, StockMovementType type, String reason) {
-        StockMovementEntity movement =
-                StockMovementEntity
-                        .builder()
-                        .movementDate(LocalDateTime.now())
-                        .quantity(quantity)
-                        .type(type)
-                        .reason(reason)
-                        .variant(variant)
-                        .build();
+        StockMovementEntity movement = StockMovementEntity.builder()
+                .movementDate(LocalDateTime.now())
+                .quantity(quantity)
+                .type(type)
+                .reason(reason)
+                .variant(variant)
+                .build();
 
         stockMovementRepository.save(movement);
-
     }
 
+    private void validateWholesaleConfig(ProductVariantRequestDTO dto) {
+        boolean hasPrice = dto.getWholesalePrice() != null;
+        boolean hasMinQty = dto.getWholesaleMinQty() != null;
 
-
-
-
-
-
-
-
-
-
-
-
+        if (hasPrice && !hasMinQty) {
+            throw new BusinessRuleException("wholesaleMinQty is required when wholesalePrice is set");
+        }
+        if (!hasPrice && hasMinQty) {
+            throw new BusinessRuleException("wholesalePrice is required when wholesaleMinQty is set");
+        }
+        if (hasPrice && hasMinQty) {
+            if (dto.getWholesalePrice().compareTo(dto.getPrice()) >= 0) {
+                throw new BusinessRuleException("wholesalePrice must be less than regular price");
+            }
+        }
+    }
 }
