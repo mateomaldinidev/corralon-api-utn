@@ -223,13 +223,11 @@ public class CartService {
         return user;
     }
 
-    private BigDecimal calculateUnitPrice(
-            ProductVariantEntity variant,
-            Integer quantity
-    ) {
+    private BigDecimal calculateUnitPrice(ProductVariantEntity variant, Integer quantity) {
 
-        if (variant.getWholesaleMinQty() != null && quantity >= variant.getWholesaleMinQty())
-        {
+        if (variant.getWholesaleMinQty() != null
+                && variant.getWholesalePrice() != null
+                && quantity >= variant.getWholesaleMinQty()) {
             return variant.getWholesalePrice();
         }
 
