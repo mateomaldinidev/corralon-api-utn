@@ -39,8 +39,8 @@ public class StockMovementEntity {
     @Column(name = "reason", length = 500)
     private String reason;
 
-    @ManyToMany
-    @JoinColumn(name = "varianTid", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "variantId", nullable = false)
     private ProductVariantEntity variant;
 
 }
