@@ -42,7 +42,13 @@ public class OrderMapper {
         OrderResponseDTO dto = modelMapper.map(orderEntity, OrderResponseDTO.class);
 
         dto.setUserExternalId(orderEntity.getUser().getExternalId());
-        dto.setAddressExternalId(orderEntity.getAddress().getExternalId());
+
+        //null check -> permite address null
+        dto.setAddressExternalId(
+                orderEntity.getAddress() != null
+                        ? orderEntity.getAddress().getExternalId()
+                        : null
+        );
 
         dto.setItems(
                 orderEntity.getItems()
@@ -62,7 +68,12 @@ public class OrderMapper {
 
         dto.setCustomerName(order.getUser().getName() + " " + order.getUser().getLastName());
 
-        dto.setAddressExternalId(order.getAddress().getExternalId());
+        //null check -> permite address null
+        dto.setAddressExternalId(
+                order.getAddress() != null
+                        ? order.getAddress().getExternalId()
+                        : null
+        );
 
         dto.setItems(order
                 .getItems()

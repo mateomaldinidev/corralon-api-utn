@@ -20,7 +20,6 @@ public class OrderRequestDTO {
     @NotNull
     private UUID userExternalId;
 
-    @NotNull
-    private UUID addressExternalId;
+    private UUID addressExternalId; // null = retiro en sucursal
 
 }
