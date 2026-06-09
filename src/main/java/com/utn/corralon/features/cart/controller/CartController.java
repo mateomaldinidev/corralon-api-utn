@@ -53,7 +53,7 @@ public class CartController {
     @PostMapping("/{userId}/checkout")
     public ResponseEntity<OrderResponseDTO> checkout(
             @PathVariable UUID userId,
-            @RequestParam UUID addressId
+            @RequestParam(required = false) UUID addressId
     ) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)

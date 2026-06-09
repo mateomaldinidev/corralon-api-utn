@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface IOrderService {
 
     OrderResponseDTO createFromCart(
-            CartEntity cart, UUID addressId
+            CartEntity cart, UUID addressId // null = retiro en sucursal
     );
 
     List<OrderAdminResponseDTO> getAll();

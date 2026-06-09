@@ -17,6 +17,9 @@ import com.utn.corralon.features.orderItem.entity.OrderItemEntity;
 import com.utn.corralon.features.orderItem.mapper.OrderItemMapper;
 import com.utn.corralon.features.productVariant.entity.ProductVariantEntity;
 import com.utn.corralon.features.productVariant.repository.ProductVariantRepository;
+import com.utn.corralon.features.stockMovement.entity.StockMovementEntity;
+import com.utn.corralon.features.stockMovement.enums.StockMovementType;
+import com.utn.corralon.features.stockMovement.repository.StockMovementRepository;
 import com.utn.corralon.features.user.entity.UserEntity;
 import com.utn.corralon.features.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -25,6 +28,7 @@ import com.utn.corralon.exception.BadRequestException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,33 +44,35 @@ public class OrderService implements IOrderService {
     private final UserRepository userRepository;
     private final AddressRepository addressRepository;
     private final CartRepository cartRepository;
+    private final StockMovementRepository stockMovementRepository;
 
-    //CREATE
     @Override
     @Transactional
-    public OrderResponseDTO createFromCart(
-            CartEntity cart, UUID addressId
-    ) {
-        AddressEntity address = addressRepository.findByExternalId(addressId)
-                        .orElseThrow(() ->
-                                new ResourceNotFoundException("Address not found with ID: ", addressId)
-                        );
+    public OrderResponseDTO createFromCart(CartEntity cart, UUID addressId) {
 
-        if (!address.getUser().getExternalId()
-                .equals(cart.getUser().getExternalId())) {
-            throw new BusinessRuleException("Address does not belong to user");
+        AddressEntity address = null;
+        if (addressId != null) {
+            address = addressRepository.findByExternalId(addressId)
+                    .orElseThrow(() ->
+                            new ResourceNotFoundException("Address not found with ID: ", addressId)
+                    );
+
+            if (!address.getUser().getExternalId()
+                    .equals(cart.getUser().getExternalId())) {
+                throw new BusinessRuleException("Address does not belong to user");
+            }
         }
 
         if (cart.getCartItems().isEmpty()) {
             throw new BusinessRuleException("Cart is empty");
         }
 
-        OrderEntity order = orderMapper.toEntity( cart.getUser(), address);
+        OrderEntity order = orderMapper.toEntity(cart.getUser(), address);
 
         List<OrderItemEntity> items =
                 cart.getCartItems()
                         .stream()
-                        .map(cartItem  -> {
+                        .map(cartItem -> {
 
                             ProductVariantEntity variant = cartItem.getProductVariant();
 
@@ -74,8 +80,7 @@ public class OrderService implements IOrderService {
                                 throw new BusinessRuleException("Product variant is inactive");
                             }
 
-                            if (variant.getStock() < cartItem.getQuantity())
-                            {
+                            if (variant.getStock() < cartItem.getQuantity()) {
                                 throw new BusinessRuleException("Insufficient stock");
                             }
 
@@ -88,6 +93,12 @@ public class OrderService implements IOrderService {
 
                             productVariantRepository.save(variant);
 
+                            createStockMovement(
+                                    variant,
+                                    cartItem.getQuantity(),
+                                    StockMovementType.SALE,
+                                    "Stock discounted by order creation"
+                            );
 
                             return orderItemMapper.toEntity(order, variant, cartItem.getQuantity(), unitPrice, subtotal);
                         })
@@ -107,7 +118,6 @@ public class OrderService implements IOrderService {
         return orderMapper.toResponseDTO(savedOrder);
     }
 
-    //GET ALL
     @Override
     public List<OrderAdminResponseDTO> getAll() {
 
@@ -117,22 +127,18 @@ public class OrderService implements IOrderService {
                 .toList();
     }
 
-    //GET BY EXTERNAL ID
     @Override
     public OrderResponseDTO getByExternalId(UUID externalId) {
 
         OrderEntity order = orderRepository
                 .findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Address not found with ID: ",externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: ", externalId));
 
         return orderMapper.toResponseDTO(order);
     }
 
-
     @Override
-    public List<OrderSummaryDTO> getOrdersByUser(
-            UUID userExternalId)
-    {
+    public List<OrderSummaryDTO> getOrdersByUser(UUID userExternalId) {
         findUser(userExternalId);
 
         return orderRepository
@@ -154,7 +160,7 @@ public class OrderService implements IOrderService {
 
         return orderRepository
                 .findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Address not found with ID: ",externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: ", externalId));
     }
 
     @Override
@@ -163,13 +169,13 @@ public class OrderService implements IOrderService {
 
         OrderEntity order = orderRepository
                 .findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Order not found wit ID ",externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: ", externalId));
 
         if (order.getStatus() == OrderStatus.CANCELLED) {
-             throw new BadRequestException("Order is already cancelled");
+            throw new BadRequestException("Order is already cancelled");
         }
 
-        if(order.getStatus() == OrderStatus.PAID){
+        if (order.getStatus() == OrderStatus.PAID) {
             throw new BusinessRuleException("Paid orders cannot be cancelled");
         }
 
@@ -180,7 +186,6 @@ public class OrderService implements IOrderService {
         orderRepository.save(order);
     }
 
-
     private void restoreStock(OrderEntity order) {
 
         for (OrderItemEntity item : order.getItems()) {
@@ -190,14 +195,19 @@ public class OrderService implements IOrderService {
             variant.setStock(variant.getStock() + item.getQuantity());
 
             productVariantRepository.save(variant);
+
+            createStockMovement(
+                    variant,
+                    item.getQuantity(),
+                    StockMovementType.CANCELLATION,
+                    "Stock restored by order cancellation"
+            );
         }
     }
 
-
     private BigDecimal calculateUnitPrice(ProductVariantEntity variant, Integer quantity) {
 
-        if (variant.getWholesaleMinQty() != null && quantity >= variant.getWholesaleMinQty())
-        {
+        if (variant.getWholesaleMinQty() != null && quantity >= variant.getWholesaleMinQty()) {
             return variant.getWholesalePrice();
         }
 
@@ -208,7 +218,19 @@ public class OrderService implements IOrderService {
 
         return userRepository
                 .findByExternalId(externalId)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuar not found wit ID: ", externalId));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: ", externalId));
+    }
+
+    private void createStockMovement(ProductVariantEntity variant, Integer quantity, StockMovementType type, String reason) {
+        StockMovementEntity movement = StockMovementEntity.builder()
+                .movementDate(LocalDateTime.now())
+                .quantity(quantity)
+                .type(type)
+                .reason(reason)
+                .variant(variant)
+                .build();
+
+        stockMovementRepository.save(movement);
     }
 
 }

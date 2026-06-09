@@ -245,14 +245,14 @@ public class CartService {
     }
 
     @Transactional
-    public OrderResponseDTO checkout(UUID userId, UUID adressId) {
+    public OrderResponseDTO checkout(UUID userId, UUID addressId) {
         CartEntity cart = getCartEntityByUserId(userId);
 
         if(cart.getCartItems().isEmpty()) {
             throw new BusinessRuleException("Cart is empty");
         }
 
-        OrderResponseDTO order = orderService.createFromCart(cart, adressId);
+        OrderResponseDTO order = orderService.createFromCart(cart, addressId);
 
         cart.getCartItems().clear();
         cartRepository.save(cart);

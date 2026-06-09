@@ -47,7 +47,7 @@ public class OrderEntity {
     private UserEntity user;
 
     @ManyToOne (fetch = FetchType.LAZY)
-    @JoinColumn(name="addressId",nullable = false)
+    @JoinColumn(name="addressId", nullable = true)
     private AddressEntity address;
 
 }
