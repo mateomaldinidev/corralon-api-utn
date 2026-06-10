@@ -12,4 +12,5 @@ import java.util.UUID;
 @Repository
 public interface StockMovementRepository extends JpaRepository<StockMovementEntity, Long>, JpaSpecificationExecutor<StockMovementEntity> {
     List<StockMovementEntity> findByVariantExternalId(UUID variantId);
+    StockMovementEntity findByExternalId(UUID externalId);
 }
