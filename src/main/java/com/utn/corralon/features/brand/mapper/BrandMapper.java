@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class BrandMapper {
 
-    public ModelMapper modelMapper = new ModelMapper();
+    private final ModelMapper modelMapper;
 
     public BrandMapper(ModelMapper modelMapper) {
         this.modelMapper = modelMapper;
