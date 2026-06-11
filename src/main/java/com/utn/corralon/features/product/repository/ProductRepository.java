@@ -19,5 +19,5 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long>, J
 
 
 
-    boolean existByNameAndBrand(String name, BrandEntity brand);
+    boolean existsByNameAndBrand(String name, BrandEntity brand);
 }

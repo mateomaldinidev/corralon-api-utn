@@ -3,9 +3,12 @@ spring:
     name: corralon
 
   datasource:
-    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
+    # Los valores por defecto (:localhost, :3306, etc.) se usan solo
+    # si se corre la app local con mvn spring-boot:run.
+    # Con Docker, las variables se inyectan desde compose.yaml.
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:corralon_db}
+    username: ${DB_USER:user}
+    password: ${DB_PASSWORD:password}
 
   jpa:
     hibernate:
