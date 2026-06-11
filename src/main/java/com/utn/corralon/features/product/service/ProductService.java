@@ -60,7 +60,7 @@ public class ProductService implements IProductService{
         }
 
 
-        if(productRepository.existByNameAndBrand(productRequestDTO.getName(), brand)){
+        if(productRepository.existsByNameAndBrand(productRequestDTO.getName(), brand)){
             throw new BusinessRuleException("Product already exists for this brand.");
         }
 
