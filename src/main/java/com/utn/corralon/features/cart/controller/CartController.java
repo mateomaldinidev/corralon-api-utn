@@ -8,7 +8,6 @@ import com.utn.corralon.features.order.dto.OrderResponseDTO;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -36,7 +35,6 @@ public class CartController {
 
     //  actualizar la cantidad de un ítem especifico del carrito
     @PatchMapping("/{userId}/items/{productVariantId}")
-    @PreAuthorize("hasRole('ADMIN') or (hasRole('CUSTOMER') and #userId == authentication.principal.id)") // Ejemplo con Spring Security
     public ResponseEntity<CartResponseDTO> updateCartItemQuantity(
             @PathVariable UUID userId,
             @PathVariable UUID productVariantId,

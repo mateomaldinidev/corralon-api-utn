@@ -8,9 +8,9 @@ import com.utn.corralon.features.user.entity.UserEntity;
 import com.utn.corralon.features.user.mapper.UserMapper;
 import com.utn.corralon.features.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.security.MessageDigest;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -20,7 +20,6 @@ import java.util.UUID;
 public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserResponseDTO create(UserRequestDTO dto) {
@@ -28,7 +27,7 @@ public class UserService implements IUserService {
             throw new EmailAlreadyExistsException("El email ya está registrado");
         }
         UserEntity entity = userMapper.toEntity(dto);
-        entity.setPassword(passwordEncoder.encode(dto.getPassword()));
+        entity.setPassword(encodePassword(dto.getPassword()));
         entity.setCreatedAt(LocalDateTime.now());
         UserEntity saved = userRepository.save(entity);
         return userMapper.toResponse(saved);
@@ -57,8 +56,8 @@ public class UserService implements IUserService {
                 .orElseThrow(() -> new ResourceNotFoundException("Cannot be updated. User not found with ID: ", externalId));
 
         userMapper.updateEntity(entity, dto);
-        if (!entity.getPassword().equals(dto.getPassword())) {
-            entity.setPassword(passwordEncoder.encode(dto.getPassword()));
+        if (!entity.getPassword().equals(encodePassword(dto.getPassword()))) {
+            entity.setPassword(encodePassword(dto.getPassword()));
         }
         entity.setCreatedAt(entity.getCreatedAt());
         UserEntity updated = userRepository.save(entity);
@@ -72,5 +71,19 @@ public class UserService implements IUserService {
                 .orElseThrow(() -> new ResourceNotFoundException("Cannot be deleted. User not found wit ID: ", externalId));
         entity.setActive(false);
         userRepository.save(entity);
+    }
+
+    private String encodePassword(String rawPassword) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+            byte[] hash = md.digest(rawPassword.getBytes());
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hash) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+        } catch (Exception e) {
+            throw new RuntimeException("Error encoding password", e);
+        }
     }
 }
