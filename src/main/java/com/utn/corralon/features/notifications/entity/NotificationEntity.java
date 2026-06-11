@@ -36,7 +36,7 @@ public class NotificationEntity {
     @Column(name="created_at",nullable = false)
     private LocalDateTime createdAt;
 
-    @Column(name="read",nullable = false)
+    @Column(name="is_read",nullable = false)
     private Boolean read;
 
     @Enumerated(EnumType.STRING)
