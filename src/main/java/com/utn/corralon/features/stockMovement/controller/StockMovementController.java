@@ -17,14 +17,14 @@ public class StockMovementController {
 
     private final IStockMovementService stockMovementService;
 
-    // Ver historial de movimientos de una variante.
+    @PreAuthorize("hasAuthority('STOCK_MOVEMENT_LIST_BY_VARIANT')")
     @GetMapping("/variant/{variantId}")
     @PreAuthorize("hasAuthority('STOCK_MOVEMENT_LIST_BY_VARIANT')")
     public ResponseEntity<List<StockMovementResponseDTO>> getMovementsByVariant(@PathVariable UUID variantId) {
         return ResponseEntity.ok(stockMovementService.getMovementsByVariant(variantId));
     }
 
-    // Ver un movimiento de stock por su ID
+    @PreAuthorize("hasAuthority('STOCK_MOVEMENT_READ')")
     @GetMapping("/{externalId}")
     @PreAuthorize("hasAuthority('STOCK_MOVEMENT_READ')")
     public ResponseEntity<StockMovementResponseDTO> getMovementById(@PathVariable UUID externalId) {

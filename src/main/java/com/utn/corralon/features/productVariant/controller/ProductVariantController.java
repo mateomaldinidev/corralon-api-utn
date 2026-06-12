@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/product-variants")
+@RequestMapping("/api/product-variants")
 public class ProductVariantController {
     private final IProductVariantService productVariantService;
 

@@ -44,10 +44,11 @@ public class OrderController {
     @PostMapping("/{externalId}/cancel")
     @PreAuthorize("hasAuthority('ORDER_CANCEL_OWN')")
     public ResponseEntity<Void> cancelOrder(
-            @PathVariable UUID externalId
+            @PathVariable UUID externalId,
+            @RequestParam UUID userExternalId
     ) {
 
-        orderService.cancelOrder(externalId);
+        orderService.cancelOrder(externalId, userExternalId);
 
         return ResponseEntity
                 .noContent()

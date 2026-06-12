@@ -2,6 +2,10 @@ package com.utn.corralon.features.order.service;
 
 import com.utn.corralon.exception.BusinessRuleException;
 import com.utn.corralon.exception.ResourceNotFoundException;
+import com.utn.corralon.exception.UnauthorizedException;
+import com.utn.corralon.features.auth.CredentialsEntity;
+import com.utn.corralon.features.auth.CredentialsRepository;
+import com.utn.corralon.features.auth.Roles;
 import com.utn.corralon.features.address.entity.AddressEntity;
 import com.utn.corralon.features.address.repository.AddressRepository;
 import com.utn.corralon.features.cart.entity.CartEntity;
@@ -45,6 +49,7 @@ public class OrderService implements IOrderService {
     private final OrderItemMapper orderItemMapper;
     private final ProductVariantRepository productVariantRepository;
     private final UserRepository userRepository;
+    private final CredentialsRepository credentialsRepository;
     private final AddressRepository addressRepository;
     private final CartRepository cartRepository;
     private final StockMovementRepository stockMovementRepository;
@@ -217,11 +222,31 @@ public class OrderService implements IOrderService {
 
     @Override
     @Transactional
-    public void cancelOrder(UUID externalId) {
+    public void cancelOrder(UUID externalId, UUID userExternalId) {
 
         OrderEntity order = orderRepository
                 .findByExternalId(externalId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order not found with ID: ", externalId));
+
+        UserEntity requestingUser = userRepository
+                .findByExternalId(userExternalId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: ", userExternalId));
+
+        CredentialsEntity credentials = credentialsRepository
+                .findByUsername(requestingUser.getEmail())
+                .orElseThrow(() -> new ResourceNotFoundException("Credentials not found for user: ", userExternalId));
+
+        boolean isCustomer = credentials.getRoles().stream()
+                .anyMatch(r -> r.getRole() == Roles.ROLE_CUSTOMER);
+
+        boolean isAdminOrEmployee = credentials.getRoles().stream()
+                .anyMatch(r -> r.getRole() == Roles.ROLE_ADMIN || r.getRole() == Roles.ROLE_EMPLOYEE);
+
+        if (isCustomer && !isAdminOrEmployee) {
+            if (!order.getUser().getExternalId().equals(userExternalId)) {
+                throw new UnauthorizedException("You can only cancel your own orders");
+            }
+        }
 
         if (order.getStatus() == OrderStatus.CANCELLED) {
             throw new BadRequestException("Order is already cancelled");

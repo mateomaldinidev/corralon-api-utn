@@ -3,6 +3,8 @@ package com.utn.corralon.features.offer.service;
 import com.utn.corralon.exception.BusinessRuleException;
 import com.utn.corralon.exception.ResourceNotFoundException;
 import com.utn.corralon.features.auth.Roles;
+import com.utn.corralon.features.auth.CredentialsRepository;
+import com.utn.corralon.features.auth.Roles;
 import com.utn.corralon.features.notifications.service.IEmailService;
 import com.utn.corralon.features.offer.dto.OfferRequestDTO;
 import com.utn.corralon.features.offer.dto.OfferResponseDTO;
@@ -34,6 +36,7 @@ public class OfferService implements IOfferService {
     private final OfferProductRepository offerProductRepository;
     private final ProductVariantRepository productVariantRepository;
     private final UserRepository userRepository;
+    private final CredentialsRepository credentialsRepository;
     private final IEmailService emailService;
 
     private final OfferMapper offerMapper;
@@ -145,7 +148,12 @@ public class OfferService implements IOfferService {
 
         OfferResponseDTO offerDTO = offerMapper.toResponse(offer);
 
-        List<UserEntity> customers = userRepository.findAllByRoleAndActiveTrue(Roles.ROLE_CUSTOMER);
+        List<UserEntity> customers = userRepository.findAllByActiveTrue().stream()
+                .filter(u -> credentialsRepository.findByUsername(u.getEmail())
+                        .map(CredentialsEntity -> CredentialsEntity.getRoles().stream()
+                                .anyMatch(r -> r.getRole() == Roles.ROLE_CUSTOMER))
+                        .orElse(false))
+                .toList();
         for (UserEntity customer : customers) {
             emailService.sendNewPromotionEmail(customer.getEmail(), customer.getName(), offerDTO);
         }

@@ -166,7 +166,7 @@ public class SecurityDataInitializer {
 
         permits.forEach(permission ->
                 permitRepository.findByPermit(permission)
-                        .ifPresent(roleEntity::addPermits)
+                        .ifPresent(roleEntity::addPermit)
         );
 
         roleRepository.save(roleEntity);

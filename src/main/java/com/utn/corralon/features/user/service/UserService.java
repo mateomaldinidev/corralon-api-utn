@@ -67,22 +67,28 @@ public class UserService implements IUserService {
 
         emailService.sendWelcomeEmail(saved.getEmail(), saved.getName());
 
-        return userMapper.toResponse(saved);
+        return userMapper.toResponse(saved, credentials);
     }
 
     @Override
     public List<UserResponseDTO> getAll() {
         return userRepository.findAllByActiveTrue().stream()
-                .map(userMapper::toResponse)
+                .map(user -> {
+                    CredentialsEntity credentials = credentialsRepository.findByUsername(user.getEmail())
+                            .orElse(null);
+                    return userMapper.toResponse(user, credentials);
+                })
                 .toList();
     }
 
     @Override
     public UserResponseDTO getByExternalId(UUID externalId) {
-        return userRepository.findByExternalId(externalId)
+        UserEntity user = userRepository.findByExternalId(externalId)
                 .filter(UserEntity::getActive)
-                .map(userMapper::toResponse)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: ", externalId));
+        CredentialsEntity credentials = credentialsRepository.findByUsername(user.getEmail())
+                .orElseThrow(() -> new ResourceNotFoundException("Credentials not found for user: ", externalId));
+        return userMapper.toResponse(user, credentials);
     }
 
     @Override
@@ -138,7 +144,7 @@ public class UserService implements IUserService {
                     updated.getName());
         }
 
-        return userMapper.toResponse(updated);
+        return userMapper.toResponse(updated, credentials);
     }
 
     @Override

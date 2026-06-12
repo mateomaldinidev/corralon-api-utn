@@ -24,6 +24,7 @@ public class CartController {
         this.cartService = cartService;
     }
 
+    @PreAuthorize("hasAuthority('CART_CREATE_OR_UPDATE')")
     @PostMapping
     @PreAuthorize("hasAuthority('CART_CREATE_OR_UPDATE')")
     public ResponseEntity<CartResponseDTO> createOrUpdateCart(@Valid @RequestBody CartRequestDTO cartRequest) {
@@ -31,13 +32,14 @@ public class CartController {
         return ResponseEntity.ok( cartService.createOrUpdateCart(cartRequest));
     }
 
+    @PreAuthorize("hasAuthority('CART_READ')")
     @GetMapping("/{userId}")
     @PreAuthorize("hasAuthority('CART_READ')")
     public ResponseEntity<CartResponseDTO> getCartByUserId(@PathVariable UUID userId) {
         return ResponseEntity.ok(cartService.getCartByUserId(userId));
     }
 
-    //  actualizar la cantidad de un ítem especifico del carrito
+    @PreAuthorize("hasAuthority('CART_UPDATE_ITEM_QUANTITY')")
     @PatchMapping("/{userId}/items/{productVariantId}")
     @PreAuthorize("hasAuthority('CART_UPDATE_ITEM_QUANTITY')")
     public ResponseEntity<CartResponseDTO> updateCartItemQuantity(
@@ -47,13 +49,15 @@ public class CartController {
         return ResponseEntity.ok(cartService.updateCartItemQuantity(userId, productVariantId, updateDTO));
     }
 
+    @PreAuthorize("hasAuthority('CART_CLEAR')")
     @DeleteMapping("/{userId}")
     @PreAuthorize("hasAuthority('CART_CLEAR')")
     public ResponseEntity<Void> clearCart(@PathVariable UUID userId) {
         cartService.clearCart(userId);
-        return ResponseEntity.noContent().build(); // TIRA UN 204
+        return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasAuthority('CART_CHECKOUT')")
     @PostMapping("/{userId}/checkout")
     @PreAuthorize("hasAuthority('CART_CHECKOUT')")
     public ResponseEntity<OrderResponseDTO> checkout(

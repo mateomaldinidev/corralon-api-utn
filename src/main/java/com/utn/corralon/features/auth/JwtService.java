@@ -1,7 +1,6 @@
 package com.utn.corralon.features.auth;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -93,8 +92,5 @@ public class JwtService {
         Date expiration = extractClaim(token, Claims::getExpiration);
         return expiration.before(new Date());
     }
-
-
-
 
 }
