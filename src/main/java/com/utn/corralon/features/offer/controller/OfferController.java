@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,13 +21,13 @@ public class OfferController {
 
     private final IOfferService offerService;
 
-    // Crear una nueva oferta
+    @PreAuthorize("hasAuthority('OFFER_CREATE')")
     @PostMapping
     public ResponseEntity<OfferResponseDTO> create(@RequestBody @Valid OfferRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(offerService.create(dto));
     }
 
-    // Agregar un producto a una oferta existente
+    @PreAuthorize("hasAuthority('OFFER_ADD_PRODUCT')")
     @PostMapping("/{offerExternalId}/products")
     public ResponseEntity<OfferResponseDTO> addProduct(
             @PathVariable UUID offerExternalId,
@@ -34,7 +35,7 @@ public class OfferController {
         return ResponseEntity.ok(offerService.addProductToOffer(dto));
     }
 
-    // Sacar un producto de una oferta
+    @PreAuthorize("hasAuthority('OFFER_REMOVE_PRODUCT')")
     @DeleteMapping("/{offerExternalId}/products/{productVariantExternalId}")
     public ResponseEntity<OfferResponseDTO> removeProduct(
             @PathVariable UUID offerExternalId,
@@ -42,32 +43,32 @@ public class OfferController {
         return ResponseEntity.ok(offerService.removeProductFromOffer(offerExternalId, productVariantExternalId));
     }
 
-    // Buscar una oferta por su ID
+    @PreAuthorize("hasAuthority('OFFER_READ')")
     @GetMapping("/{externalId}")
     public ResponseEntity<OfferResponseDTO> getByExternalId(@PathVariable UUID externalId) {
         return ResponseEntity.ok(offerService.getByExternalId(externalId));
     }
 
-    // Listar todas las ofertas activas
+    @PreAuthorize("hasAuthority('OFFER_LIST')")
     @GetMapping
     public ResponseEntity<List<OfferResponseDTO>> getAllActive() {
         return ResponseEntity.ok(offerService.getAllActive());
     }
 
-    // Listar todas las ofertas inactivas
+    @PreAuthorize("hasAuthority('OFFER_LIST_INACTIVE')")
     @GetMapping("/inactive")
     public ResponseEntity<List<OfferResponseDTO>> getAllInactive() {
         return ResponseEntity.ok(offerService.getAllInactive());
     }
 
-    // Activar una oferta
+    @PreAuthorize("hasAuthority('OFFER_ACTIVATE')")
     @PatchMapping("/{externalId}/activate")
     public ResponseEntity<Void> activate(@PathVariable UUID externalId) {
         offerService.activate(externalId);
         return ResponseEntity.noContent().build();
     }
 
-    // Desactivar una oferta
+    @PreAuthorize("hasAuthority('OFFER_DEACTIVATE')")
     @PatchMapping("/{externalId}/deactivate")
     public ResponseEntity<Void> deactivate(@PathVariable UUID externalId) {
         offerService.deactivate(externalId);

@@ -7,6 +7,7 @@ import com.utn.corralon.features.stockMovement.dto.StockMovementRequestDTO;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -14,7 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/product-variants")
+@RequestMapping("/api/product-variants")
 public class ProductVariantController {
     private final IProductVariantService productVariantService;
 
@@ -22,7 +23,7 @@ public class ProductVariantController {
         this.productVariantService = productVariantService;
     }
 
-    //GET BY ID
+    @PreAuthorize("hasAuthority('PRODUCT_VARIANT_READ')")
     @GetMapping("/{externalId}")
     public ResponseEntity<ProductVariantResponseDTO> getById(
             @PathVariable UUID externalId)
@@ -32,7 +33,7 @@ public class ProductVariantController {
                 .body(productVariantService.getById(externalId));
     }
 
-    // CREATE
+    @PreAuthorize("hasAuthority('PRODUCT_VARIANT_CREATE')")
     @PostMapping
     public ResponseEntity<ProductVariantResponseDTO> create(
             @Valid
@@ -43,7 +44,7 @@ public class ProductVariantController {
                 .body(productVariantService.create(productVariantRequestDTO));
     }
 
-    // UPDATE
+    @PreAuthorize("hasAuthority('PRODUCT_VARIANT_UPDATE')")
     @PutMapping("/{externalId}")
     public ResponseEntity<ProductVariantResponseDTO> update(
             @PathVariable UUID externalId,
@@ -57,7 +58,7 @@ public class ProductVariantController {
                 ));
     }
 
-    // LOGICAL DELETE
+    @PreAuthorize("hasAuthority('PRODUCT_VARIANT_DELETE')")
     @DeleteMapping("/{externalId}")
     public ResponseEntity<Void> delete(
             @PathVariable UUID externalId)
@@ -69,7 +70,7 @@ public class ProductVariantController {
                 .build();
     }
 
-    // ACTIVATE
+    @PreAuthorize("hasAuthority('PRODUCT_VARIANT_ACTIVATE')")
     @PatchMapping("/{externalId}/activate")
     public ResponseEntity<Void> activate(
             @PathVariable UUID externalId)
@@ -81,7 +82,7 @@ public class ProductVariantController {
                 .build();
     }
 
-    // SEARCH ACTIVE VARIANTS
+    @PreAuthorize("hasAuthority('PRODUCT_VARIANT_LIST')")
     @GetMapping("/search")
     public ResponseEntity<List<ProductVariantResponseDTO>> search(
             @RequestParam(required = false) String attribute,
@@ -107,7 +108,7 @@ public class ProductVariantController {
                 ));
     }
 
-    // SEARCH INACTIVE VARIANTS
+    @PreAuthorize("hasAuthority('PRODUCT_VARIANT_LIST_INACTIVE')")
     @GetMapping("/inactive")
     public ResponseEntity<List<ProductVariantResponseDTO>> getInactive(
             @RequestParam(required = false) String attribute,
@@ -133,7 +134,7 @@ public class ProductVariantController {
                 ));
     }
 
-    // STOCK ENTRY
+    @PreAuthorize("hasAuthority('STOCK_ENTRY')")
     @PostMapping("/stock/entry")
     public ResponseEntity<ProductVariantResponseDTO> registerEntry(
             @RequestBody StockMovementRequestDTO dto)
@@ -143,7 +144,7 @@ public class ProductVariantController {
                 .body(productVariantService.registerEntry(dto));
     }
 
-    // STOCK ADJUSTMENT
+    @PreAuthorize("hasAuthority('STOCK_ADJUSTMENT')")
     @PostMapping("/stock/adjustment")
     public ResponseEntity<ProductVariantResponseDTO> adjustStock(
             @RequestBody StockMovementRequestDTO dto)
@@ -153,7 +154,7 @@ public class ProductVariantController {
                 .body(productVariantService.adjustStock(dto));
     }
 
-    // AVAILABLE STOCK
+    @PreAuthorize("hasAuthority('STOCK_READ')")
     @GetMapping("/{externalId}/stock")
     public ResponseEntity<Integer> getAvailableStock(
             @PathVariable UUID externalId)
@@ -162,16 +163,4 @@ public class ProductVariantController {
                 .status(HttpStatus.OK)
                 .body(productVariantService.getAvailableStock(externalId));
     }
-
-
-
-
-
-
-
-
-
-
-
-
 }
