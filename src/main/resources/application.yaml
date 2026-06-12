@@ -29,8 +29,9 @@ spring:
   app:
     base-url: ${APP_BASE_URL:http://localhost:8080}
 
-jwt:
-  secret: "${JWT_SECRET}"
+  jwt:
+    secret: QzY1RjQ4QjQzRjQ3RjQ2RjQ1RjQ0RjQzRjQyRjQxRjQwRjM5RjM4RjM3RjM2RjM1RjM0RjMzRjMyRjMxRjMwRjI5RjI4RjI3RjI2RjI1RjI0RjIzRjIyRjIxRjIwRjE5RjE4RjE3RjE2RjE1RjE0RjEzRjEyRjExRjEwRjA5RjA4RjA3RjA2RjA1RjA0RjAzRjAyRjAxRjAw
+
   expiration: 86400000
 
 server:
