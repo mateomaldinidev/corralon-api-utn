@@ -13,3 +13,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+
+jwt:
+  secret: "Fp9vB7EaDnMYPhq7LxxiXIwb07pcLDBZoyzVrnJFWqy"
+  expiration: 86400000
+
+server:
+  port: 8081

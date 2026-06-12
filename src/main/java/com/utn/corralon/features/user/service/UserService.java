@@ -2,17 +2,23 @@ package com.utn.corralon.features.user.service;
 
 import com.utn.corralon.exception.EmailAlreadyExistsException;
 import com.utn.corralon.exception.ResourceNotFoundException;
+import com.utn.corralon.features.auth.CredentialsEntity;
+import com.utn.corralon.features.auth.CredentialsRepository;
+import com.utn.corralon.features.auth.RoleEntity;
+import com.utn.corralon.features.auth.RolesRepository;
 import com.utn.corralon.features.user.dto.UserRequestDTO;
 import com.utn.corralon.features.user.dto.UserResponseDTO;
 import com.utn.corralon.features.user.entity.UserEntity;
 import com.utn.corralon.features.user.mapper.UserMapper;
 import com.utn.corralon.features.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.MessageDigest;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -20,6 +26,9 @@ import java.util.UUID;
 public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final CredentialsRepository credentialsRepository;
+    private final RolesRepository rolesRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserResponseDTO create(UserRequestDTO dto) {
@@ -27,9 +36,33 @@ public class UserService implements IUserService {
             throw new EmailAlreadyExistsException("El email ya está registrado");
         }
         UserEntity entity = userMapper.toEntity(dto);
-        entity.setPassword(encodePassword(dto.getPassword()));
+
+        entity.setPassword(
+                passwordEncoder.encode(dto.getPassword())
+        );
+
         entity.setCreatedAt(LocalDateTime.now());
+
         UserEntity saved = userRepository.save(entity);
+
+        RoleEntity role = rolesRepository.findByRole(dto.getRole())
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Role not found: " + dto.getRole()
+                        )
+                );
+
+        CredentialsEntity credentials =
+                CredentialsEntity.builder()
+                        .username(saved.getEmail())
+                        .password(saved.getPassword())
+                        .enabled(true)
+                        .usuario(saved)
+                        .roles(Set.of(role))
+                        .build();
+
+        credentialsRepository.save(credentials);
+
         return userMapper.toResponse(saved);
     }
 
@@ -55,12 +88,33 @@ public class UserService implements IUserService {
                 .filter(UserEntity::getActive)
                 .orElseThrow(() -> new ResourceNotFoundException("Cannot be updated. User not found with ID: ", externalId));
 
+        CredentialsEntity credentials =
+                credentialsRepository.findByUsername(entity.getEmail())
+                        .orElseThrow(() ->
+                                new RuntimeException("Credentials not found")
+                        );
+
         userMapper.updateEntity(entity, dto);
-        if (!entity.getPassword().equals(encodePassword(dto.getPassword()))) {
-            entity.setPassword(encodePassword(dto.getPassword()));
-        }
-        entity.setCreatedAt(entity.getCreatedAt());
+
+        entity.setPassword(
+                passwordEncoder.encode(dto.getPassword())
+        );
+
         UserEntity updated = userRepository.save(entity);
+
+        RoleEntity role = rolesRepository.findByRole(dto.getRole())
+                .orElseThrow(() ->
+                        new RuntimeException(
+                                "Role not found: " + dto.getRole()
+                        )
+                );
+
+        credentials.setUsername(updated.getEmail());
+        credentials.setPassword(updated.getPassword());
+        credentials.setRoles(Set.of(role));
+
+        credentialsRepository.save(credentials);
+
         return userMapper.toResponse(updated);
     }
 
@@ -69,21 +123,17 @@ public class UserService implements IUserService {
         UserEntity entity = userRepository.findByExternalId(externalId)
                 .filter(UserEntity::getActive)
                 .orElseThrow(() -> new ResourceNotFoundException("Cannot be deleted. User not found wit ID: ", externalId));
+        CredentialsEntity credentials =
+                credentialsRepository.findByUsername(entity.getEmail())
+                        .orElseThrow(() ->
+                                new RuntimeException("Credentials not found")
+                        );
+
         entity.setActive(false);
+        credentials.setEnabled(false);
+
         userRepository.save(entity);
+        credentialsRepository.save(credentials);
     }
 
-    private String encodePassword(String rawPassword) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] hash = md.digest(rawPassword.getBytes());
-            StringBuilder sb = new StringBuilder();
-            for (byte b : hash) {
-                sb.append(String.format("%02x", b));
-            }
-            return sb.toString();
-        } catch (Exception e) {
-            throw new RuntimeException("Error encoding password", e);
-        }
-    }
 }
