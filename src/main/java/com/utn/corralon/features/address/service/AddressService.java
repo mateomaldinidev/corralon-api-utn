@@ -1,6 +1,7 @@
 package com.utn.corralon.features.address.service;
 
 import com.utn.corralon.exception.ResourceNotFoundException;
+import com.utn.corralon.exception.UnauthorizedException;
 import com.utn.corralon.features.address.dto.AddressRequestDTO;
 import com.utn.corralon.features.address.dto.AddressResponseDTO;
 import com.utn.corralon.features.address.entity.AddressEntity;
@@ -69,10 +70,14 @@ public class AddressService implements IAddressService {
 
     @Override
     @Transactional
-    public void delete(UUID externalId) {
-        AddressEntity entity = addressRepository.findByExternalId(externalId)
+    public void delete(UUID externalId, UUID userExternalId) {
+        AddressEntity address = addressRepository.findByExternalId(externalId)
                 .orElseThrow(() -> new ResourceNotFoundException("Address not found with ID: ",externalId));
-        addressRepository.delete(entity);
+        if (!address.getUser().getExternalId().equals(userExternalId)) {
+            throw new UnauthorizedException("Address does not belong to user");
+        }
+
+        address.setActive(false);
     }
 
     @Override
