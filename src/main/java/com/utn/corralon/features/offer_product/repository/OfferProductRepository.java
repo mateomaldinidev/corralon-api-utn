@@ -1,7 +1,11 @@
 package com.utn.corralon.features.offer_product.repository;
 
 import com.utn.corralon.features.offer_product.entity.OfferProductEntity;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -15,4 +19,11 @@ public interface OfferProductRepository extends JpaRepository<OfferProductEntity
     boolean existsByOfferExternalIdAndProductVariantExternalId(
             UUID offerExternalId, UUID productVariantExternalId);
     List<OfferProductEntity> findByOfferExternalId(UUID offerExternalId);
+
+    @Query("SELECT op FROM OfferProductEntity op JOIN op.offer o " +
+           "WHERE op.productVariant.externalId = :variantId " +
+           "AND o.active = true " +
+           "AND o.startDate <= CURRENT_TIMESTAMP " +
+           "AND o.endDate >= CURRENT_TIMESTAMP")
+    Optional<OfferProductEntity> findActiveOfferForVariant(@Param("variantId") UUID variantId);
 }
