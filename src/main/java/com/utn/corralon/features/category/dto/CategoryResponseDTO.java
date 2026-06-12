@@ -11,10 +11,10 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 public class CategoryResponseDTO{
-    @NotBlank
+
     private UUID externalId;
-    @NotBlank
+
     private String name;
-    @NotBlank
+
     private boolean active;
 }

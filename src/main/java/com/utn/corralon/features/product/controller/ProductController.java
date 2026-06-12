@@ -16,7 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 
 @RestController
-@RequestMapping("/products")
+@RequestMapping("api/products")
 public class ProductController {
     private final IProductService productService;
 

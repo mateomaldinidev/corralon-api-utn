@@ -11,12 +11,12 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 public class SupplierResponseDTO{
-    @NotBlank
+
     private UUID externalId;
-    @NotBlank
+
     private String name;
-    @NotBlank
+
     private String contact;
-    @NotBlank
+
     private Boolean active;
 }
