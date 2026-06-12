@@ -18,10 +18,10 @@ import java.util.UUID;
 @Builder
 public class OrderRequestDTO {
 
-    @NotNull
+    @NotNull(message = "User external ID is required")
     private UUID userExternalId;
 
-    @NotNull
+    @NotNull(message = "Delivery type is required")
     private DeliveryType deliveryType;
 
     // opcional según deliveryType
