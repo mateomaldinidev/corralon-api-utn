@@ -16,5 +16,4 @@ public class BrandRequestDTO {
     private String name;
     @NotNull(message = "Active is required")
     private Boolean active;
-
 }

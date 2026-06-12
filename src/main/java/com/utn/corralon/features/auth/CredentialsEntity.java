@@ -40,19 +40,26 @@ public class CredentialsEntity implements UserDetails {
     @JoinColumn(name = "usuario_id", referencedColumnName = "id", unique = true)
     private UserEntity usuario;
 
-    @ManyToMany(cascade = CascadeType.MERGE,fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "credentials_roles",
             joinColumns = @JoinColumn(name = "credential_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id"))
+            inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
     private Set<RoleEntity> roles = new HashSet<>();
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
+        System.out.println("ROLES: " + roles);
+
         Set<GrantedAuthority> authorities = new HashSet<>();
 
         roles.forEach(role -> {
+
+            System.out.println("ROL: " + role.getRole());
+            System.out.println("PERMISOS: " + role.getPermits());
+
             authorities.add(
                     new SimpleGrantedAuthority(
                             role.getRole().name()
@@ -68,6 +75,7 @@ public class CredentialsEntity implements UserDetails {
             );
         });
 
+        System.out.println("AUTHORITIES FINALES: " + authorities);
 
         return authorities;
     }

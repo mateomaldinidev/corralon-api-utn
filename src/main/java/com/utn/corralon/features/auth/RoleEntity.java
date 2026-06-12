@@ -11,26 +11,27 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
 @Entity
 public class RoleEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, unique = true)
     private Roles role;
 
-    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name = "role_permits",
             joinColumns = @JoinColumn(name = "role_id"),
-            inverseJoinColumns = @JoinColumn(name = "permit_id"))
-    private final Set<PermitEntity> permits = new HashSet<>();
+            inverseJoinColumns = @JoinColumn(name = "permit_id")
+    )
+    private Set<PermitEntity> permits = new HashSet<>();
 
-    public RoleEntity(Roles name) {
-        this.role = name;
+    public RoleEntity(Roles role) {
+        this.role = role;
     }
 
     public void addPermit(PermitEntity permit) {
