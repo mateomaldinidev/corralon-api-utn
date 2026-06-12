@@ -2,6 +2,7 @@ package com.utn.corralon.features.offer.service;
 
 import com.utn.corralon.exception.BusinessRuleException;
 import com.utn.corralon.exception.ResourceNotFoundException;
+import com.utn.corralon.features.notifications.service.IEmailService;
 import com.utn.corralon.features.offer.dto.OfferRequestDTO;
 import com.utn.corralon.features.offer.dto.OfferResponseDTO;
 import com.utn.corralon.features.offer.entity.OfferEntity;
@@ -13,6 +14,9 @@ import com.utn.corralon.features.offer_product.mapper.OfferProductMapper;
 import com.utn.corralon.features.offer_product.repository.OfferProductRepository;
 import com.utn.corralon.features.productVariant.entity.ProductVariantEntity;
 import com.utn.corralon.features.productVariant.repository.ProductVariantRepository;
+import com.utn.corralon.features.user.entity.UserEntity;
+import com.utn.corralon.features.user.enums.RoleEnum;
+import com.utn.corralon.features.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +33,8 @@ public class OfferService implements IOfferService {
     private final OfferRepository offerRepository;
     private final OfferProductRepository offerProductRepository;
     private final ProductVariantRepository productVariantRepository;
+    private final UserRepository userRepository;
+    private final IEmailService emailService;
 
     private final OfferMapper offerMapper;
     private final OfferProductMapper offerProductMapper;
@@ -136,6 +142,13 @@ public class OfferService implements IOfferService {
 
         offer.setActive(true);
         offerRepository.save(offer);
+
+        OfferResponseDTO offerDTO = offerMapper.toResponse(offer);
+
+        List<UserEntity> customers = userRepository.findAllByRoleAndActiveTrue(RoleEnum.CUSTOMER);
+        for (UserEntity customer : customers) {
+            emailService.sendNewPromotionEmail(customer.getEmail(), customer.getName(), offerDTO);
+        }
     }
 
     // Desactivar una oferta que esté activa
