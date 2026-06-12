@@ -1,7 +1,6 @@
 package com.utn.corralon.features.supplier.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.* ;
 
@@ -20,6 +19,5 @@ public class SupplierRequestDTO {
     @Size(max = 255, message = "Contact must be less than 255 characters")
     private String contact;
 
-    @NotNull(message = "Active is required")
     private Boolean active;
 }
