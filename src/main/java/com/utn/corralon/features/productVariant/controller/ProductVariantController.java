@@ -4,6 +4,11 @@ import com.utn.corralon.features.productVariant.dto.ProductVariantRequestDTO;
 import com.utn.corralon.features.productVariant.dto.ProductVariantResponseDTO;
 import com.utn.corralon.features.productVariant.service.IProductVariantService;
 import com.utn.corralon.features.stockMovement.dto.StockMovementRequestDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +21,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/product-variants")
+@Tag(name = "Product Variants", description = "Endpoints para la gestion de variantes de producto y stock")
 public class ProductVariantController {
     private final IProductVariantService productVariantService;
 
@@ -23,20 +29,25 @@ public class ProductVariantController {
         this.productVariantService = productVariantService;
     }
 
-    //GET BY ID
     @GetMapping("/{externalId}")
     @PreAuthorize("hasAuthority('PRODUCT_VARIANT_READ')")
+    @Operation(summary = "Obtener variante por ID", description = "Retorna una variante de producto por su externalId")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Variante encontrada"),
+            @ApiResponse(responseCode = "404", description = "Variante no encontrada")
+    })
     public ResponseEntity<ProductVariantResponseDTO> getById(
-            @PathVariable UUID externalId)
+            @Parameter(description = "ID externo de la variante") @PathVariable UUID externalId)
     {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(productVariantService.getById(externalId));
     }
 
-    // CREATE
     @PostMapping
     @PreAuthorize("hasAuthority('PRODUCT_VARIANT_CREATE')")
+    @Operation(summary = "Crear variante", description = "Crea una nueva variante de producto")
+    @ApiResponse(responseCode = "201", description = "Variante creada exitosamente")
     public ResponseEntity<ProductVariantResponseDTO> create(
             @Valid
             @RequestBody ProductVariantRequestDTO productVariantRequestDTO)
@@ -46,11 +57,15 @@ public class ProductVariantController {
                 .body(productVariantService.create(productVariantRequestDTO));
     }
 
-    // UPDATE
     @PutMapping("/{externalId}")
     @PreAuthorize("hasAuthority('PRODUCT_VARIANT_UPDATE')")
+    @Operation(summary = "Actualizar variante", description = "Actualiza los datos de una variante existente")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Variante actualizada"),
+            @ApiResponse(responseCode = "404", description = "Variante no encontrada")
+    })
     public ResponseEntity<ProductVariantResponseDTO> update(
-            @PathVariable UUID externalId,
+            @Parameter(description = "ID externo de la variante") @PathVariable UUID externalId,
             @RequestBody ProductVariantRequestDTO productVariantRequestDTO)
     {
         return ResponseEntity
@@ -61,11 +76,15 @@ public class ProductVariantController {
                 ));
     }
 
-    // LOGICAL DELETE
     @DeleteMapping("/{externalId}")
     @PreAuthorize("hasAuthority('PRODUCT_VARIANT_DELETE')")
+    @Operation(summary = "Eliminar variante", description = "Eliminacion logica de una variante de producto")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Variante eliminada"),
+            @ApiResponse(responseCode = "404", description = "Variante no encontrada")
+    })
     public ResponseEntity<Void> delete(
-            @PathVariable UUID externalId)
+            @Parameter(description = "ID externo de la variante") @PathVariable UUID externalId)
     {
         productVariantService.delete(externalId);
 
@@ -74,11 +93,12 @@ public class ProductVariantController {
                 .build();
     }
 
-    // ACTIVATE
     @PatchMapping("/{externalId}/activate")
     @PreAuthorize("hasAuthority('PRODUCT_VARIANT_ACTIVATE')")
+    @Operation(summary = "Activar variante", description = "Activa una variante previamente desactivada")
+    @ApiResponse(responseCode = "204", description = "Variante activada")
     public ResponseEntity<Void> activate(
-            @PathVariable UUID externalId)
+            @Parameter(description = "ID externo de la variante") @PathVariable UUID externalId)
     {
         productVariantService.activate(externalId);
 
@@ -87,18 +107,18 @@ public class ProductVariantController {
                 .build();
     }
 
-    // SEARCH ACTIVE VARIANTS
     @GetMapping("/search")
     @PreAuthorize("hasAuthority('PRODUCT_VARIANT_LIST')")
+    @Operation(summary = "Buscar variantes activas", description = "Busca variantes activas con filtros opcionales")
     public ResponseEntity<List<ProductVariantResponseDTO>> search(
-            @RequestParam(required = false) String attribute,
-            @RequestParam(required = false) BigDecimal minPrice,
-            @RequestParam(required = false) BigDecimal maxPrice,
-            @RequestParam(required = false) Integer minStock,
-            @RequestParam(required = false) UUID productId,
-            @RequestParam(required = false) UUID categoryId,
-            @RequestParam(required = false) UUID brandId,
-            @RequestParam(required = false) String productName)
+            @Parameter(description = "Atributo de la variante") @RequestParam(required = false) String attribute,
+            @Parameter(description = "Precio minimo") @RequestParam(required = false) BigDecimal minPrice,
+            @Parameter(description = "Precio maximo") @RequestParam(required = false) BigDecimal maxPrice,
+            @Parameter(description = "Stock minimo") @RequestParam(required = false) Integer minStock,
+            @Parameter(description = "ID del producto") @RequestParam(required = false) UUID productId,
+            @Parameter(description = "ID de la categoria") @RequestParam(required = false) UUID categoryId,
+            @Parameter(description = "ID de la marca") @RequestParam(required = false) UUID brandId,
+            @Parameter(description = "Nombre del producto") @RequestParam(required = false) String productName)
     {
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -114,18 +134,18 @@ public class ProductVariantController {
                 ));
     }
 
-    // SEARCH INACTIVE VARIANTS
     @GetMapping("/inactive")
     @PreAuthorize("hasAuthority('PRODUCT_VARIANT_LIST_INACTIVE')")
+    @Operation(summary = "Buscar variantes inactivas", description = "Busca variantes inactivas con filtros opcionales")
     public ResponseEntity<List<ProductVariantResponseDTO>> getInactive(
-            @RequestParam(required = false) String attribute,
-            @RequestParam(required = false) BigDecimal minPrice,
-            @RequestParam(required = false) BigDecimal maxPrice,
-            @RequestParam(required = false) Integer minStock,
-            @RequestParam(required = false) UUID productId,
-            @RequestParam(required = false) UUID categoryId,
-            @RequestParam(required = false) UUID brandId,
-            @RequestParam(required = false) String productName)
+            @Parameter(description = "Atributo de la variante") @RequestParam(required = false) String attribute,
+            @Parameter(description = "Precio minimo") @RequestParam(required = false) BigDecimal minPrice,
+            @Parameter(description = "Precio maximo") @RequestParam(required = false) BigDecimal maxPrice,
+            @Parameter(description = "Stock minimo") @RequestParam(required = false) Integer minStock,
+            @Parameter(description = "ID del producto") @RequestParam(required = false) UUID productId,
+            @Parameter(description = "ID de la categoria") @RequestParam(required = false) UUID categoryId,
+            @Parameter(description = "ID de la marca") @RequestParam(required = false) UUID brandId,
+            @Parameter(description = "Nombre del producto") @RequestParam(required = false) String productName)
     {
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -141,9 +161,10 @@ public class ProductVariantController {
                 ));
     }
 
-    // STOCK ENTRY
     @PostMapping("/stock/entry")
     @PreAuthorize("hasAuthority('STOCK_ENTRY')")
+    @Operation(summary = "Registrar entrada de stock", description = "Registra una entrada de stock para una variante")
+    @ApiResponse(responseCode = "200", description = "Entrada de stock registrada")
     public ResponseEntity<ProductVariantResponseDTO> registerEntry(
             @RequestBody StockMovementRequestDTO dto)
     {
@@ -152,9 +173,10 @@ public class ProductVariantController {
                 .body(productVariantService.registerEntry(dto));
     }
 
-    // STOCK ADJUSTMENT
     @PostMapping("/stock/adjustment")
     @PreAuthorize("hasAuthority('STOCK_ADJUSTMENT')")
+    @Operation(summary = "Ajustar stock", description = "Realiza un ajuste de stock para una variante")
+    @ApiResponse(responseCode = "200", description = "Stock ajustado")
     public ResponseEntity<ProductVariantResponseDTO> adjustStock(
             @RequestBody StockMovementRequestDTO dto)
     {
@@ -163,11 +185,15 @@ public class ProductVariantController {
                 .body(productVariantService.adjustStock(dto));
     }
 
-    // AVAILABLE STOCK
     @GetMapping("/{externalId}/stock")
     @PreAuthorize("hasAuthority('STOCK_READ')")
+    @Operation(summary = "Obtener stock disponible", description = "Retorna el stock disponible de una variante")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Stock obtenido"),
+            @ApiResponse(responseCode = "404", description = "Variante no encontrada")
+    })
     public ResponseEntity<Integer> getAvailableStock(
-            @PathVariable UUID externalId)
+            @Parameter(description = "ID externo de la variante") @PathVariable UUID externalId)
     {
         return ResponseEntity
                 .status(HttpStatus.OK)

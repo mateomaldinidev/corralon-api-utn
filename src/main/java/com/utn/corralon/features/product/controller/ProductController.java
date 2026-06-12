@@ -5,6 +5,11 @@ import com.utn.corralon.features.product.dto.ProductDeleteResponseDTO;
 import com.utn.corralon.features.product.dto.ProductRequestDTO;
 import com.utn.corralon.features.product.dto.ProductResponseDTO;
 import com.utn.corralon.features.product.service.IProductService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,22 +23,28 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/products")
+@Tag(name = "Products", description = "Endpoints para la gestion de productos")
 public class ProductController {
     private final IProductService productService;
 
-    // GET BY ID
     @PreAuthorize("hasAuthority('PRODUCT_READ')")
     @GetMapping("/{externalId}")
+    @Operation(summary = "Obtener producto por ID", description = "Retorna un producto activo por su externalId")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Producto encontrado"),
+            @ApiResponse(responseCode = "404", description = "Producto no encontrado")
+    })
     public ResponseEntity<ProductResponseDTO> getById(
-            @PathVariable UUID externalId) {
+            @Parameter(description = "ID externo del producto") @PathVariable UUID externalId) {
         return  ResponseEntity
                 .status(HttpStatus.OK)
                 .body(productService.getById(externalId));
     }
 
-    // CREATE
     @PreAuthorize("hasAuthority('PRODUCT_CREATE')")
     @PostMapping
+    @Operation(summary = "Crear producto", description = "Crea un nuevo producto en el sistema")
+    @ApiResponse(responseCode = "201", description = "Producto creado exitosamente")
     public ResponseEntity<ProductResponseDTO> create(
             @Valid
             @RequestBody ProductRequestDTO productRequestDTO) {
@@ -42,11 +53,15 @@ public class ProductController {
                 .body(productService.create(productRequestDTO));
     }
 
-    // UPDATE
     @PreAuthorize("hasAuthority('PRODUCT_UPDATE')")
     @PutMapping("/{externalId}")
+    @Operation(summary = "Actualizar producto", description = "Actualiza los datos de un producto existente")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "Producto actualizado"),
+            @ApiResponse(responseCode = "404", description = "Producto no encontrado")
+    })
     public ResponseEntity<ProductResponseDTO> update(
-            @PathVariable UUID externalId,
+            @Parameter(description = "ID externo del producto") @PathVariable UUID externalId,
             @RequestBody ProductRequestDTO productRequestDTO) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -54,49 +69,54 @@ public class ProductController {
         );
     }
 
-    // LOGICAL DELETE
     @PreAuthorize("hasAuthority('PRODUCT_DELETE')")
     @DeleteMapping("/{externalId}")
+    @Operation(summary = "Eliminar producto", description = "Eliminacion logica de un producto")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Producto eliminado"),
+            @ApiResponse(responseCode = "404", description = "Producto no encontrado")
+    })
     public ResponseEntity<ProductDeleteResponseDTO> delete(
-            @PathVariable UUID externalId) {
+            @Parameter(description = "ID externo del producto") @PathVariable UUID externalId) {
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(productService.delete(externalId));
     }
 
-    // ACTIVATE
     @PreAuthorize("hasAuthority('PRODUCT_ACTIVATE')")
     @PatchMapping("/{externalId}/activate")
+    @Operation(summary = "Activar producto", description = "Activa un producto previamente desactivado")
+    @ApiResponse(responseCode = "204", description = "Producto activado")
     public ResponseEntity<Void> activate(
-            @PathVariable UUID externalId) {
+            @Parameter(description = "ID externo del producto") @PathVariable UUID externalId) {
         productService.activate(externalId);
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
                 .build();
     }
 
-    // SEARCH ACTIVE PRODUCTS
     @PreAuthorize("hasAuthority('PRODUCT_LIST')")
     @GetMapping("/search")
+    @Operation(summary = "Buscar productos activos", description = "Busca productos activos con filtros opcionales")
     public ResponseEntity<List<ProductResponseDTO>> search(
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) UUID supplierId,
-            @RequestParam(required = false) UUID categoryId,
-            @RequestParam(required = false) UUID brandId
+            @Parameter(description = "Nombre del producto") @RequestParam(required = false) String name,
+            @Parameter(description = "ID del proveedor") @RequestParam(required = false) UUID supplierId,
+            @Parameter(description = "ID de la categoria") @RequestParam(required = false) UUID categoryId,
+            @Parameter(description = "ID de la marca") @RequestParam(required = false) UUID brandId
     ) {
         return ResponseEntity
                 .status(200)
                 .body(productService.search(name, supplierId, categoryId, brandId));
     }
 
-    // SEARCH INACTIVE PRODUCTS
     @PreAuthorize("hasAuthority('PRODUCT_LIST_INACTIVE')")
     @GetMapping("/inactive")
+    @Operation(summary = "Buscar productos inactivos", description = "Busca productos inactivos con filtros opcionales")
     public ResponseEntity<List<ProductResponseDTO>> getInactive(
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) UUID supplierId,
-            @RequestParam(required = false) UUID categoryId,
-            @RequestParam(required = false) UUID brandId) {
+            @Parameter(description = "Nombre del producto") @RequestParam(required = false) String name,
+            @Parameter(description = "ID del proveedor") @RequestParam(required = false) UUID supplierId,
+            @Parameter(description = "ID de la categoria") @RequestParam(required = false) UUID categoryId,
+            @Parameter(description = "ID de la marca") @RequestParam(required = false) UUID brandId) {
 
         return ResponseEntity
                 .status(HttpStatus.OK)

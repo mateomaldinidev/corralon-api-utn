@@ -35,3 +35,12 @@ jwt:
 
 server:
   port: 8081
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+  show-actuator: false
