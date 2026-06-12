@@ -18,4 +18,5 @@ public class NotificationResponseDTO {
     private LocalDateTime createdAt;
     private Boolean read;
     private NotificationType type;
+    private Boolean sent;
 }

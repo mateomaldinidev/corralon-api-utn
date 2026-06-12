@@ -43,6 +43,8 @@ public class NotificationEntity {
     @Column(name = "type", nullable = false)
     private NotificationType type;
 
-
+    @Builder.Default
+    @Column(name = "sent", nullable = false)
+    private Boolean sent = false;
 
 }

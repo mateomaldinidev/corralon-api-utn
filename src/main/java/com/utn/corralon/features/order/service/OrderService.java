@@ -6,6 +6,7 @@ import com.utn.corralon.features.address.entity.AddressEntity;
 import com.utn.corralon.features.address.repository.AddressRepository;
 import com.utn.corralon.features.cart.entity.CartEntity;
 import com.utn.corralon.features.cart.repository.CartRepository;
+import com.utn.corralon.features.notifications.service.IEmailService;
 import com.utn.corralon.features.order.dto.OrderAdminResponseDTO;
 import com.utn.corralon.features.order.enums.DeliveryType;
 import com.utn.corralon.features.order.enums.OrderStatus;
@@ -46,6 +47,7 @@ public class OrderService implements IOrderService {
     private final AddressRepository addressRepository;
     private final CartRepository cartRepository;
     private final StockMovementRepository stockMovementRepository;
+    private final IEmailService emailService;
 
     @Override
     @Transactional
@@ -166,11 +168,15 @@ public class OrderService implements IOrderService {
 
         OrderEntity savedOrder = orderRepository.save(order);
 
-        // =========================
-        // 7. RESPONSE
-        // =========================
+        OrderResponseDTO responseDTO = orderMapper.toResponseDTO(savedOrder);
 
-        return orderMapper.toResponseDTO(savedOrder);
+        emailService.sendOrderCreatedEmail(
+                cart.getUser().getEmail(),
+                cart.getUser().getName(),
+                responseDTO
+        );
+
+        return responseDTO;
     }
 
     @Override
@@ -239,6 +245,15 @@ public class OrderService implements IOrderService {
         order.setStatus(OrderStatus.CANCELLED);
 
         orderRepository.save(order);
+
+        OrderResponseDTO orderDTO = orderMapper.toResponseDTO(order);
+
+        emailService.sendOrderCancelledEmail(
+                order.getUser().getEmail(),
+                order.getUser().getName(),
+                orderDTO,
+                "Order cancelled"
+        );
     }
 
     private void restoreStock(OrderEntity order) {

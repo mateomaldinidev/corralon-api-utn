@@ -2,8 +2,11 @@ package com.utn.corralon.features.payment.service;
 
 import com.utn.corralon.exception.BusinessRuleException;
 import com.utn.corralon.exception.ResourceNotFoundException;
+import com.utn.corralon.features.notifications.service.IEmailService;
+import com.utn.corralon.features.order.dto.OrderResponseDTO;
 import com.utn.corralon.features.order.entity.OrderEntity;
 import com.utn.corralon.features.order.enums.OrderStatus;
+import com.utn.corralon.features.order.mapper.OrderMapper;
 import com.utn.corralon.features.order.repository.OrderRepository;
 import com.utn.corralon.features.orderItem.entity.OrderItemEntity;
 import com.utn.corralon.features.payment.dto.PaymentRequestDTO;
@@ -14,6 +17,9 @@ import com.utn.corralon.features.payment.mapper.PaymentMapper;
 import com.utn.corralon.features.payment.repository.PaymentRepository;
 import com.utn.corralon.features.productVariant.entity.ProductVariantEntity;
 import com.utn.corralon.features.productVariant.repository.ProductVariantRepository;
+import com.utn.corralon.features.stockMovement.entity.StockMovementEntity;
+import com.utn.corralon.features.stockMovement.enums.StockMovementType;
+import com.utn.corralon.features.stockMovement.repository.StockMovementRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +36,9 @@ public class PaymentService implements IPaymentService {
     private final OrderRepository orderRepository;
     private final ProductVariantRepository productVariantRepository;
     private final PaymentMapper paymentMapper;
+    private final OrderMapper orderMapper;
+    private final IEmailService emailService;
+    private final StockMovementRepository stockMovementRepository;
 
     @Override
     public PaymentResponseDTO pay(PaymentRequestDTO request) {
@@ -68,6 +77,15 @@ public class PaymentService implements IPaymentService {
             orderRepository.save(order);
             paymentRepository.save(payment);
 
+            OrderResponseDTO orderDTO = orderMapper.toResponseDTO(order);
+
+            emailService.sendOrderStatusChangedEmail(
+                    order.getUser().getEmail(),
+                    order.getUser().getName(),
+                    orderDTO,
+                    "PAID"
+            );
+
             return paymentMapper.toDTO(payment);
         }
 
@@ -95,7 +113,26 @@ public class PaymentService implements IPaymentService {
             );
 
             productVariantRepository.save(variant);
+
+            createStockMovement(
+                    variant,
+                    item.getQuantity(),
+                    StockMovementType.CANCELLATION,
+                    "Stock restored by payment rejection"
+            );
         }
+    }
+
+    private void createStockMovement(ProductVariantEntity variant, Integer quantity, StockMovementType type, String reason) {
+        StockMovementEntity movement = StockMovementEntity.builder()
+                .movementDate(LocalDateTime.now())
+                .quantity(quantity)
+                .type(type)
+                .reason(reason)
+                .variant(variant)
+                .build();
+
+        stockMovementRepository.save(movement);
     }
 
 
