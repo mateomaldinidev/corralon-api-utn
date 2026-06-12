@@ -78,6 +78,7 @@ public class AddressService implements IAddressService {
         }
 
         address.setActive(false);
+        addressRepository.save(address);
     }
 
     @Override

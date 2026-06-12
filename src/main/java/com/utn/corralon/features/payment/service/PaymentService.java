@@ -98,6 +98,15 @@ public class PaymentService implements IPaymentService {
         orderRepository.save(order);
         paymentRepository.save(payment);
 
+        OrderResponseDTO orderDTO = orderMapper.toResponseDTO(order);
+
+        emailService.sendOrderCancelledEmail(
+                order.getUser().getEmail(),
+                order.getUser().getName(),
+                orderDTO,
+                "Payment was rejected"
+        );
+
         return paymentMapper.toDTO(payment);
     }
 
