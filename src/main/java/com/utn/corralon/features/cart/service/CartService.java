@@ -12,6 +12,7 @@ import com.utn.corralon.features.cart_item.dto.CartItemResponseDTO;
 import com.utn.corralon.features.cart_item.dto.CartItemQuantityUpdateDTO;
 import com.utn.corralon.features.cart_item.entity.CartItemEntity;
 import com.utn.corralon.features.order.dto.OrderResponseDTO;
+import com.utn.corralon.features.order.enums.DeliveryType;
 import com.utn.corralon.features.order.service.OrderService;
 import com.utn.corralon.features.productVariant.entity.ProductVariantEntity;
 import com.utn.corralon.features.productVariant.repository.ProductVariantRepository;
@@ -66,7 +67,7 @@ public class CartService {
         // Lista para almacenar los ítems que deben ser eliminados del carrito
         List<CartItemEntity> itemsToRemove = new ArrayList<>();
 
-        // 1. Procesar ítems existentes: actualizar o marcar para eliminación
+        // Procesar ítems existentes: actualizar o marcar para eliminación
         for (CartItemEntity existingItem : new ArrayList<>(cart.getCartItems())) {
             UUID productVariantId = existingItem.getProductVariant().getExternalId();
             CartItemRequestDTO incomingItemRequest = incomingItemsMap.get(productVariantId);
@@ -90,12 +91,12 @@ public class CartService {
             }
         }
 
-        // 2. Eliminar ítems marcados
+        //Eliminar ítems marcados
         for (CartItemEntity item : itemsToRemove) {
             cart.removeCartItem(item);
         }
 
-        // 3. Añadir nuevos ítems (los que quedan en incomingItemsMap)
+        //Añadir nuevos ítems (los que quedan en incomingItemsMap)
         for (CartItemRequestDTO newItemRequest : incomingItemsMap.values()) {
             ProductVariantEntity productVariant = productVariantRepository.findByExternalId(newItemRequest.getProductVariantId())
                     .orElseThrow(() -> new ResourceNotFoundException("ProductVariant not found with ID:", newItemRequest.getProductVariantId()));
@@ -243,14 +244,14 @@ public class CartService {
     }
 
     @Transactional
-    public OrderResponseDTO checkout(UUID userId, UUID addressId) {
+    public OrderResponseDTO checkout(UUID userId, UUID addressId, DeliveryType deliveryType) {
         CartEntity cart = getCartEntityByUserId(userId);
 
         if(cart.getCartItems().isEmpty()) {
             throw new BusinessRuleException("Cart is empty");
         }
 
-        OrderResponseDTO order = orderService.createFromCart(cart, addressId);
+        OrderResponseDTO order = orderService.createFromCart(cart, addressId, deliveryType);
 
         cart.getCartItems().clear();
         cartRepository.save(cart);

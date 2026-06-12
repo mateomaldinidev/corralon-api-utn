@@ -1,6 +1,7 @@
 package com.utn.corralon.features.order.entity;
 
 import com.utn.corralon.features.address.entity.AddressEntity;
+import com.utn.corralon.features.order.enums.DeliveryType;
 import com.utn.corralon.features.order.enums.OrderStatus;
 import com.utn.corralon.features.orderItem.entity.OrderItemEntity;
 import com.utn.corralon.features.user.entity.UserEntity;
@@ -38,6 +39,10 @@ public class OrderEntity {
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private DeliveryType deliveryType;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItemEntity> items;

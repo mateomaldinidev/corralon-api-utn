@@ -7,6 +7,7 @@ import com.utn.corralon.features.address.repository.AddressRepository;
 import com.utn.corralon.features.cart.entity.CartEntity;
 import com.utn.corralon.features.cart.repository.CartRepository;
 import com.utn.corralon.features.order.dto.OrderAdminResponseDTO;
+import com.utn.corralon.features.order.enums.DeliveryType;
 import com.utn.corralon.features.order.enums.OrderStatus;
 import com.utn.corralon.features.order.dto.OrderResponseDTO;
 import com.utn.corralon.features.order.dto.OrderSummaryDTO;
@@ -48,10 +49,36 @@ public class OrderService implements IOrderService {
 
     @Override
     @Transactional
-    public OrderResponseDTO createFromCart(CartEntity cart, UUID addressId) {
+    public OrderResponseDTO createFromCart(CartEntity cart, UUID addressId, DeliveryType deliveryType) {
+
+        // =========================
+        // 1. VALIDACIONES DE DOMINIO
+        // =========================
+
+        if (deliveryType == null) {
+            throw new BusinessRuleException("Delivery type is required");
+        }
+
+        if (cart.getCartItems().isEmpty()) {
+            throw new BusinessRuleException("Cart is empty");
+        }
+
+        if (deliveryType == DeliveryType.DELIVERY && addressId == null) {
+            throw new BusinessRuleException("Address is required for DELIVERY orders");
+        }
+
+        if (deliveryType == DeliveryType.PICKUP && addressId != null) {
+            throw new BusinessRuleException("Address must be null for PICKUP orders");
+        }
+
+        // =========================
+        // 2. RESOLUCIÓN DE ADDRESS
+        // =========================
 
         AddressEntity address = null;
-        if (addressId != null) {
+
+        if (deliveryType == DeliveryType.DELIVERY) {
+
             address = addressRepository.findByExternalId(addressId)
                     .orElseThrow(() ->
                             new ResourceNotFoundException("Address not found with ID: ", addressId)
@@ -63,11 +90,19 @@ public class OrderService implements IOrderService {
             }
         }
 
-        if (cart.getCartItems().isEmpty()) {
-            throw new BusinessRuleException("Cart is empty");
-        }
+        // =========================
+        // 3. CREAR ORDER BASE
+        // =========================
 
-        OrderEntity order = orderMapper.toEntity(cart.getUser(), address);
+        OrderEntity order = orderMapper.toEntity(
+                cart.getUser(),
+                address,
+                deliveryType
+        );
+
+        // =========================
+        // 4. CREAR ITEMS + STOCK
+        // =========================
 
         List<OrderItemEntity> items =
                 cart.getCartItems()
@@ -84,15 +119,17 @@ public class OrderService implements IOrderService {
                                 throw new BusinessRuleException("Insufficient stock");
                             }
 
-                            BigDecimal unitPrice = calculateUnitPrice(variant, cartItem.getQuantity());
+                            BigDecimal unitPrice =
+                                    calculateUnitPrice(variant, cartItem.getQuantity());
 
                             BigDecimal subtotal =
                                     unitPrice.multiply(BigDecimal.valueOf(cartItem.getQuantity()));
 
+                            // descontar stock
                             variant.setStock(variant.getStock() - cartItem.getQuantity());
-
                             productVariantRepository.save(variant);
 
+                            // movimiento stock
                             createStockMovement(
                                     variant,
                                     cartItem.getQuantity(),
@@ -100,20 +137,38 @@ public class OrderService implements IOrderService {
                                     "Stock discounted by order creation"
                             );
 
-                            return orderItemMapper.toEntity(order, variant, cartItem.getQuantity(), unitPrice, subtotal);
+                            return orderItemMapper.toEntity(
+                                    order,
+                                    variant,
+                                    cartItem.getQuantity(),
+                                    unitPrice,
+                                    subtotal
+                            );
                         })
                         .toList();
 
-        BigDecimal total = items
-                .stream()
+        // =========================
+        // 5. TOTAL
+        // =========================
+
+        BigDecimal total = items.stream()
                 .map(OrderItemEntity::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         order.setItems(items);
         order.setTotal(total);
-        order.setStatus(OrderStatus.PENDING_PAYMENT);
+
+        // (NO seteamos status acá porque ya lo maneja el mapper)
+
+        // =========================
+        // 6. PERSISTENCIA
+        // =========================
 
         OrderEntity savedOrder = orderRepository.save(order);
+
+        // =========================
+        // 7. RESPONSE
+        // =========================
 
         return orderMapper.toResponseDTO(savedOrder);
     }
