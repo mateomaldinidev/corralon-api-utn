@@ -30,8 +30,8 @@ app:
   base-url: ${APP_BASE_URL:http://localhost:8080}
 
 jwt:
-  secret: "Fp9vB7EaDnMYPhq7LxxiXIwb07pcLDBZoyzVrnJFWqy"
-  expiration: 86400000
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION}
 
 server:
   port: 8081

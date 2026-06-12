@@ -7,6 +7,7 @@ import com.utn.corralon.features.order.service.IOrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,7 +20,8 @@ public class OrderController {
 
     private final IOrderService orderService;
 
-    @GetMapping("/admin") //solo para admin porque devuelve informaciòn administrativa
+    @GetMapping("/admin")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
     public ResponseEntity<List<OrderAdminResponseDTO>> getAll() {
 
         return ResponseEntity
@@ -28,6 +30,7 @@ public class OrderController {
     }
 
     @GetMapping("/{externalId}")
+    @PreAuthorize("hasAuthority('ORDER_READ')")
     public ResponseEntity<OrderResponseDTO> getByExternalId(
             @PathVariable UUID externalId) {
 
@@ -39,6 +42,7 @@ public class OrderController {
 
 
     @PostMapping("/{externalId}/cancel")
+    @PreAuthorize("hasAuthority('ORDER_CANCEL_OWN')")
     public ResponseEntity<Void> cancelOrder(
             @PathVariable UUID externalId
     ) {
@@ -51,6 +55,7 @@ public class OrderController {
     }
 
     @GetMapping("/user/{userExternalId}")
+    @PreAuthorize("hasAuthority('ORDER_READ_BY_USER')")
     public ResponseEntity<List<OrderSummaryDTO>> getOrdersByUser(
             @PathVariable UUID userExternalId) {
 
@@ -58,6 +63,7 @@ public class OrderController {
     }
 
     @GetMapping("/admin/{externalId}")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
     public ResponseEntity<OrderAdminResponseDTO> getAdminOrder(
             @PathVariable UUID externalId) {
 

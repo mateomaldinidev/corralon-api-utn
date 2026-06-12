@@ -7,6 +7,7 @@ import com.utn.corralon.features.stockMovement.dto.StockMovementRequestDTO;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -24,6 +25,7 @@ public class ProductVariantController {
 
     //GET BY ID
     @GetMapping("/{externalId}")
+    @PreAuthorize("hasAuthority('PRODUCT_VARIANT_READ')")
     public ResponseEntity<ProductVariantResponseDTO> getById(
             @PathVariable UUID externalId)
     {
@@ -34,6 +36,7 @@ public class ProductVariantController {
 
     // CREATE
     @PostMapping
+    @PreAuthorize("hasAuthority('PRODUCT_VARIANT_CREATE')")
     public ResponseEntity<ProductVariantResponseDTO> create(
             @Valid
             @RequestBody ProductVariantRequestDTO productVariantRequestDTO)
@@ -45,6 +48,7 @@ public class ProductVariantController {
 
     // UPDATE
     @PutMapping("/{externalId}")
+    @PreAuthorize("hasAuthority('PRODUCT_VARIANT_UPDATE')")
     public ResponseEntity<ProductVariantResponseDTO> update(
             @PathVariable UUID externalId,
             @RequestBody ProductVariantRequestDTO productVariantRequestDTO)
@@ -59,6 +63,7 @@ public class ProductVariantController {
 
     // LOGICAL DELETE
     @DeleteMapping("/{externalId}")
+    @PreAuthorize("hasAuthority('PRODUCT_VARIANT_DELETE')")
     public ResponseEntity<Void> delete(
             @PathVariable UUID externalId)
     {
@@ -71,6 +76,7 @@ public class ProductVariantController {
 
     // ACTIVATE
     @PatchMapping("/{externalId}/activate")
+    @PreAuthorize("hasAuthority('PRODUCT_VARIANT_ACTIVATE')")
     public ResponseEntity<Void> activate(
             @PathVariable UUID externalId)
     {
@@ -83,6 +89,7 @@ public class ProductVariantController {
 
     // SEARCH ACTIVE VARIANTS
     @GetMapping("/search")
+    @PreAuthorize("hasAuthority('PRODUCT_VARIANT_LIST')")
     public ResponseEntity<List<ProductVariantResponseDTO>> search(
             @RequestParam(required = false) String attribute,
             @RequestParam(required = false) BigDecimal minPrice,
@@ -109,6 +116,7 @@ public class ProductVariantController {
 
     // SEARCH INACTIVE VARIANTS
     @GetMapping("/inactive")
+    @PreAuthorize("hasAuthority('PRODUCT_VARIANT_LIST_INACTIVE')")
     public ResponseEntity<List<ProductVariantResponseDTO>> getInactive(
             @RequestParam(required = false) String attribute,
             @RequestParam(required = false) BigDecimal minPrice,
@@ -135,6 +143,7 @@ public class ProductVariantController {
 
     // STOCK ENTRY
     @PostMapping("/stock/entry")
+    @PreAuthorize("hasAuthority('STOCK_ENTRY')")
     public ResponseEntity<ProductVariantResponseDTO> registerEntry(
             @RequestBody StockMovementRequestDTO dto)
     {
@@ -145,6 +154,7 @@ public class ProductVariantController {
 
     // STOCK ADJUSTMENT
     @PostMapping("/stock/adjustment")
+    @PreAuthorize("hasAuthority('STOCK_ADJUSTMENT')")
     public ResponseEntity<ProductVariantResponseDTO> adjustStock(
             @RequestBody StockMovementRequestDTO dto)
     {
@@ -155,6 +165,7 @@ public class ProductVariantController {
 
     // AVAILABLE STOCK
     @GetMapping("/{externalId}/stock")
+    @PreAuthorize("hasAuthority('STOCK_READ')")
     public ResponseEntity<Integer> getAvailableStock(
             @PathVariable UUID externalId)
     {
@@ -162,16 +173,5 @@ public class ProductVariantController {
                 .status(HttpStatus.OK)
                 .body(productVariantService.getAvailableStock(externalId));
     }
-
-
-
-
-
-
-
-
-
-
-
 
 }

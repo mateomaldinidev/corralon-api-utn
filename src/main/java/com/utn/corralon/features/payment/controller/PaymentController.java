@@ -6,6 +6,7 @@ import com.utn.corralon.features.payment.service.IPaymentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -18,6 +19,7 @@ public class PaymentController {
     private final IPaymentService paymentService;
 
     @PostMapping("/pay")
+    @PreAuthorize("hasAuthority('PAYMENT_CREATE')")
     public ResponseEntity<PaymentResponseDTO> pay(
             @Valid @RequestBody PaymentRequestDTO request
     ) {
@@ -28,6 +30,7 @@ public class PaymentController {
     }
 
     @GetMapping("/order/{orderId}")
+    @PreAuthorize("hasAuthority('PAYMENT_READ')")
     public ResponseEntity<PaymentResponseDTO> getByOrder(
             @PathVariable UUID orderId
     ) {
