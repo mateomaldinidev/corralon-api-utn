@@ -1,7 +1,7 @@
 package com.utn.corralon.features.user.repository;
 
+import com.utn.corralon.features.auth.Roles;
 import com.utn.corralon.features.user.entity.UserEntity;
-import com.utn.corralon.features.user.enums.RoleEnum;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -15,6 +15,6 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> findByEmail(String email);
     boolean existsByEmail(String email);
     boolean existsByExternalId(UUID externalId);
-    List<UserEntity> findAllByRoleAndActiveTrue(RoleEnum role);
+    List<UserEntity> findAllByRoleAndActiveTrue(Roles role);
     List<UserEntity> findAllByActiveTrue();
 }
