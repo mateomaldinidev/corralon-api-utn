@@ -2,6 +2,7 @@ package com.utn.corralon.features.user.service;
 
 import com.utn.corralon.exception.EmailAlreadyExistsException;
 import com.utn.corralon.exception.ResourceNotFoundException;
+import com.utn.corralon.features.notifications.service.IEmailService;
 import com.utn.corralon.features.user.dto.UserRequestDTO;
 import com.utn.corralon.features.user.dto.UserResponseDTO;
 import com.utn.corralon.features.user.entity.UserEntity;
@@ -20,6 +21,7 @@ import java.util.UUID;
 public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final IEmailService emailService;
 
     @Override
     public UserResponseDTO create(UserRequestDTO dto) {
@@ -30,6 +32,9 @@ public class UserService implements IUserService {
         entity.setPassword(encodePassword(dto.getPassword()));
         entity.setCreatedAt(LocalDateTime.now());
         UserEntity saved = userRepository.save(entity);
+
+        emailService.sendWelcomeEmail(saved.getEmail(), saved.getName());
+
         return userMapper.toResponse(saved);
     }
 
@@ -55,12 +60,19 @@ public class UserService implements IUserService {
                 .filter(UserEntity::getActive)
                 .orElseThrow(() -> new ResourceNotFoundException("Cannot be updated. User not found with ID: ", externalId));
 
+        boolean passwordChanged = !entity.getPassword().equals(encodePassword(dto.getPassword()));
+
         userMapper.updateEntity(entity, dto);
-        if (!entity.getPassword().equals(encodePassword(dto.getPassword()))) {
+        if (passwordChanged) {
             entity.setPassword(encodePassword(dto.getPassword()));
         }
         entity.setCreatedAt(entity.getCreatedAt());
         UserEntity updated = userRepository.save(entity);
+
+        if (passwordChanged) {
+            emailService.sendPasswordChangedEmail(updated.getEmail(), updated.getName());
+        }
+
         return userMapper.toResponse(updated);
     }
 
