@@ -1,7 +1,7 @@
 package com.utn.corralon.features.user.entity;
 
 import com.utn.corralon.features.address.entity.AddressEntity;
-import com.utn.corralon.features.auth.Roles;
+import com.utn.corralon.features.user.enums.RoleEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
@@ -43,7 +43,7 @@ public class UserEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false)
-    private Roles role;
+    private RoleEnum role;
 
     @Column(name = "active", nullable = false)
     private Boolean active = true;
