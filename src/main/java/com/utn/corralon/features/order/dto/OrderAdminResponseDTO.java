@@ -1,5 +1,6 @@
 package com.utn.corralon.features.order.dto;
 
+import com.utn.corralon.features.order.enums.DeliveryType;
 import com.utn.corralon.features.order.enums.OrderStatus;
 import com.utn.corralon.features.orderItem.dto.OrderItemResponseDTO;
 import lombok.Getter;
@@ -21,5 +22,6 @@ public class OrderAdminResponseDTO {
     private BigDecimal total;
     private OrderStatus status;
     private LocalDateTime createdAt;
+    private DeliveryType deliveryType;
     private List<OrderItemResponseDTO> items;
 }
