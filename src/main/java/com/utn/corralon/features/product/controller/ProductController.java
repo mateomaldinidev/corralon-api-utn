@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class ProductController {
     private final IProductService productService;
 
     // GET BY ID
+    @PreAuthorize("hasAuthority('PRODUCT_READ')")
     @GetMapping("/{externalId}")
     public ResponseEntity<ProductResponseDTO> getById(
             @PathVariable UUID externalId) {
@@ -30,6 +32,7 @@ public class ProductController {
     }
 
     // CREATE
+    @PreAuthorize("hasAuthority('PRODUCT_CREATE')")
     @PostMapping
     public ResponseEntity<ProductResponseDTO> create(
             @Valid
@@ -40,6 +43,7 @@ public class ProductController {
     }
 
     // UPDATE
+    @PreAuthorize("hasAuthority('PRODUCT_UPDATE')")
     @PutMapping("/{externalId}")
     public ResponseEntity<ProductResponseDTO> update(
             @PathVariable UUID externalId,
@@ -51,6 +55,7 @@ public class ProductController {
     }
 
     // LOGICAL DELETE
+    @PreAuthorize("hasAuthority('PRODUCT_DELETE')")
     @DeleteMapping("/{externalId}")
     public ResponseEntity<ProductDeleteResponseDTO> delete(
             @PathVariable UUID externalId) {
@@ -60,6 +65,7 @@ public class ProductController {
     }
 
     // ACTIVATE
+    @PreAuthorize("hasAuthority('PRODUCT_ACTIVATE')")
     @PatchMapping("/{externalId}/activate")
     public ResponseEntity<Void> activate(
             @PathVariable UUID externalId) {
@@ -70,6 +76,7 @@ public class ProductController {
     }
 
     // SEARCH ACTIVE PRODUCTS
+    @PreAuthorize("hasAuthority('PRODUCT_LIST')")
     @GetMapping("/search")
     public ResponseEntity<List<ProductResponseDTO>> search(
             @RequestParam(required = false) String name,
@@ -83,6 +90,7 @@ public class ProductController {
     }
 
     // SEARCH INACTIVE PRODUCTS
+    @PreAuthorize("hasAuthority('PRODUCT_LIST_INACTIVE')")
     @GetMapping("/inactive")
     public ResponseEntity<List<ProductResponseDTO>> getInactive(
             @RequestParam(required = false) String name,
