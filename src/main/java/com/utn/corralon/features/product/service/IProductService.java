@@ -11,6 +11,7 @@ import java.util.UUID;
 public interface IProductService {
     ProductResponseDTO getById(UUID externalId);
     List<ProductResponseDTO> search(String name, UUID supplierId, UUID categoryId, UUID brandId);
+    List<ProductResponseDTO> getAllActiveProducts(); // Nuevo método
     ProductResponseDTO create(ProductRequestDTO productRequestDTO);
     ProductResponseDTO update(UUID externalId,
                               ProductRequestDTO productRequestDTO);

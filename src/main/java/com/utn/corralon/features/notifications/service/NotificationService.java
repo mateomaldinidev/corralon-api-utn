@@ -52,6 +52,13 @@ public class NotificationService implements INotificationService {
     }
 
     @Override
+    public List<NotificationResponseDTO> getAll() {
+        return notificationRepository.findAll().stream()
+                .map(notificationMapper::toResponse)
+                .toList();
+    }
+
+    @Override
     @Transactional
     public NotificationResponseDTO markAsRead(UUID notificationExternalId) {
         NotificationEntity notification = notificationRepository.findByExternalId(notificationExternalId)

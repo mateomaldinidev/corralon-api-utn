@@ -29,7 +29,7 @@ public class UserEntity {
     private UUID externalId;
 
     @Column(name = "email", nullable = false, unique = true)
-    @Email(message = "Email is not valid", regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^-]+@[a-zA-Z0-9.-]+$")
+    @Email(message = "Email is not valid", regexp = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$") // CAMBIO AQUÍ: Añadido '.'
     private String email;
 
     @Column(name = "name", nullable = false)

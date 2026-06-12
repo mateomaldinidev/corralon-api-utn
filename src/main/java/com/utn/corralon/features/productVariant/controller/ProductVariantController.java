@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/product-variants")
+@RequestMapping("api/product-variants")
 public class ProductVariantController {
     private final IProductVariantService productVariantService;
 
@@ -85,10 +85,10 @@ public class ProductVariantController {
                 .build();
     }
 
-    // SEARCH ACTIVE VARIANTS
-    @GetMapping("/search")
-    public ResponseEntity<List<ProductVariantResponseDTO>> search(
-            @Valid
+    // GET ALL ACTIVE VARIANTS / SEARCH ACTIVE VARIANTS
+    // Este método ahora maneja tanto GET /api/product-variants como GET /api/product-variants?param=value
+    @GetMapping
+    public ResponseEntity<List<ProductVariantResponseDTO>> getAllActiveAndSearch(
             @RequestParam(required = false) String attribute,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
@@ -98,18 +98,27 @@ public class ProductVariantController {
             @RequestParam(required = false) UUID brandId,
             @RequestParam(required = false) String productName)
     {
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(productVariantService.search(
-                        attribute,
-                        minPrice,
-                        maxPrice,
-                        minStock,
-                        productId,
-                        categoryId,
-                        brandId,
-                        productName
-                ));
+        // Si no se proporcionan parámetros de búsqueda, llamar a getAllActiveProductVariants
+        if (attribute == null && minPrice == null && maxPrice == null && minStock == null &&
+                productId == null && categoryId == null && brandId == null && productName == null) {
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(productVariantService.getAllActiveProductVariants());
+        } else {
+            // Si se proporcionan parámetros, realizar la búsqueda filtrada
+            return ResponseEntity
+                    .status(HttpStatus.OK)
+                    .body(productVariantService.search(
+                            attribute,
+                            minPrice,
+                            maxPrice,
+                            minStock,
+                            productId,
+                            categoryId,
+                            brandId,
+                            productName
+                    ));
+        }
     }
 
     // SEARCH INACTIVE VARIANTS
@@ -171,16 +180,4 @@ public class ProductVariantController {
                 .status(HttpStatus.OK)
                 .body(productVariantService.getAvailableStock(externalId));
     }
-
-
-
-
-
-
-
-
-
-
-
-
 }

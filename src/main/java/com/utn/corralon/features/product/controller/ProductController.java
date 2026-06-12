@@ -20,6 +20,13 @@ import java.util.UUID;
 public class ProductController {
     private final IProductService productService;
 
+    @GetMapping
+    public ResponseEntity<List<ProductResponseDTO>> getAllActive() {
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(productService.search(null, null, null, null)); // Assuming search with nulls returns all active
+    }
+
     // GET BY ID
     @GetMapping("/{externalId}")
     public ResponseEntity<ProductResponseDTO> getById(

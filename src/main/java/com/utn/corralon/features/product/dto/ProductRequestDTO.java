@@ -30,4 +30,8 @@ public class ProductRequestDTO {
 
     @NotNull(message = "Brand is required")
     private UUID brandId;
+
+    @NotNull(message = "Active status is required")
+    private Boolean active;
+
 }

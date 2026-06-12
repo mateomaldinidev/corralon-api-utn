@@ -41,13 +41,13 @@ public class ProductService implements IProductService{
     @Override
     public ProductResponseDTO create(ProductRequestDTO productRequestDTO) {
         SupplierEntity supplier = supplierRepository.findByExternalId(productRequestDTO.getSupplierId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Supplier not found with ID: ", productRequestDTO.getSupplierId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Supplier not found with ID: ", productRequestDTO.getSupplierId()));
         if(!supplier.isActive()){
             throw new BusinessRuleException("Cannot assign inactive supplier");
         }
 
         CategoryEntity category = categoryRepository.findByExternalId(productRequestDTO.getCategoryId())
-                        .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: ", productRequestDTO.getCategoryId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: ", productRequestDTO.getCategoryId()));
         if(!category.getActive()){
             throw new BusinessRuleException("Cannot assign inactive category");
         }
@@ -123,20 +123,20 @@ public class ProductService implements IProductService{
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found. ID: ", externalId));
 
         List<DisabledVariantDTO> disabledVariants = product.getProductVariants()
-                        .stream()
-                        .map(variant -> {
+                .stream()
+                .map(variant -> {
 
-                            variant.setActive(false);
-                            productVariantRepository.save(variant);
+                    variant.setActive(false);
+                    productVariantRepository.save(variant);
 
-                            DisabledVariantDTO dto = new DisabledVariantDTO();
+                    DisabledVariantDTO dto = new DisabledVariantDTO();
 
-                            dto.setExternalId(variant.getExternalId());
-                            dto.setAttribute(variant.getAttribute());
+                    dto.setExternalId(variant.getExternalId());
+                    dto.setAttribute(variant.getAttribute());
 
-                            return dto;
-                        })
-                        .toList();
+                    return dto;
+                })
+                .toList();
 
         product.setActive(false);
         productRepository.save(product);
@@ -192,6 +192,12 @@ public class ProductService implements IProductService{
                 .stream()
                 .map(productMapper::toResponse)
                 .toList();
+    }
+
+    // Implementación del nuevo método de la interfaz
+    @Override
+    public List<ProductResponseDTO> getAllActiveProducts() {
+        return search(null, null, null, null);
     }
 
     //LIST ALL INACTIVES

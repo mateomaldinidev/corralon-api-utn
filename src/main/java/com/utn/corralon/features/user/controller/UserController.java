@@ -46,4 +46,17 @@ public class UserController {
         userService.delete(externalId);
         return ResponseEntity.noContent().build();
     }
+
+    // NUEVO ENDPOINT: Activar un usuario
+    @PatchMapping("/{externalId}/activate")
+    public ResponseEntity<Void> activate(@PathVariable UUID externalId) {
+        userService.activate(externalId);
+        return ResponseEntity.noContent().build();
+    }
+
+    // NUEVO ENDPOINT: Obtener usuarios inactivos
+    @GetMapping("/inactive")
+    public ResponseEntity<List<UserResponseDTO>> getInactive() {
+        return ResponseEntity.ok(userService.getInactive());
+    }
 }

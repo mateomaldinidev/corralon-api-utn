@@ -23,7 +23,10 @@ public class NotificationController {
     public ResponseEntity<NotificationResponseDTO> create(@RequestBody @Valid NotificationRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(notificationService.create(dto));
     }
-
+    @GetMapping
+    public ResponseEntity<List<NotificationResponseDTO>> getAll() {
+        return ResponseEntity.ok(notificationService.getAll());
+    }
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<NotificationResponseDTO>> getAllByUserId(@PathVariable UUID userId) {
         return ResponseEntity.ok(notificationService.getAllByUserId(userId));

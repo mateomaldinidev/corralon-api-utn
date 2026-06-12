@@ -168,6 +168,13 @@ public class CartService {
         return mapCartToResponseDTO(cart);
     }
 
+    // NUEVO MÉTODO: Obtener todos los carritos
+    public List<CartResponseDTO> getAll() {
+        return cartRepository.findAll().stream()
+                .map(this::mapCartToResponseDTO)
+                .toList();
+    }
+
     @Transactional
     public void clearCart(UUID userExternalId) {
         UserEntity user = getActiveUser(userExternalId);
@@ -184,9 +191,23 @@ public class CartService {
     private CartResponseDTO mapCartToResponseDTO(CartEntity cart) {
         CartResponseDTO responseDTO = modelMapper.map(cart, CartResponseDTO.class);
 
+        // Mapeo explícito para userExternalId
+        if (cart.getUser() != null) {
+            responseDTO.setUserExternalId(cart.getUser().getExternalId());
+        }
+
         List<CartItemResponseDTO> itemDTOs = cart.getCartItems().stream()
                 .map(cartItemEntity -> {
                     CartItemResponseDTO itemResponseDTO = modelMapper.map(cartItemEntity, CartItemResponseDTO.class);
+
+                    // Mapeo explícito para cartExternalId y productVariantExternalId
+                    if (cartItemEntity.getCart() != null) {
+                        itemResponseDTO.setCartExternalId(cartItemEntity.getCart().getExternalId());
+                    }
+                    if (cartItemEntity.getProductVariant() != null) {
+                        itemResponseDTO.setProductVariantExternalId(cartItemEntity.getProductVariant().getExternalId());
+                    }
+
                     itemResponseDTO.setProductName(cartItemEntity.getProductVariant().getProduct().getName());
                     itemResponseDTO.setVariantAttribute(cartItemEntity.getProductVariant().getAttribute());
 
@@ -257,5 +278,4 @@ public class CartService {
 
         return order;
     }
-
 }

@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -21,7 +22,10 @@ public class CartController {
     public CartController(CartService cartService) {
         this.cartService = cartService;
     }
-
+    @GetMapping
+    public ResponseEntity<List<CartResponseDTO>> getAll() { 
+        return ResponseEntity.ok(cartService.getAll());
+    }
     @PostMapping
     public ResponseEntity<CartResponseDTO> createOrUpdateCart(@Valid @RequestBody CartRequestDTO cartRequest) {
 

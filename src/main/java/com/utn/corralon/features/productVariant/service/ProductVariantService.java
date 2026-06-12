@@ -119,7 +119,11 @@ public class ProductVariantService implements IProductVariantService {
 
         return productVariantMapper.toResponse(variant);
     }
-
+    
+    @Override
+    public List<ProductVariantResponseDTO> getAllActiveProductVariants() {
+        return search(null, null, null, null, null, null, null, null);
+    }
     //SEARCH WITH FILTERS (ACTIVES)
     @Override
     public List<ProductVariantResponseDTO> search(String attribute, BigDecimal minPrice, BigDecimal maxPrice, Integer minStock, UUID productId, UUID categoryId, UUID brandId, String productName) {

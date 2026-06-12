@@ -20,6 +20,7 @@ public interface IProductVariantService {
     ProductVariantResponseDTO adjustStock(StockMovementRequestDTO dto);
     Integer getAvailableStock(UUID variantId);
 
+    List<ProductVariantResponseDTO> getAllActiveProductVariants(); // Nuevo método
 
     List<ProductVariantResponseDTO> search(String attribute,
                                            BigDecimal minPrice,
