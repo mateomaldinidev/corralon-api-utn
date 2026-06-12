@@ -80,7 +80,6 @@ public class UserService implements IUserService {
                 .map(user -> {
                     CredentialsEntity credentials = credentialsRepository.findByUsername(user.getEmail())
                             .orElse(null);
-                    assert credentials != null;
                     return userMapper.toResponse(user, credentials);
                 })
                 .toList();
