@@ -15,7 +15,6 @@ import com.utn.corralon.features.offer_product.repository.OfferProductRepository
 import com.utn.corralon.features.productVariant.entity.ProductVariantEntity;
 import com.utn.corralon.features.productVariant.repository.ProductVariantRepository;
 import com.utn.corralon.features.user.entity.UserEntity;
-import com.utn.corralon.features.user.enums.RoleEnum;
 import com.utn.corralon.features.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -145,7 +144,9 @@ public class OfferService implements IOfferService {
 
         OfferResponseDTO offerDTO = offerMapper.toResponse(offer);
 
-        List<UserEntity> customers = userRepository.findAllByRoleAndActiveTrue(RoleEnum.CUSTOMER);
+        List<UserEntity> customers = userRepository.findAllByActiveTrue().stream()
+                .filter(u -> u.getRole().name().equals("CUSTOMER"))
+                .toList();
         for (UserEntity customer : customers) {
             emailService.sendNewPromotionEmail(customer.getEmail(), customer.getName(), offerDTO);
         }
