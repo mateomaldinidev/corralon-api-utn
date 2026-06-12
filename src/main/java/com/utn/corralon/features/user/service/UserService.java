@@ -40,8 +40,7 @@ public class UserService implements IUserService {
 
     @Override
     public List<UserResponseDTO> getAll() {
-        return userRepository.findAll().stream()
-                .filter(UserEntity::getActive)
+        return userRepository.findAllByActiveTrue().stream()
                 .map(userMapper::toResponse)
                 .toList();
     }

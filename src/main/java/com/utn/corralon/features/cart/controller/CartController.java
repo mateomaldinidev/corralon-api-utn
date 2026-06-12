@@ -2,7 +2,7 @@ package com.utn.corralon.features.cart.controller;
 
 import com.utn.corralon.features.cart.dto.CartRequestDTO;
 import com.utn.corralon.features.cart.dto.CartResponseDTO;
-import com.utn.corralon.features.cart.service.CartService;
+import com.utn.corralon.features.cart.service.ICartService;
 import com.utn.corralon.features.cart_item.dto.CartItemQuantityUpdateDTO;
 import com.utn.corralon.features.order.dto.OrderResponseDTO;
 import com.utn.corralon.features.order.enums.DeliveryType;
@@ -17,9 +17,9 @@ import java.util.UUID;
 @RequestMapping("/api/carts")
 public class CartController {
 
-    private final CartService cartService;
+    private final ICartService cartService;
 
-    public CartController(CartService cartService) {
+    public CartController(ICartService cartService) {
         this.cartService = cartService;
     }
 

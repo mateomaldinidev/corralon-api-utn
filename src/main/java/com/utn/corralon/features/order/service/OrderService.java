@@ -7,6 +7,7 @@ import com.utn.corralon.features.address.repository.AddressRepository;
 import com.utn.corralon.features.cart.entity.CartEntity;
 import com.utn.corralon.features.cart.repository.CartRepository;
 import com.utn.corralon.features.notifications.service.IEmailService;
+import com.utn.corralon.features.offer_product.repository.OfferProductRepository;
 import com.utn.corralon.features.order.dto.OrderAdminResponseDTO;
 import com.utn.corralon.features.order.enums.DeliveryType;
 import com.utn.corralon.features.order.enums.OrderStatus;
@@ -48,6 +49,7 @@ public class OrderService implements IOrderService {
     private final CartRepository cartRepository;
     private final StockMovementRepository stockMovementRepository;
     private final IEmailService emailService;
+    private final OfferProductRepository offerProductRepository;
 
     @Override
     @Transactional
@@ -265,6 +267,15 @@ public class OrderService implements IOrderService {
     }
 
     private BigDecimal calculateUnitPrice(ProductVariantEntity variant, Integer quantity) {
+
+        BigDecimal offerPrice = offerProductRepository
+                .findActiveOfferForVariant(variant.getExternalId())
+                .map(op -> op.getDiscountedPrice())
+                .orElse(null);
+
+        if (offerPrice != null) {
+            return offerPrice;
+        }
 
         if (variant.getWholesaleMinQty() != null
                 && variant.getWholesalePrice() != null
