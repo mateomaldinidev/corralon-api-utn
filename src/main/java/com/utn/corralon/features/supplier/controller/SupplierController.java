@@ -20,48 +20,49 @@ public class SupplierController {
 
     private final ISupplierService supplierService;
 
-    @PreAuthorize("hasAuthority('SUPPLIER_CREATE')")
     @PostMapping
+    @PreAuthorize("hasAuthority('SUPPLIER_CREATE')")
     public ResponseEntity<SupplierResponseDTO> create(@RequestBody @Valid SupplierRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(supplierService.create(dto));
     }
 
-    @PreAuthorize("hasAuthority('SUPPLIER_LIST')")
     @GetMapping
+    @PreAuthorize("hasAuthority('SUPPLIER_LIST')")
     public ResponseEntity<List<SupplierResponseDTO>> getAll() {
         return ResponseEntity.ok(supplierService.getAll());
     }
 
-    @PreAuthorize("hasAuthority('SUPPLIER_READ')")
     @GetMapping("/{externalId}")
+    @PreAuthorize("hasAuthority('SUPPLIER_READ')")
     public ResponseEntity<SupplierResponseDTO> getByExternalId(@PathVariable UUID externalId) {
         return ResponseEntity.ok(supplierService.getByExternalId(externalId));
     }
 
-    @PreAuthorize("hasAuthority('SUPPLIER_UPDATE')")
     @PutMapping("/{externalId}")
+    @PreAuthorize("hasAuthority('SUPPLIER_UPDATE')")
     public ResponseEntity<SupplierResponseDTO> update(
             @PathVariable UUID externalId,
             @RequestBody @Valid SupplierRequestDTO dto) {
         return ResponseEntity.ok(supplierService.update(externalId, dto));
     }
 
-    @PreAuthorize("hasAuthority('SUPPLIER_DELETE')")
     @DeleteMapping("/{externalId}")
+    @PreAuthorize("hasAuthority('SUPPLIER_DELETE')")
     public ResponseEntity<Void> delete(@PathVariable UUID externalId) {
         supplierService.delete(externalId);
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasAuthority('SUPPLIER_ACTIVATE')")
     @PatchMapping("/{externalId}/activate")
+    @PreAuthorize("hasAuthority('SUPPLIER_ACTIVATE')")
     public ResponseEntity<Void> activate(@PathVariable UUID externalId) {
         supplierService.activate(externalId);
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasAuthority('SUPPLIER_LIST_INACTIVE')")
+    // Listar todos los proveedores inactivos
     @GetMapping("/inactive")
+    @PreAuthorize("hasAuthority('SUPPLIER_LIST_INACTIVE')")
     public ResponseEntity<List<SupplierResponseDTO>> getInactive() {
         return ResponseEntity.ok(supplierService.getInactive());
     }

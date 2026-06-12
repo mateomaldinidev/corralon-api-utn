@@ -21,32 +21,33 @@ public class UserController {
     private final IUserService userService;
 
     @PostMapping
+    @PreAuthorize("hasAuthority('USER_CREATE')")
     public ResponseEntity<UserResponseDTO> create(@RequestBody @Valid UserRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(dto));
     }
 
-    @PreAuthorize("hasAuthority('USER_LIST')")
     @GetMapping
+    @PreAuthorize("hasAuthority('USER_LIST')")
     public ResponseEntity<List<UserResponseDTO>> getAll() {
         return ResponseEntity.ok(userService.getAll());
     }
 
-    @PreAuthorize("hasAuthority('USER_READ')")
     @GetMapping("/{externalId}")
+    @PreAuthorize("hasAuthority('USER_READ')")
     public ResponseEntity<UserResponseDTO> getByExternalId(@PathVariable UUID externalId) {
         return ResponseEntity.ok(userService.getByExternalId(externalId));
     }
 
-    @PreAuthorize("hasAuthority('USER_UPDATE')")
     @PutMapping("/{externalId}")
+    @PreAuthorize("hasAuthority('USER_UPDATE')")
     public ResponseEntity<UserResponseDTO> update(
             @PathVariable UUID externalId,
             @RequestBody @Valid UserRequestDTO dto) {
         return ResponseEntity.ok(userService.update(externalId, dto));
     }
 
-    @PreAuthorize("hasAuthority('USER_DELETE')")
     @DeleteMapping("/{externalId}")
+    @PreAuthorize("hasAuthority('USER_DELETE')")
     public ResponseEntity<Void> delete(@PathVariable UUID externalId) {
         userService.delete(externalId);
         return ResponseEntity.noContent().build();

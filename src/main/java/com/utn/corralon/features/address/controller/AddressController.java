@@ -20,41 +20,42 @@ public class AddressController {
 
     private final IAddressService addressService;
 
-    @PreAuthorize("hasAuthority('ADDRESS_CREATE')")
     @PostMapping
+    @PreAuthorize("hasAuthority('ADDRESS_CREATE')")
     public ResponseEntity<AddressResponseDTO> create(@RequestBody @Valid AddressRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(addressService.create(dto));
     }
 
-    @PreAuthorize("hasAuthority('ADDRESS_LIST')")
     @GetMapping
+    @PreAuthorize("hasAuthority('ADDRESS_LIST')")
     public ResponseEntity<List<AddressResponseDTO>> getAll() {
         return ResponseEntity.ok(addressService.getAll());
     }
 
-    @PreAuthorize("hasAuthority('ADDRESS_READ')")
     @GetMapping("/{externalId}")
+    @PreAuthorize("hasAuthority('ADDRESS_READ')")
     public ResponseEntity<AddressResponseDTO> getByExternalId(@PathVariable UUID externalId) {
         return ResponseEntity.ok(addressService.getByExternalId(externalId));
     }
 
-    @PreAuthorize("hasAuthority('ADDRESS_UPDATE')")
     @PutMapping("/{externalId}")
+    @PreAuthorize("hasAuthority('ADDRESS_UPDATE')")
     public ResponseEntity<AddressResponseDTO> update(
             @PathVariable UUID externalId,
             @RequestBody @Valid AddressRequestDTO dto) {
         return ResponseEntity.ok(addressService.update(externalId, dto));
     }
 
-    @PreAuthorize("hasAuthority('ADDRESS_DELETE')")
     @DeleteMapping("/{externalId}")
+    @PreAuthorize("hasAuthority('ADDRESS_DELETE')")
     public ResponseEntity<Void> delete(@PathVariable UUID externalId, @RequestParam UUID userExternalId) {
         addressService.delete(externalId, userExternalId);
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasAuthority('ADDRESS_LIST_BY_USER')")
+    // Endpoint para obtener todas las direcciones de un usuario especifico
     @GetMapping("/user/{userExternalId}")
+    @PreAuthorize("hasAuthority('ADDRESS_LIST_BY_USER')")
     public ResponseEntity<List<AddressResponseDTO>> getAllByUserExternalId(@PathVariable UUID userExternalId) {
         return ResponseEntity.ok(addressService.getAllByUserExternalId(userExternalId));
     }

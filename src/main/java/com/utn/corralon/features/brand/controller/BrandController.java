@@ -20,48 +20,49 @@ import java.util.UUID;
 public class BrandController {
     private final IBrandService brandService;
 
-    @PreAuthorize("hasAuthority('BRAND_CREATE')")
     @PostMapping
+    @PreAuthorize("hasAuthority('BRAND_CREATE')")
     public ResponseEntity<BrandResponseDTO> create(@RequestBody @Valid BrandRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(brandService.create(dto));
     }
 
-    @PreAuthorize("hasAuthority('BRAND_LIST')")
     @GetMapping
+    @PreAuthorize("hasAuthority('BRAND_LIST')")
     public ResponseEntity<List<BrandResponseDTO>> getAll() {
         return ResponseEntity.ok(brandService.getAll());
     }
 
-    @PreAuthorize("hasAuthority('BRAND_READ')")
     @GetMapping("/{externalId}")
+    @PreAuthorize("hasAuthority('BRAND_READ')")
     public ResponseEntity<BrandResponseDTO> getByExternalId(@PathVariable UUID externalId) {
         return ResponseEntity.ok(brandService.getByExternalId(externalId));
     }
 
-    @PreAuthorize("hasAuthority('BRAND_UPDATE')")
     @PutMapping("/{externalId}")
+    @PreAuthorize("hasAuthority('BRAND_UPDATE')")
     public ResponseEntity<BrandResponseDTO> update(
             @PathVariable UUID externalId,
             @RequestBody @Valid BrandRequestDTO dto) {
         return ResponseEntity.ok(brandService.update(externalId, dto));
     }
 
-    @PreAuthorize("hasAuthority('BRAND_DELETE')")
     @DeleteMapping("/{externalId}")
+    @PreAuthorize("hasAuthority('BRAND_DELETE')")
     public ResponseEntity<Void> delete(@PathVariable UUID externalId) {
         brandService.delete(externalId);
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasAuthority('BRAND_ACTIVATE')")
     @PatchMapping("/{externalId}/activate")
+    @PreAuthorize("hasAuthority('BRAND_ACTIVATE')")
     public ResponseEntity<Void> activate(@PathVariable UUID externalId) {
         brandService.activate(externalId);
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasAuthority('BRAND_LIST_INACTIVE')")
+    // Nuevo endpoint para obtener marcas inactivas
     @GetMapping("/inactive")
+    @PreAuthorize("hasAuthority('BRAND_LIST_INACTIVE')")
     public ResponseEntity<List<BrandResponseDTO>> getInactive() {
         return ResponseEntity.ok(brandService.getInactive());
     }

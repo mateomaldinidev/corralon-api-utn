@@ -20,8 +20,8 @@ public class OrderController {
 
     private final IOrderService orderService;
 
-    @PreAuthorize("hasAuthority('ORDER_READ_ALL')")
     @GetMapping("/admin")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
     public ResponseEntity<List<OrderAdminResponseDTO>> getAll() {
 
         return ResponseEntity
@@ -29,8 +29,8 @@ public class OrderController {
                 .body(orderService.getAll());
     }
 
-    @PreAuthorize("hasAuthority('ORDER_READ')")
     @GetMapping("/{externalId}")
+    @PreAuthorize("hasAuthority('ORDER_READ')")
     public ResponseEntity<OrderResponseDTO> getByExternalId(
             @PathVariable UUID externalId) {
 
@@ -42,6 +42,7 @@ public class OrderController {
 
 
     @PostMapping("/{externalId}/cancel")
+    @PreAuthorize("hasAuthority('ORDER_CANCEL_OWN')")
     public ResponseEntity<Void> cancelOrder(
             @PathVariable UUID externalId,
             @RequestParam UUID userExternalId
@@ -54,16 +55,16 @@ public class OrderController {
                 .build();
     }
 
-    @PreAuthorize("hasAuthority('ORDER_READ_BY_USER')")
     @GetMapping("/user/{userExternalId}")
+    @PreAuthorize("hasAuthority('ORDER_READ_BY_USER')")
     public ResponseEntity<List<OrderSummaryDTO>> getOrdersByUser(
             @PathVariable UUID userExternalId) {
 
         return ResponseEntity.ok(orderService.getOrdersByUser(userExternalId));
     }
 
-    @PreAuthorize("hasAuthority('ORDER_READ_ALL')")
     @GetMapping("/admin/{externalId}")
+    @PreAuthorize("hasAnyRole('ADMIN','EMPLOYEE')")
     public ResponseEntity<OrderAdminResponseDTO> getAdminOrder(
             @PathVariable UUID externalId) {
 

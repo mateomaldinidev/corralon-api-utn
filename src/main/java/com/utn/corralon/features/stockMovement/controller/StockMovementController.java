@@ -17,14 +17,14 @@ public class StockMovementController {
 
     private final IStockMovementService stockMovementService;
 
-    @PreAuthorize("hasAuthority('STOCK_MOVEMENT_LIST_BY_VARIANT')")
     @GetMapping("/variant/{variantId}")
+    @PreAuthorize("hasAuthority('STOCK_MOVEMENT_LIST_BY_VARIANT')")
     public ResponseEntity<List<StockMovementResponseDTO>> getMovementsByVariant(@PathVariable UUID variantId) {
         return ResponseEntity.ok(stockMovementService.getMovementsByVariant(variantId));
     }
 
-    @PreAuthorize("hasAuthority('STOCK_MOVEMENT_READ')")
     @GetMapping("/{externalId}")
+    @PreAuthorize("hasAuthority('STOCK_MOVEMENT_READ')")
     public ResponseEntity<StockMovementResponseDTO> getMovementById(@PathVariable UUID externalId) {
         return ResponseEntity.ok(stockMovementService.getMovementById(externalId));
     }

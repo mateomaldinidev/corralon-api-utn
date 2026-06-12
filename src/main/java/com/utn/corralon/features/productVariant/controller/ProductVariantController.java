@@ -23,8 +23,9 @@ public class ProductVariantController {
         this.productVariantService = productVariantService;
     }
 
-    @PreAuthorize("hasAuthority('PRODUCT_VARIANT_READ')")
+    //GET BY ID
     @GetMapping("/{externalId}")
+    @PreAuthorize("hasAuthority('PRODUCT_VARIANT_READ')")
     public ResponseEntity<ProductVariantResponseDTO> getById(
             @PathVariable UUID externalId)
     {
@@ -33,8 +34,9 @@ public class ProductVariantController {
                 .body(productVariantService.getById(externalId));
     }
 
-    @PreAuthorize("hasAuthority('PRODUCT_VARIANT_CREATE')")
+    // CREATE
     @PostMapping
+    @PreAuthorize("hasAuthority('PRODUCT_VARIANT_CREATE')")
     public ResponseEntity<ProductVariantResponseDTO> create(
             @Valid
             @RequestBody ProductVariantRequestDTO productVariantRequestDTO)
@@ -44,8 +46,9 @@ public class ProductVariantController {
                 .body(productVariantService.create(productVariantRequestDTO));
     }
 
-    @PreAuthorize("hasAuthority('PRODUCT_VARIANT_UPDATE')")
+    // UPDATE
     @PutMapping("/{externalId}")
+    @PreAuthorize("hasAuthority('PRODUCT_VARIANT_UPDATE')")
     public ResponseEntity<ProductVariantResponseDTO> update(
             @PathVariable UUID externalId,
             @RequestBody ProductVariantRequestDTO productVariantRequestDTO)
@@ -58,8 +61,9 @@ public class ProductVariantController {
                 ));
     }
 
-    @PreAuthorize("hasAuthority('PRODUCT_VARIANT_DELETE')")
+    // LOGICAL DELETE
     @DeleteMapping("/{externalId}")
+    @PreAuthorize("hasAuthority('PRODUCT_VARIANT_DELETE')")
     public ResponseEntity<Void> delete(
             @PathVariable UUID externalId)
     {
@@ -70,8 +74,9 @@ public class ProductVariantController {
                 .build();
     }
 
-    @PreAuthorize("hasAuthority('PRODUCT_VARIANT_ACTIVATE')")
+    // ACTIVATE
     @PatchMapping("/{externalId}/activate")
+    @PreAuthorize("hasAuthority('PRODUCT_VARIANT_ACTIVATE')")
     public ResponseEntity<Void> activate(
             @PathVariable UUID externalId)
     {
@@ -82,8 +87,9 @@ public class ProductVariantController {
                 .build();
     }
 
-    @PreAuthorize("hasAuthority('PRODUCT_VARIANT_LIST')")
+    // SEARCH ACTIVE VARIANTS
     @GetMapping("/search")
+    @PreAuthorize("hasAuthority('PRODUCT_VARIANT_LIST')")
     public ResponseEntity<List<ProductVariantResponseDTO>> search(
             @RequestParam(required = false) String attribute,
             @RequestParam(required = false) BigDecimal minPrice,
@@ -108,8 +114,9 @@ public class ProductVariantController {
                 ));
     }
 
-    @PreAuthorize("hasAuthority('PRODUCT_VARIANT_LIST_INACTIVE')")
+    // SEARCH INACTIVE VARIANTS
     @GetMapping("/inactive")
+    @PreAuthorize("hasAuthority('PRODUCT_VARIANT_LIST_INACTIVE')")
     public ResponseEntity<List<ProductVariantResponseDTO>> getInactive(
             @RequestParam(required = false) String attribute,
             @RequestParam(required = false) BigDecimal minPrice,
@@ -134,8 +141,9 @@ public class ProductVariantController {
                 ));
     }
 
-    @PreAuthorize("hasAuthority('STOCK_ENTRY')")
+    // STOCK ENTRY
     @PostMapping("/stock/entry")
+    @PreAuthorize("hasAuthority('STOCK_ENTRY')")
     public ResponseEntity<ProductVariantResponseDTO> registerEntry(
             @RequestBody StockMovementRequestDTO dto)
     {
@@ -144,8 +152,9 @@ public class ProductVariantController {
                 .body(productVariantService.registerEntry(dto));
     }
 
-    @PreAuthorize("hasAuthority('STOCK_ADJUSTMENT')")
+    // STOCK ADJUSTMENT
     @PostMapping("/stock/adjustment")
+    @PreAuthorize("hasAuthority('STOCK_ADJUSTMENT')")
     public ResponseEntity<ProductVariantResponseDTO> adjustStock(
             @RequestBody StockMovementRequestDTO dto)
     {
@@ -154,8 +163,9 @@ public class ProductVariantController {
                 .body(productVariantService.adjustStock(dto));
     }
 
-    @PreAuthorize("hasAuthority('STOCK_READ')")
+    // AVAILABLE STOCK
     @GetMapping("/{externalId}/stock")
+    @PreAuthorize("hasAuthority('STOCK_READ')")
     public ResponseEntity<Integer> getAvailableStock(
             @PathVariable UUID externalId)
     {
@@ -163,4 +173,5 @@ public class ProductVariantController {
                 .status(HttpStatus.OK)
                 .body(productVariantService.getAvailableStock(externalId));
     }
+
 }

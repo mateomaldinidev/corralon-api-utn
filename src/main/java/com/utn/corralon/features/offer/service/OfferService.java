@@ -2,6 +2,7 @@ package com.utn.corralon.features.offer.service;
 
 import com.utn.corralon.exception.BusinessRuleException;
 import com.utn.corralon.exception.ResourceNotFoundException;
+import com.utn.corralon.features.auth.Roles;
 import com.utn.corralon.features.auth.CredentialsRepository;
 import com.utn.corralon.features.auth.Roles;
 import com.utn.corralon.features.notifications.service.IEmailService;

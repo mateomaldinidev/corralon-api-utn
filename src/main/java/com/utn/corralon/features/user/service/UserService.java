@@ -17,6 +17,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -94,7 +95,10 @@ public class UserService implements IUserService {
     public UserResponseDTO update(UUID externalId, UserRequestDTO dto) {
         UserEntity entity = userRepository.findByExternalId(externalId)
                 .filter(UserEntity::getActive)
-                .orElseThrow(() -> new ResourceNotFoundException("Cannot be updated. User not found with ID: ", externalId));
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Cannot be updated. User not found with ID: ",
+                                externalId)
+                );
 
         CredentialsEntity credentials =
                 credentialsRepository.findByUsername(entity.getEmail())
@@ -102,12 +106,18 @@ public class UserService implements IUserService {
                                 new RuntimeException("Credentials not found")
                         );
 
-        boolean passwordChanged = !passwordEncoder.matches(dto.getPassword(), entity.getPassword());
+        boolean passwordChanged =
+                !passwordEncoder.matches(
+                        dto.getPassword(),
+                        entity.getPassword()
+                );
 
         userMapper.updateEntity(entity, dto);
 
         if (passwordChanged) {
-            entity.setPassword(passwordEncoder.encode(dto.getPassword()));
+            entity.setPassword(
+                    passwordEncoder.encode(dto.getPassword())
+            );
         }
 
         UserEntity updated = userRepository.save(entity);
@@ -115,18 +125,23 @@ public class UserService implements IUserService {
         RoleEntity role = rolesRepository.findByRole(dto.getRole())
                 .orElseThrow(() ->
                         new RuntimeException(
-                                "Role not found: " + dto.getRole()
-                        )
+                                "Role not found: " + dto.getRole())
                 );
 
         credentials.setUsername(updated.getEmail());
         credentials.setPassword(updated.getPassword());
-        credentials.setRoles(Set.of(role));
+
+        Set<RoleEntity> roles = new HashSet<>();
+        roles.add(role);
+
+        credentials.setRoles(roles);
 
         credentialsRepository.save(credentials);
 
         if (passwordChanged) {
-            emailService.sendPasswordChangedEmail(updated.getEmail(), updated.getName());
+            emailService.sendPasswordChangedEmail(
+                    updated.getEmail(),
+                    updated.getName());
         }
 
         return userMapper.toResponse(updated, credentials);
