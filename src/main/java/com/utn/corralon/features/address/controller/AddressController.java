@@ -42,8 +42,8 @@ public class AddressController {
     }
 
     @DeleteMapping("/{externalId}")
-    public ResponseEntity<Void> delete(@PathVariable UUID externalId) {
-        addressService.delete(externalId);
+    public ResponseEntity<Void> delete(@RequestParam UUID externalId, @RequestParam UUID userExternalId) {
+        addressService.delete(externalId, userExternalId);
         return ResponseEntity.noContent().build();
     }
 

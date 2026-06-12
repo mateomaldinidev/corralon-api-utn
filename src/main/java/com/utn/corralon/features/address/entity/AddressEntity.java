@@ -4,6 +4,7 @@ import com.utn.corralon.features.user.entity.UserEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UuidGenerator;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.util.UUID;
 
@@ -14,6 +15,7 @@ import java.util.UUID;
 @Builder
 @Entity
 @Table(name = "addresses")
+@SQLRestriction("active = true")
 public class AddressEntity {
 
     @Id
@@ -36,6 +38,8 @@ public class AddressEntity {
     private String city;
     @Column(name = "zip_code", nullable = false)
     private String zipCode;
+    @Column(nullable = false)
+    private Boolean active = true;
 
     @ManyToOne()
     @JoinColumn(name = "user_id", nullable = false)
