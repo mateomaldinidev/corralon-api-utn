@@ -3,3 +3,5 @@ target/
 .idea/
 *.iml
 .DS_Store
+desktop.ini
+src/main/resources/application.yaml

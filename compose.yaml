@@ -2,18 +2,61 @@ services:
   mysql:
     image: mysql:8.0
     container_name: corralon-mysql
-
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: corralon_db
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
-
     ports:
-      - "3306:3306"
-
+      - "3307:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
+      MYSQL_DATABASE: ${DB_NAME:-corralon_db}
+      MYSQL_USER: ${DB_USER:-user}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-password}
+    # Verifica que MySQL esté listo antes de arrancar la app
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     volumes:
       - mysql_data:/var/lib/mysql
+    networks:
+      - corralon-network
+
+  mailhog:
+    image: mailhog/mailhog
+    container_name: corralon-mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - corralon-network
+
+  app:
+    build: .
+    container_name: corralon-app
+    ports:
+      - "8080:8081"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME:-corralon_db}
+      DB_USER: ${DB_USER:-user}
+      DB_PASSWORD: ${DB_PASSWORD:-password}
+      MAIL_HOST: mailhog
+      MAIL_PORT: 1025
+      MAIL_AUTH: "false"
+      MAIL_STARTTLS: "false"
+      APP_BASE_URL: http://localhost:8080
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-3600000}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-86400000}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - corralon-network
 
 volumes:
   mysql_data:
+
+networks:
+  corralon-network:
+    driver: bridge

@@ -3,10 +3,44 @@ spring:
     name: corralon
 
   datasource:
-    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}
-    username: ${DB_USER}
-    password: ${DB_PASSWORD}
+    # Los valores por defecto (:localhost, :3306, etc.) se usan solo
+    # si se corre la app local con mvn spring-boot:run.
+    # Con Docker, las variables se inyectan desde compose.yaml.
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:corralon_db}
+    username: ${DB_USER:user}
+    password: ${DB_PASSWORD:password}
 
   jpa:
     hibernate:
       ddl-auto: update
+
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1025}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: ${MAIL_AUTH:false}
+          starttls:
+            enable: ${MAIL_STARTTLS:false}
+
+app:
+  base-url: ${APP_BASE_URL:http://localhost:8080}
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION}
+
+server:
+  port: 8081
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs
+  show-actuator: false
