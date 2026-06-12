@@ -1,6 +1,7 @@
 package com.utn.corralon.features.order.dto;
 
 
+import com.utn.corralon.features.order.enums.DeliveryType;
 import com.utn.corralon.features.orderItem.dto.OrderItemRequestDTO;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -20,6 +21,10 @@ public class OrderRequestDTO {
     @NotNull
     private UUID userExternalId;
 
-    private UUID addressExternalId; // null = retiro en sucursal
+    @NotNull
+    private DeliveryType deliveryType;
 
+    // opcional según deliveryType
+    private UUID addressExternalId;
 }
+

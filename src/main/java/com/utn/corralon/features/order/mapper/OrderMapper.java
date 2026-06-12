@@ -3,6 +3,7 @@ package com.utn.corralon.features.order.mapper;
 import com.utn.corralon.features.address.entity.AddressEntity;
 import com.utn.corralon.features.order.dto.OrderAdminResponseDTO;
 import com.utn.corralon.features.order.dto.OrderSummaryDTO;
+import com.utn.corralon.features.order.enums.DeliveryType;
 import com.utn.corralon.features.order.enums.OrderStatus;
 import com.utn.corralon.features.order.dto.OrderResponseDTO;
 import com.utn.corralon.features.order.entity.OrderEntity;
@@ -22,13 +23,14 @@ public class OrderMapper {
     private final OrderItemMapper orderItemMapper;
 
 
-    public OrderEntity toEntity(UserEntity user, AddressEntity address)
+    public OrderEntity toEntity(UserEntity user, AddressEntity address, DeliveryType deliveryType)
     {
 
         OrderEntity order =
                 OrderEntity.builder()
                         .user(user)
                         .address(address)
+                        .deliveryType(deliveryType)
                         .createdAt(LocalDateTime.now())
                         .status(OrderStatus.PENDING_PAYMENT)
                         .build();
@@ -42,6 +44,8 @@ public class OrderMapper {
         OrderResponseDTO dto = modelMapper.map(orderEntity, OrderResponseDTO.class);
 
         dto.setUserExternalId(orderEntity.getUser().getExternalId());
+
+        dto.setDeliveryType(orderEntity.getDeliveryType());
 
         //null check -> permite address null
         dto.setAddressExternalId(
@@ -65,6 +69,8 @@ public class OrderMapper {
         OrderAdminResponseDTO dto = modelMapper.map(order, OrderAdminResponseDTO.class);
 
         dto.setUserExternalId(order.getUser().getExternalId());
+
+        dto.setDeliveryType(order.getDeliveryType());
 
         dto.setCustomerName(order.getUser().getName() + " " + order.getUser().getLastName());
 

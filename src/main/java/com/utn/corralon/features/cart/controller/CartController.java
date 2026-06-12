@@ -5,6 +5,7 @@ import com.utn.corralon.features.cart.dto.CartResponseDTO;
 import com.utn.corralon.features.cart.service.CartService;
 import com.utn.corralon.features.cart_item.dto.CartItemQuantityUpdateDTO;
 import com.utn.corralon.features.order.dto.OrderResponseDTO;
+import com.utn.corralon.features.order.enums.DeliveryType;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -51,10 +52,11 @@ public class CartController {
     @PostMapping("/{userId}/checkout")
     public ResponseEntity<OrderResponseDTO> checkout(
             @PathVariable UUID userId,
+            @RequestParam DeliveryType deliveryType,
             @RequestParam(required = false) UUID addressId
     ) {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(cartService.checkout(userId, addressId));
+                .body(cartService.checkout(userId, addressId, deliveryType));
     }
 }
