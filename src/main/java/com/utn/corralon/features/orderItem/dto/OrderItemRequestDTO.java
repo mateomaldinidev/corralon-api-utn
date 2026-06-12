@@ -15,10 +15,10 @@ import java.util.UUID;
 @Builder
 public class OrderItemRequestDTO {
 
-    @NotNull
+    @NotNull(message = "Product variant external ID is required")
     private UUID productVariantExternalId;
 
-    @NotNull
-    @Min(1)
+    @NotNull(message = "Quantity is required")
+    @Min(value = 1, message = "Quantity must be at least 1")
     private Integer quantity;
 }

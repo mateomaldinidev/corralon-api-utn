@@ -132,20 +132,9 @@ public class OrderService implements IOrderService {
                             productVariantRepository.save(variant);
 
                             // movimiento stock
-                            createStockMovement(
-                                    variant,
-                                    cartItem.getQuantity(),
-                                    StockMovementType.SALE,
-                                    "Stock discounted by order creation"
-                            );
+                            createStockMovement(variant, cartItem.getQuantity(), StockMovementType.SALE, "Stock discounted by order creation");
 
-                            return orderItemMapper.toEntity(
-                                    order,
-                                    variant,
-                                    cartItem.getQuantity(),
-                                    unitPrice,
-                                    subtotal
-                            );
+                            return orderItemMapper.toEntity(order, variant, cartItem.getQuantity(), unitPrice, subtotal);
                         })
                         .toList();
 

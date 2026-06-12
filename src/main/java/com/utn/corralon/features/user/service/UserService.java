@@ -26,7 +26,7 @@ public class UserService implements IUserService {
     @Override
     public UserResponseDTO create(UserRequestDTO dto) {
         if (userRepository.existsByEmail(dto.getEmail())) {
-            throw new EmailAlreadyExistsException("El email ya está registrado");
+            throw new EmailAlreadyExistsException("Email is already registered.");
         }
         UserEntity entity = userMapper.toEntity(dto);
         entity.setPassword(encodePassword(dto.getPassword()));

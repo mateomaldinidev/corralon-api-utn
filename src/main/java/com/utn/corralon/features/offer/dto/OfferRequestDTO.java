@@ -14,16 +14,16 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 public class OfferRequestDTO {
-    @NotBlank
+    @NotBlank(message = "Name must not be blank")
     private String name;
 
-    @NotNull
-    @Positive
+    @NotNull(message = "Discount percentage is required")
+    @Positive(message = "Discount percentage must be greater than 0")
     private BigDecimal discountPercentage;
 
-    @NotNull
+    @NotNull(message = "Start date is required")
     private LocalDateTime startDate;
 
-    @NotNull
+    @NotNull(message = "End date is required")
     private LocalDateTime endDate;
 }
