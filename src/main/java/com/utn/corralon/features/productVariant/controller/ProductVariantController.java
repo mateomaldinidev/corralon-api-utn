@@ -25,7 +25,6 @@ public class ProductVariantController {
     //GET BY ID
     @GetMapping("/{externalId}")
     public ResponseEntity<ProductVariantResponseDTO> getById(
-            @Valid
             @PathVariable UUID externalId)
     {
         return ResponseEntity
@@ -47,7 +46,6 @@ public class ProductVariantController {
     // UPDATE
     @PutMapping("/{externalId}")
     public ResponseEntity<ProductVariantResponseDTO> update(
-            @Valid
             @PathVariable UUID externalId,
             @RequestBody ProductVariantRequestDTO productVariantRequestDTO)
     {
@@ -62,7 +60,6 @@ public class ProductVariantController {
     // LOGICAL DELETE
     @DeleteMapping("/{externalId}")
     public ResponseEntity<Void> delete(
-            @Valid
             @PathVariable UUID externalId)
     {
         productVariantService.delete(externalId);
@@ -75,7 +72,6 @@ public class ProductVariantController {
     // ACTIVATE
     @PatchMapping("/{externalId}/activate")
     public ResponseEntity<Void> activate(
-            @Valid
             @PathVariable UUID externalId)
     {
         productVariantService.activate(externalId);
@@ -88,7 +84,6 @@ public class ProductVariantController {
     // SEARCH ACTIVE VARIANTS
     @GetMapping("/search")
     public ResponseEntity<List<ProductVariantResponseDTO>> search(
-            @Valid
             @RequestParam(required = false) String attribute,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
@@ -115,7 +110,6 @@ public class ProductVariantController {
     // SEARCH INACTIVE VARIANTS
     @GetMapping("/inactive")
     public ResponseEntity<List<ProductVariantResponseDTO>> getInactive(
-            @Valid
             @RequestParam(required = false) String attribute,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
@@ -142,7 +136,6 @@ public class ProductVariantController {
     // STOCK ENTRY
     @PostMapping("/stock/entry")
     public ResponseEntity<ProductVariantResponseDTO> registerEntry(
-            @Valid
             @RequestBody StockMovementRequestDTO dto)
     {
         return ResponseEntity
@@ -153,7 +146,6 @@ public class ProductVariantController {
     // STOCK ADJUSTMENT
     @PostMapping("/stock/adjustment")
     public ResponseEntity<ProductVariantResponseDTO> adjustStock(
-            @Valid
             @RequestBody StockMovementRequestDTO dto)
     {
         return ResponseEntity
@@ -164,7 +156,6 @@ public class ProductVariantController {
     // AVAILABLE STOCK
     @GetMapping("/{externalId}/stock")
     public ResponseEntity<Integer> getAvailableStock(
-            @Valid
             @PathVariable UUID externalId)
     {
         return ResponseEntity
