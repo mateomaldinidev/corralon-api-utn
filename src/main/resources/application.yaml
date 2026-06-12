@@ -26,8 +26,8 @@ spring:
           starttls:
             enable: ${MAIL_STARTTLS:false}
 
-  app:
-    base-url: ${APP_BASE_URL:http://localhost:8080}
+app:
+  base-url: ${APP_BASE_URL:http://localhost:8080}
 
 jwt:
   secret: "Fp9vB7EaDnMYPhq7LxxiXIwb07pcLDBZoyzVrnJFWqy"
