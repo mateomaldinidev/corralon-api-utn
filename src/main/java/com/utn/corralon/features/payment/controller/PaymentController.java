@@ -3,6 +3,7 @@ package com.utn.corralon.features.payment.controller;
 import com.utn.corralon.features.payment.dto.PaymentRequestDTO;
 import com.utn.corralon.features.payment.dto.PaymentResponseDTO;
 import com.utn.corralon.features.payment.service.IPaymentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +19,7 @@ public class PaymentController {
 
     @PostMapping("/pay")
     public ResponseEntity<PaymentResponseDTO> pay(
-            @RequestBody PaymentRequestDTO request
+            @Valid @RequestBody PaymentRequestDTO request
     ) {
 
         return ResponseEntity.ok(

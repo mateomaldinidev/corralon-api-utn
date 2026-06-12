@@ -38,7 +38,7 @@ public class OrderController {
 
 
 
-    @DeleteMapping("/{externalId}")
+    @PostMapping("/{externalId}/cancel")
     public ResponseEntity<Void> cancelOrder(
             @PathVariable UUID externalId
     ) {

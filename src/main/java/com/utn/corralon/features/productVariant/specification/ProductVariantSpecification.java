@@ -77,7 +77,7 @@ public class ProductVariantSpecification {
                 return null;
             }
             return criteriaBuilder.equal(
-                    root.get("product").get("id"),
+                    root.get("product").get("externalId"),
                     productId
             );
         };
