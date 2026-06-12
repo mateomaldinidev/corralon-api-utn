@@ -21,14 +21,12 @@ public class OfferController {
 
     private final IOfferService offerService;
 
-    @PreAuthorize("hasAuthority('OFFER_CREATE')")
     @PostMapping
     @PreAuthorize("hasAuthority('OFFER_CREATE')")
     public ResponseEntity<OfferResponseDTO> create(@RequestBody @Valid OfferRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(offerService.create(dto));
     }
 
-    @PreAuthorize("hasAuthority('OFFER_ADD_PRODUCT')")
     @PostMapping("/{offerExternalId}/products")
     @PreAuthorize("hasAuthority('OFFER_ADD_PRODUCT')")
     public ResponseEntity<OfferResponseDTO> addProduct(
@@ -37,7 +35,6 @@ public class OfferController {
         return ResponseEntity.ok(offerService.addProductToOffer(dto));
     }
 
-    @PreAuthorize("hasAuthority('OFFER_REMOVE_PRODUCT')")
     @DeleteMapping("/{offerExternalId}/products/{productVariantExternalId}")
     @PreAuthorize("hasAuthority('OFFER_REMOVE_PRODUCT')")
     public ResponseEntity<OfferResponseDTO> removeProduct(
@@ -46,28 +43,24 @@ public class OfferController {
         return ResponseEntity.ok(offerService.removeProductFromOffer(offerExternalId, productVariantExternalId));
     }
 
-    @PreAuthorize("hasAuthority('OFFER_READ')")
     @GetMapping("/{externalId}")
     @PreAuthorize("hasAuthority('OFFER_READ')")
     public ResponseEntity<OfferResponseDTO> getByExternalId(@PathVariable UUID externalId) {
         return ResponseEntity.ok(offerService.getByExternalId(externalId));
     }
 
-    @PreAuthorize("hasAuthority('OFFER_LIST')")
     @GetMapping
     @PreAuthorize("hasAuthority('OFFER_LIST')")
     public ResponseEntity<List<OfferResponseDTO>> getAllActive() {
         return ResponseEntity.ok(offerService.getAllActive());
     }
 
-    @PreAuthorize("hasAuthority('OFFER_LIST_INACTIVE')")
     @GetMapping("/inactive")
     @PreAuthorize("hasAuthority('OFFER_LIST_INACTIVE')")
     public ResponseEntity<List<OfferResponseDTO>> getAllInactive() {
         return ResponseEntity.ok(offerService.getAllInactive());
     }
 
-    @PreAuthorize("hasAuthority('OFFER_ACTIVATE')")
     @PatchMapping("/{externalId}/activate")
     @PreAuthorize("hasAuthority('OFFER_ACTIVATE')")
     public ResponseEntity<Void> activate(@PathVariable UUID externalId) {
@@ -75,7 +68,6 @@ public class OfferController {
         return ResponseEntity.noContent().build();
     }
 
-    @PreAuthorize("hasAuthority('OFFER_DEACTIVATE')")
     @PatchMapping("/{externalId}/deactivate")
     @PreAuthorize("hasAuthority('OFFER_DEACTIVATE')")
     public ResponseEntity<Void> deactivate(@PathVariable UUID externalId) {

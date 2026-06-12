@@ -18,7 +18,6 @@ public class PaymentController {
 
     private final IPaymentService paymentService;
 
-    @PreAuthorize("hasAuthority('PAYMENT_CREATE')")
     @PostMapping("/pay")
     @PreAuthorize("hasAuthority('PAYMENT_CREATE')")
     public ResponseEntity<PaymentResponseDTO> pay(
@@ -30,7 +29,6 @@ public class PaymentController {
         );
     }
 
-    @PreAuthorize("hasAuthority('PAYMENT_READ')")
     @GetMapping("/order/{orderId}")
     @PreAuthorize("hasAuthority('PAYMENT_READ')")
     public ResponseEntity<PaymentResponseDTO> getByOrder(

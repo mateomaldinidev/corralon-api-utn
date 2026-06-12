@@ -26,21 +26,18 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(dto));
     }
 
-    @PreAuthorize("hasAuthority('USER_LIST')")
     @GetMapping
     @PreAuthorize("hasAuthority('USER_LIST')")
     public ResponseEntity<List<UserResponseDTO>> getAll() {
         return ResponseEntity.ok(userService.getAll());
     }
 
-    @PreAuthorize("hasAuthority('USER_READ')")
     @GetMapping("/{externalId}")
     @PreAuthorize("hasAuthority('USER_READ')")
     public ResponseEntity<UserResponseDTO> getByExternalId(@PathVariable UUID externalId) {
         return ResponseEntity.ok(userService.getByExternalId(externalId));
     }
 
-    @PreAuthorize("hasAuthority('USER_UPDATE')")
     @PutMapping("/{externalId}")
     @PreAuthorize("hasAuthority('USER_UPDATE')")
     public ResponseEntity<UserResponseDTO> update(
@@ -49,7 +46,6 @@ public class UserController {
         return ResponseEntity.ok(userService.update(externalId, dto));
     }
 
-    @PreAuthorize("hasAuthority('USER_DELETE')")
     @DeleteMapping("/{externalId}")
     @PreAuthorize("hasAuthority('USER_DELETE')")
     public ResponseEntity<Void> delete(@PathVariable UUID externalId) {
