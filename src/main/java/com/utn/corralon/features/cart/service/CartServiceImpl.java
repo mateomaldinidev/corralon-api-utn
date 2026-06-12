@@ -34,7 +34,7 @@ import java.util.Map;
 @AllArgsConstructor
 
 @Service
-public class CartService {
+public class CartServiceImpl implements ICartService {
     private final CartRepository cartRepository;
     private final UserRepository userRepository;
     private final ProductVariantRepository productVariantRepository;

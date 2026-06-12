@@ -23,7 +23,6 @@ public class ProductController {
     // GET BY ID
     @GetMapping("/{externalId}")
     public ResponseEntity<ProductResponseDTO> getById(
-            @Valid
             @PathVariable UUID externalId) {
         return  ResponseEntity
                 .status(HttpStatus.OK)
@@ -43,7 +42,6 @@ public class ProductController {
     // UPDATE
     @PutMapping("/{externalId}")
     public ResponseEntity<ProductResponseDTO> update(
-            @Valid
             @PathVariable UUID externalId,
             @RequestBody ProductRequestDTO productRequestDTO) {
         return ResponseEntity
@@ -55,7 +53,6 @@ public class ProductController {
     // LOGICAL DELETE
     @DeleteMapping("/{externalId}")
     public ResponseEntity<ProductDeleteResponseDTO> delete(
-            @Valid
             @PathVariable UUID externalId) {
         return ResponseEntity
                 .status(HttpStatus.OK)
