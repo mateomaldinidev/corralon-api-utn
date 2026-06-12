@@ -18,17 +18,31 @@ services:
     networks:
       - corralon-network
 
+  mailhog:
+    image: mailhog/mailhog
+    container_name: corralon-mailhog
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    networks:
+      - corralon-network
+
   app:
     build: .
     container_name: corralon-app
     ports:
       - "8080:8080"
     environment:
-      DB_HOST: mysql          # nombre del servicio mysql en la red interna
+      DB_HOST: mysql
       DB_PORT: 3306
       DB_NAME: ${DB_NAME:-corralon_db}
       DB_USER: ${DB_USER:-user}
       DB_PASSWORD: ${DB_PASSWORD:-password}
+      MAIL_HOST: mailhog
+      MAIL_PORT: 1025
+      MAIL_AUTH: "false"
+      MAIL_STARTTLS: "false"
+      APP_BASE_URL: http://localhost:8080
     depends_on:
       mysql:
         condition: service_healthy
