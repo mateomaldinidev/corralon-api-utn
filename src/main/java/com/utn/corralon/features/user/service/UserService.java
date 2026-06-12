@@ -4,6 +4,7 @@ import com.utn.corralon.exception.EmailAlreadyExistsException;
 import com.utn.corralon.exception.ResourceNotFoundException;
 import com.utn.corralon.features.auth.CredentialsEntity;
 import com.utn.corralon.features.auth.CredentialsRepository;
+import com.utn.corralon.features.auth.JwtService;
 import com.utn.corralon.features.auth.RoleEntity;
 import com.utn.corralon.features.auth.RolesRepository;
 import com.utn.corralon.features.notifications.service.IEmailService;
@@ -30,6 +31,7 @@ public class UserService implements IUserService {
     private final RolesRepository rolesRepository;
     private final PasswordEncoder passwordEncoder;
     private final IEmailService emailService;
+    private final JwtService jwtService;
 
     @Override
     public UserResponseDTO create(UserRequestDTO dto) {
@@ -61,6 +63,9 @@ public class UserService implements IUserService {
                         .usuario(saved)
                         .roles(Set.of(role))
                         .build();
+
+        String refreshToken = jwtService.generateRefreshToken(credentials);
+        credentials.setRefreshToken(refreshToken);
 
         credentialsRepository.save(credentials);
 
