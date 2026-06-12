@@ -22,18 +22,18 @@ public class RoleEntity {
     @Column(nullable = false, unique = true)
     private Roles role;
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
     @JoinTable(
-            name = "rolePermits",
+            name = "role_permits",
             joinColumns = @JoinColumn(name = "role_id"),
-            inverseJoinColumns = @JoinColumn(name = "permitsId"))
-    private Set<PermitEntity> permits = new HashSet<>();
+            inverseJoinColumns = @JoinColumn(name = "permit_id"))
+    private final Set<PermitEntity> permits = new HashSet<>();
 
     public RoleEntity(Roles name) {
         this.role = name;
     }
 
-    public void addPermits(PermitEntity permit) {
+    public void addPermit(PermitEntity permit) {
         this.permits.add(permit);
     }
 }

@@ -24,5 +24,5 @@ public interface IOrderService {
 
     OrderAdminResponseDTO getAdminOrder(UUID externalId);
 
-    void cancelOrder(UUID externalId);
+    void cancelOrder(UUID externalId, UUID userExternalId);
 }

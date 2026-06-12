@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,21 +20,25 @@ public class CategoryController {
 
     private final ICategoryService categoryService;
 
+    @PreAuthorize("hasAuthority('CATEGORY_CREATE')")
     @PostMapping
     public ResponseEntity<CategoryResponseDTO> create(@RequestBody @Valid CategoryRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryService.create(dto));
     }
 
+    @PreAuthorize("hasAuthority('CATEGORY_LIST')")
     @GetMapping
     public ResponseEntity<List<CategoryResponseDTO>> getAll() {
         return ResponseEntity.ok(categoryService.getAll());
     }
 
+    @PreAuthorize("hasAuthority('CATEGORY_READ')")
     @GetMapping("/{externalId}")
     public ResponseEntity<CategoryResponseDTO> getByExternalId(@PathVariable UUID externalId) {
         return ResponseEntity.ok(categoryService.getByExternalId(externalId));
     }
 
+    @PreAuthorize("hasAuthority('CATEGORY_UPDATE')")
     @PutMapping("/{externalId}")
     public ResponseEntity<CategoryResponseDTO> update(
             @PathVariable UUID externalId,
@@ -41,18 +46,21 @@ public class CategoryController {
         return ResponseEntity.ok(categoryService.update(externalId, dto));
     }
 
+    @PreAuthorize("hasAuthority('CATEGORY_DELETE')")
     @DeleteMapping("/{externalId}")
     public ResponseEntity<Void> delete(@PathVariable UUID externalId) {
         categoryService.delete(externalId);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasAuthority('CATEGORY_ACTIVATE')")
     @PatchMapping("/{externalId}/activate")
     public ResponseEntity<Void> activate(@PathVariable UUID externalId) {
         categoryService.activate(externalId);
         return ResponseEntity.noContent().build();
     }
 
+    @PreAuthorize("hasAuthority('CATEGORY_LIST_INACTIVE')")
     @GetMapping("/inactive")
     public ResponseEntity<List<CategoryResponseDTO>> getInactive() {
         return ResponseEntity.ok(categoryService.getInactive());

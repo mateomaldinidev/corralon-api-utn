@@ -6,7 +6,6 @@ import com.utn.corralon.features.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -21,10 +20,8 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> authenticateUser(
             @RequestBody AuthRequest authRequest){
-        UserDetails user = authService.authenticate(authRequest);
-        System.out.println(user);
+        CredentialsEntity user = (CredentialsEntity) authService.authenticate(authRequest);
         String token = jwtService.generateToken(user);
-        System.out.println(token);
         return ResponseEntity.ok(new AuthResponse(token));
     }
 

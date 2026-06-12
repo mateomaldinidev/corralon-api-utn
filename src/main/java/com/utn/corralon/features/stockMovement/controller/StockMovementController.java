@@ -4,6 +4,7 @@ import com.utn.corralon.features.stockMovement.dto.StockMovementResponseDTO;
 import com.utn.corralon.features.stockMovement.service.IStockMovementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,13 +17,13 @@ public class StockMovementController {
 
     private final IStockMovementService stockMovementService;
 
-    // Ver historial de movimientos de una variante.
+    @PreAuthorize("hasAuthority('STOCK_MOVEMENT_LIST_BY_VARIANT')")
     @GetMapping("/variant/{variantId}")
     public ResponseEntity<List<StockMovementResponseDTO>> getMovementsByVariant(@PathVariable UUID variantId) {
         return ResponseEntity.ok(stockMovementService.getMovementsByVariant(variantId));
     }
 
-    // Ver un movimiento de stock por su ID
+    @PreAuthorize("hasAuthority('STOCK_MOVEMENT_READ')")
     @GetMapping("/{externalId}")
     public ResponseEntity<StockMovementResponseDTO> getMovementById(@PathVariable UUID externalId) {
         return ResponseEntity.ok(stockMovementService.getMovementById(externalId));

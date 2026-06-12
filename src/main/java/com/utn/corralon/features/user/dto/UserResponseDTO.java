@@ -3,6 +3,7 @@ package com.utn.corralon.features.user.dto;
 import com.utn.corralon.features.auth.Roles;
 import lombok.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -16,6 +17,6 @@ public class UserResponseDTO {
     private String email;
     private String name;
     private String lastName;
-    private Roles role;
+    private List<Roles> roles;
     private Boolean active;
 }

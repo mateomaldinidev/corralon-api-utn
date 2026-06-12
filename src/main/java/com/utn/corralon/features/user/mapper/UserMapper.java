@@ -1,11 +1,16 @@
 package com.utn.corralon.features.user.mapper;
 
+import com.utn.corralon.features.auth.CredentialsEntity;
+import com.utn.corralon.features.auth.RoleEntity;
+import com.utn.corralon.features.auth.Roles;
 import com.utn.corralon.features.user.dto.UserRequestDTO;
 import com.utn.corralon.features.user.dto.UserResponseDTO;
 import com.utn.corralon.features.user.entity.UserEntity;
 import jakarta.validation.constraints.NotNull;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Component
 public class UserMapper {
@@ -18,6 +23,15 @@ public class UserMapper {
 
     public UserResponseDTO toResponse(UserEntity user) {
         return modelMapper.map(user, UserResponseDTO.class);
+    }
+
+    public UserResponseDTO toResponse(UserEntity user, CredentialsEntity credentials) {
+        UserResponseDTO dto = modelMapper.map(user, UserResponseDTO.class);
+        List<Roles> roles = credentials.getRoles().stream()
+                .map(RoleEntity::getRole)
+                .toList();
+        dto.setRoles(roles);
+        return dto;
     }
 
     public UserEntity toEntity(@NotNull UserRequestDTO dto) {

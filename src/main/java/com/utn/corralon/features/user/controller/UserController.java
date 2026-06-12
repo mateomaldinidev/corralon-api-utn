@@ -7,13 +7,14 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 @RequiredArgsConstructor
 
 public class UserController {
@@ -24,16 +25,19 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(dto));
     }
 
+    @PreAuthorize("hasAuthority('USER_LIST')")
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> getAll() {
         return ResponseEntity.ok(userService.getAll());
     }
 
+    @PreAuthorize("hasAuthority('USER_READ')")
     @GetMapping("/{externalId}")
     public ResponseEntity<UserResponseDTO> getByExternalId(@PathVariable UUID externalId) {
         return ResponseEntity.ok(userService.getByExternalId(externalId));
     }
 
+    @PreAuthorize("hasAuthority('USER_UPDATE')")
     @PutMapping("/{externalId}")
     public ResponseEntity<UserResponseDTO> update(
             @PathVariable UUID externalId,
@@ -41,6 +45,7 @@ public class UserController {
         return ResponseEntity.ok(userService.update(externalId, dto));
     }
 
+    @PreAuthorize("hasAuthority('USER_DELETE')")
     @DeleteMapping("/{externalId}")
     public ResponseEntity<Void> delete(@PathVariable UUID externalId) {
         userService.delete(externalId);
