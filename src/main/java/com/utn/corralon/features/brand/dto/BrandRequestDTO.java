@@ -14,5 +14,4 @@ public class BrandRequestDTO {
     @Size(max = 255, message = "Name must be less than 255 characters")
     private String name;
     private Boolean active;
-
 }

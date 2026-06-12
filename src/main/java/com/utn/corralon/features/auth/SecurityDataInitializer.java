@@ -18,7 +18,7 @@ public class SecurityDataInitializer {
 
         return args -> {
 
-            // crear permisos
+            // Crear permisos
             for (Permits permit : Permits.values()) {
 
                 if (permitRepository.findByPermit(permit).isEmpty()) {
@@ -31,19 +31,18 @@ public class SecurityDataInitializer {
                 }
             }
 
-            if (roleRepository.findByRole(Roles.ROLE_ADMIN).isEmpty()) {
+            // ADMIN
+            RoleEntity admin = roleRepository.findByRole(Roles.ROLE_ADMIN)
+                    .orElseGet(() -> new RoleEntity(Roles.ROLE_ADMIN));
 
-                RoleEntity admin = new RoleEntity(Roles.ROLE_ADMIN);
+            admin.getPermits().clear();
+            admin.getPermits().addAll(
+                    permitRepository.findAll()
+            );
 
-                admin.getPermits().addAll(
-                        permitRepository.findAll()
-                );
+            roleRepository.save(admin);
 
-                roleRepository.save(admin);
-            }
-
-
-
+            // GUEST
             createRoleIfNotExists(
                     Roles.ROLE_GUEST,
                     List.of(
@@ -59,6 +58,8 @@ public class SecurityDataInitializer {
                             Permits.OFFER_LIST
                     )
             );
+
+            // CUSTOMER
             createRoleIfNotExists(
                     Roles.ROLE_CUSTOMER,
                     List.of(
@@ -97,6 +98,8 @@ public class SecurityDataInitializer {
                             Permits.NOTIFICATION_MARK_ALL_AS_READ
                     )
             );
+
+            // EMPLOYEE
             createRoleIfNotExists(
                     Roles.ROLE_EMPLOYEE,
                     List.of(
@@ -144,12 +147,17 @@ public class SecurityDataInitializer {
                     )
             );
 
-            System.out.println(
-                    "Cantidad de permisos: "
-                            + permitRepository.count()
-            );
-            System.out.println("Roles existentes: " + roleRepository.count());
+            System.out.println("Cantidad de permisos: "
+                    + permitRepository.count());
 
+            System.out.println("Roles existentes: "
+                    + roleRepository.count());
+
+            roleRepository.findByRole(Roles.ROLE_ADMIN)
+                    .ifPresent(r -> System.out.println(
+                            "Permisos ADMIN: "
+                                    + r.getPermits().size()
+                    ));
         };
     }
 
@@ -171,4 +179,5 @@ public class SecurityDataInitializer {
 
         roleRepository.save(roleEntity);
     }
+
 }
