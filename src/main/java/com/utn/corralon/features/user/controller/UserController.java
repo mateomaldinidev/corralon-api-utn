@@ -3,6 +3,11 @@ package com.utn.corralon.features.user.controller;
 import com.utn.corralon.features.user.dto.UserRequestDTO;
 import com.utn.corralon.features.user.dto.UserResponseDTO;
 import com.utn.corralon.features.user.service.IUserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -16,39 +21,59 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
-
+@Tag(name = "Users", description = "Endpoints para la gestion de usuarios")
 public class UserController {
     private final IUserService userService;
 
     @PostMapping
     @PreAuthorize("hasAuthority('USER_CREATE')")
+    @Operation(summary = "Crear usuario", description = "Crea un nuevo usuario en el sistema")
+    @ApiResponse(responseCode = "201", description = "Usuario creado exitosamente")
     public ResponseEntity<UserResponseDTO> create(@RequestBody @Valid UserRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.create(dto));
     }
 
     @GetMapping
     @PreAuthorize("hasAuthority('USER_LIST')")
+    @Operation(summary = "Listar usuarios", description = "Retorna todos los usuarios del sistema")
     public ResponseEntity<List<UserResponseDTO>> getAll() {
         return ResponseEntity.ok(userService.getAll());
     }
 
     @GetMapping("/{externalId}")
     @PreAuthorize("hasAuthority('USER_READ')")
-    public ResponseEntity<UserResponseDTO> getByExternalId(@PathVariable UUID externalId) {
+    @Operation(summary = "Obtener usuario por ID", description = "Retorna un usuario por su externalId")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Usuario encontrado"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
+    })
+    public ResponseEntity<UserResponseDTO> getByExternalId(
+            @Parameter(description = "ID externo del usuario") @PathVariable UUID externalId) {
         return ResponseEntity.ok(userService.getByExternalId(externalId));
     }
 
     @PutMapping("/{externalId}")
     @PreAuthorize("hasAuthority('USER_UPDATE')")
+    @Operation(summary = "Actualizar usuario", description = "Actualiza los datos de un usuario existente")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Usuario actualizado"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
+    })
     public ResponseEntity<UserResponseDTO> update(
-            @PathVariable UUID externalId,
+            @Parameter(description = "ID externo del usuario") @PathVariable UUID externalId,
             @RequestBody @Valid UserRequestDTO dto) {
         return ResponseEntity.ok(userService.update(externalId, dto));
     }
 
     @DeleteMapping("/{externalId}")
     @PreAuthorize("hasAuthority('USER_DELETE')")
-    public ResponseEntity<Void> delete(@PathVariable UUID externalId) {
+    @Operation(summary = "Eliminar usuario", description = "Elimina un usuario del sistema")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Usuario eliminado"),
+            @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
+    })
+    public ResponseEntity<Void> delete(
+            @Parameter(description = "ID externo del usuario") @PathVariable UUID externalId) {
         userService.delete(externalId);
         return ResponseEntity.noContent().build();
     }

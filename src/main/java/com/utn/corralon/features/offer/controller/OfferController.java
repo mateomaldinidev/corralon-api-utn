@@ -4,6 +4,11 @@ import com.utn.corralon.features.offer.dto.OfferRequestDTO;
 import com.utn.corralon.features.offer.dto.OfferResponseDTO;
 import com.utn.corralon.features.offer.service.IOfferService;
 import com.utn.corralon.features.offer_product.dto.OfferProductRequestDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,60 +22,87 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/offers")
 @RequiredArgsConstructor
+@Tag(name = "Offers", description = "Endpoints para la gestion de ofertas")
 public class OfferController {
 
     private final IOfferService offerService;
 
     @PostMapping
     @PreAuthorize("hasAuthority('OFFER_CREATE')")
+    @Operation(summary = "Crear oferta", description = "Crea una nueva oferta")
+    @ApiResponse(responseCode = "201", description = "Oferta creada exitosamente")
     public ResponseEntity<OfferResponseDTO> create(@RequestBody @Valid OfferRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(offerService.create(dto));
     }
 
     @PostMapping("/{offerExternalId}/products")
     @PreAuthorize("hasAuthority('OFFER_ADD_PRODUCT')")
+    @Operation(summary = "Agregar producto a oferta", description = "Agrega un producto a una oferta existente")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Producto agregado"),
+            @ApiResponse(responseCode = "404", description = "Oferta no encontrada")
+    })
     public ResponseEntity<OfferResponseDTO> addProduct(
-            @PathVariable UUID offerExternalId,
+            @Parameter(description = "ID externo de la oferta") @PathVariable UUID offerExternalId,
             @RequestBody @Valid OfferProductRequestDTO dto) {
         return ResponseEntity.ok(offerService.addProductToOffer(dto));
     }
 
     @DeleteMapping("/{offerExternalId}/products/{productVariantExternalId}")
     @PreAuthorize("hasAuthority('OFFER_REMOVE_PRODUCT')")
+    @Operation(summary = "Remover producto de oferta", description = "Elimina un producto de una oferta existente")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Producto removido"),
+            @ApiResponse(responseCode = "404", description = "Oferta o producto no encontrado")
+    })
     public ResponseEntity<OfferResponseDTO> removeProduct(
-            @PathVariable UUID offerExternalId,
-            @PathVariable UUID productVariantExternalId) {
+            @Parameter(description = "ID externo de la oferta") @PathVariable UUID offerExternalId,
+            @Parameter(description = "ID externo de la variante de producto") @PathVariable UUID productVariantExternalId) {
         return ResponseEntity.ok(offerService.removeProductFromOffer(offerExternalId, productVariantExternalId));
     }
 
     @GetMapping("/{externalId}")
     @PreAuthorize("hasAuthority('OFFER_READ')")
-    public ResponseEntity<OfferResponseDTO> getByExternalId(@PathVariable UUID externalId) {
+    @Operation(summary = "Obtener oferta por ID", description = "Retorna una oferta por su externalId")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Oferta encontrada"),
+            @ApiResponse(responseCode = "404", description = "Oferta no encontrada")
+    })
+    public ResponseEntity<OfferResponseDTO> getByExternalId(
+            @Parameter(description = "ID externo de la oferta") @PathVariable UUID externalId) {
         return ResponseEntity.ok(offerService.getByExternalId(externalId));
     }
 
     @GetMapping
     @PreAuthorize("hasAuthority('OFFER_LIST')")
+    @Operation(summary = "Listar ofertas activas", description = "Retorna todas las ofertas activas")
     public ResponseEntity<List<OfferResponseDTO>> getAllActive() {
         return ResponseEntity.ok(offerService.getAllActive());
     }
 
     @GetMapping("/inactive")
     @PreAuthorize("hasAuthority('OFFER_LIST_INACTIVE')")
+    @Operation(summary = "Listar ofertas inactivas", description = "Retorna todas las ofertas inactivas")
     public ResponseEntity<List<OfferResponseDTO>> getAllInactive() {
         return ResponseEntity.ok(offerService.getAllInactive());
     }
 
     @PatchMapping("/{externalId}/activate")
     @PreAuthorize("hasAuthority('OFFER_ACTIVATE')")
-    public ResponseEntity<Void> activate(@PathVariable UUID externalId) {
+    @Operation(summary = "Activar oferta", description = "Activa una oferta previamente desactivada")
+    @ApiResponse(responseCode = "204", description = "Oferta activada")
+    public ResponseEntity<Void> activate(
+            @Parameter(description = "ID externo de la oferta") @PathVariable UUID externalId) {
         offerService.activate(externalId);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{externalId}/deactivate")
     @PreAuthorize("hasAuthority('OFFER_DEACTIVATE')")
-    public ResponseEntity<Void> deactivate(@PathVariable UUID externalId) {
+    @Operation(summary = "Desactivar oferta", description = "Desactiva una oferta activa")
+    @ApiResponse(responseCode = "204", description = "Oferta desactivada")
+    public ResponseEntity<Void> deactivate(
+            @Parameter(description = "ID externo de la oferta") @PathVariable UUID externalId) {
         offerService.deactivate(externalId);
         return ResponseEntity.noContent().build();
     }
