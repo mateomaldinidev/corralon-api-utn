@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,21 +20,25 @@ public class AddressController {
 
     private final IAddressService addressService;
 
+    @PreAuthorize("hasAuthority('ADDRESS_CREATE')")
     @PostMapping
     public ResponseEntity<AddressResponseDTO> create(@RequestBody @Valid AddressRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(addressService.create(dto));
     }
 
+    @PreAuthorize("hasAuthority('ADDRESS_LIST')")
     @GetMapping
     public ResponseEntity<List<AddressResponseDTO>> getAll() {
         return ResponseEntity.ok(addressService.getAll());
     }
 
+    @PreAuthorize("hasAuthority('ADDRESS_READ')")
     @GetMapping("/{externalId}")
     public ResponseEntity<AddressResponseDTO> getByExternalId(@PathVariable UUID externalId) {
         return ResponseEntity.ok(addressService.getByExternalId(externalId));
     }
 
+    @PreAuthorize("hasAuthority('ADDRESS_UPDATE')")
     @PutMapping("/{externalId}")
     public ResponseEntity<AddressResponseDTO> update(
             @PathVariable UUID externalId,
@@ -41,13 +46,14 @@ public class AddressController {
         return ResponseEntity.ok(addressService.update(externalId, dto));
     }
 
+    @PreAuthorize("hasAuthority('ADDRESS_DELETE')")
     @DeleteMapping("/{externalId}")
-    public ResponseEntity<Void> delete(@RequestParam UUID externalId, @RequestParam UUID userExternalId) {
+    public ResponseEntity<Void> delete(@PathVariable UUID externalId, @RequestParam UUID userExternalId) {
         addressService.delete(externalId, userExternalId);
         return ResponseEntity.noContent().build();
     }
 
-    // Endpoint para obtener todas las direcciones de un usuario especifico
+    @PreAuthorize("hasAuthority('ADDRESS_LIST_BY_USER')")
     @GetMapping("/user/{userExternalId}")
     public ResponseEntity<List<AddressResponseDTO>> getAllByUserExternalId(@PathVariable UUID userExternalId) {
         return ResponseEntity.ok(addressService.getAllByUserExternalId(userExternalId));

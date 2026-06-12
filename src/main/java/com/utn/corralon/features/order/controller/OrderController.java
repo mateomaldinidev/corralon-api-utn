@@ -7,6 +7,7 @@ import com.utn.corralon.features.order.service.IOrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,7 +20,8 @@ public class OrderController {
 
     private final IOrderService orderService;
 
-    @GetMapping("/admin") //solo para admin porque devuelve informaciòn administrativa
+    @PreAuthorize("hasAuthority('ORDER_READ_ALL')")
+    @GetMapping("/admin")
     public ResponseEntity<List<OrderAdminResponseDTO>> getAll() {
 
         return ResponseEntity
@@ -27,6 +29,7 @@ public class OrderController {
                 .body(orderService.getAll());
     }
 
+    @PreAuthorize("hasAuthority('ORDER_READ')")
     @GetMapping("/{externalId}")
     public ResponseEntity<OrderResponseDTO> getByExternalId(
             @PathVariable UUID externalId) {
@@ -40,16 +43,18 @@ public class OrderController {
 
     @PostMapping("/{externalId}/cancel")
     public ResponseEntity<Void> cancelOrder(
-            @PathVariable UUID externalId
+            @PathVariable UUID externalId,
+            @RequestParam UUID userExternalId
     ) {
 
-        orderService.cancelOrder(externalId);
+        orderService.cancelOrder(externalId, userExternalId);
 
         return ResponseEntity
                 .noContent()
                 .build();
     }
 
+    @PreAuthorize("hasAuthority('ORDER_READ_BY_USER')")
     @GetMapping("/user/{userExternalId}")
     public ResponseEntity<List<OrderSummaryDTO>> getOrdersByUser(
             @PathVariable UUID userExternalId) {
@@ -57,6 +62,7 @@ public class OrderController {
         return ResponseEntity.ok(orderService.getOrdersByUser(userExternalId));
     }
 
+    @PreAuthorize("hasAuthority('ORDER_READ_ALL')")
     @GetMapping("/admin/{externalId}")
     public ResponseEntity<OrderAdminResponseDTO> getAdminOrder(
             @PathVariable UUID externalId) {

@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,25 +20,25 @@ public class SupplierController {
 
     private final ISupplierService supplierService;
 
-    // Crear un nuevo proveedor
+    @PreAuthorize("hasAuthority('SUPPLIER_CREATE')")
     @PostMapping
     public ResponseEntity<SupplierResponseDTO> create(@RequestBody @Valid SupplierRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(supplierService.create(dto));
     }
 
-    // Listar todos los proveedores activos
+    @PreAuthorize("hasAuthority('SUPPLIER_LIST')")
     @GetMapping
     public ResponseEntity<List<SupplierResponseDTO>> getAll() {
         return ResponseEntity.ok(supplierService.getAll());
     }
 
-    // Buscar un proveedor por su ID
+    @PreAuthorize("hasAuthority('SUPPLIER_READ')")
     @GetMapping("/{externalId}")
     public ResponseEntity<SupplierResponseDTO> getByExternalId(@PathVariable UUID externalId) {
         return ResponseEntity.ok(supplierService.getByExternalId(externalId));
     }
 
-    // Actualizar un proveedor existente
+    @PreAuthorize("hasAuthority('SUPPLIER_UPDATE')")
     @PutMapping("/{externalId}")
     public ResponseEntity<SupplierResponseDTO> update(
             @PathVariable UUID externalId,
@@ -45,21 +46,21 @@ public class SupplierController {
         return ResponseEntity.ok(supplierService.update(externalId, dto));
     }
 
-    // Eliminar un proveedor (baja lógica)
+    @PreAuthorize("hasAuthority('SUPPLIER_DELETE')")
     @DeleteMapping("/{externalId}")
     public ResponseEntity<Void> delete(@PathVariable UUID externalId) {
         supplierService.delete(externalId);
         return ResponseEntity.noContent().build();
     }
 
-    // Activar un proveedor inactivo
+    @PreAuthorize("hasAuthority('SUPPLIER_ACTIVATE')")
     @PatchMapping("/{externalId}/activate")
     public ResponseEntity<Void> activate(@PathVariable UUID externalId) {
         supplierService.activate(externalId);
         return ResponseEntity.noContent().build();
     }
 
-    // Listar todos los proveedores inactivos
+    @PreAuthorize("hasAuthority('SUPPLIER_LIST_INACTIVE')")
     @GetMapping("/inactive")
     public ResponseEntity<List<SupplierResponseDTO>> getInactive() {
         return ResponseEntity.ok(supplierService.getInactive());
