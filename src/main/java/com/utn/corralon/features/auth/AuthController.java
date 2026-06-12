@@ -22,7 +22,7 @@ public class AuthController {
             @RequestBody AuthRequest authRequest){
         CredentialsEntity user = (CredentialsEntity) authService.authenticate(authRequest);
         String token = jwtService.generateToken(user);
-        return ResponseEntity.ok(new AuthResponse(token, user.getRefreshToken()));
+        return ResponseEntity.ok(new AuthResponse(token));
     }
 
     @PostMapping("/register")
@@ -30,12 +30,6 @@ public class AuthController {
             @RequestBody UserRequestDTO userRequestDTO){
         return new ResponseEntity<>(userService.create(userRequestDTO),
                 HttpStatus.CREATED);
-    }
-
-    @PostMapping("/refresh")
-    public ResponseEntity<AuthResponse> refreshToken(@RequestBody RefreshTokenRequest request){
-        AuthResponse response = authService.refreshAccessToken(request.refreshToken());
-        return ResponseEntity.ok(response);
     }
 
 }

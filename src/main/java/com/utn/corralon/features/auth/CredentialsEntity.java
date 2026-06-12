@@ -33,7 +33,7 @@ public class CredentialsEntity implements UserDetails {
     @Column(nullable = false, columnDefinition = "boolean default true")
     private Boolean enabled;
 
-    @Column(name = "refresh_token", length = 2048, unique = true, nullable = false)
+    @Column(name = "refresh_token", length = 2048)
     private String refreshToken;
 
     @OneToOne
