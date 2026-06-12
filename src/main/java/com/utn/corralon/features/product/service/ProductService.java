@@ -65,6 +65,7 @@ public class ProductService implements IProductService{
         }
 
         ProductEntity product = productMapper.toEntity(productRequestDTO, supplier, category, brand);
+        product.setActive(true);
 
         productRepository.save(product);
 

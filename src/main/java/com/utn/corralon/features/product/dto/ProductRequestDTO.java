@@ -18,7 +18,6 @@ public class ProductRequestDTO {
     @Size(max = 255, message = "Name must be less than 255 characters")
     private String name;
 
-    @NotBlank(message = "Description is required")
     @Size(max = 255, message = "Description must be less than 255 characters")
     private String description;
 
