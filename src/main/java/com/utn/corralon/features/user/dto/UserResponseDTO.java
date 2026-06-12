@@ -1,14 +1,21 @@
 package com.utn.corralon.features.user.dto;
 
-import com.utn.corralon.features.user.enums.RoleEnum;
+import com.utn.corralon.features.auth.Roles;
+import lombok.*;
 
 import java.util.UUID;
 
-public record UserResponseDTO( // record en vez de class para response
-        UUID externalId,
-        String email,
-        String name,
-        String lastName,
-        RoleEnum role,
-        Boolean active
-) { }
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class UserResponseDTO {
+
+    private UUID externalId;
+    private String email;
+    private String name;
+    private String lastName;
+    private Roles role;
+    private Boolean active;
+}
